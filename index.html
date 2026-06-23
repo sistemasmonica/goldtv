@@ -1,0 +1,1066 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLD TV — Panel de Gestión</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0b1f;--surface:#13112a;--surface2:#1a1735;
+  --gold:#f5c518;--gold2:#ffd700;
+  --nb:#4a6cf7;--np:#c026d3;
+  --green:#22c55e;--green2:#052e16;
+  --red:#ef4444;--red2:#300a0a;
+  --text:#ffffff;--muted:#8888aa;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
+.w{max-width:1100px;margin:0 auto;padding:16px}
+
+/* ── utilidad: borde degradado ── */
+.gb{position:relative;border-radius:12px}
+.gb::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:linear-gradient(135deg,var(--nb),var(--np));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+
+/* HEADER */
+.hdr{background:var(--surface);border-radius:14px;padding:16px 22px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:relative}
+.hdr::before{content:'';position:absolute;inset:0;border-radius:14px;padding:1.5px;background:linear-gradient(135deg,var(--nb),var(--np));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.hdr-logo{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.hdr-logo .tv{font-size:32px;filter:drop-shadow(0 0 10px rgba(245,197,24,.8))}
+.hdr-title{font-size:22px;font-weight:900;background:linear-gradient(90deg,#d4a017,var(--gold),#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.hdr-pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:relative;z-index:1}
+.pill{background:transparent;border:1px solid var(--gold);border-radius:20px;padding:4px 14px;font-size:11px;color:var(--gold);font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.pill:hover{background:rgba(245,197,24,.1)}
+
+/* NAV */
+.nav{display:flex;gap:4px;background:var(--surface);border-radius:10px;padding:5px;margin-bottom:16px;overflow-x:auto;position:relative}
+.nav::before{content:'';position:absolute;inset:0;border-radius:10px;padding:1.5px;background:linear-gradient(135deg,var(--nb),var(--np));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.nt{flex:1;min-width:90px;padding:9px 12px;text-align:center;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;border:none;background:transparent;color:var(--muted);white-space:nowrap;transition:all .2s;font-family:inherit;position:relative;z-index:1}
+.nt.on{background:linear-gradient(135deg,var(--np),#9333ea);color:#fff;font-weight:700;box-shadow:0 0 18px rgba(192,38,211,.5)}
+.nt:hover:not(.on){background:rgba(255,255,255,.07);color:#ddd}
+.pn{display:none}.pn.on{display:block}
+
+/* TARJETAS STAT */
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.sc{background:var(--surface);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;inset:0;border-radius:12px;padding:1.5px;background:linear-gradient(135deg,var(--nb),var(--np));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.sc-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;position:relative;z-index:1}
+.sc-val{font-size:26px;font-weight:700;color:var(--gold);position:relative;z-index:1}
+.sc-sub{font-size:10px;color:var(--muted);margin-top:4px;position:relative;z-index:1}
+
+/* TARJETAS GENERALES */
+.card{background:var(--surface);border-radius:12px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;border-radius:12px;padding:1.5px;background:linear-gradient(135deg,var(--nb),var(--np));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.card-inner{position:relative;z-index:1}
+.card-t{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;color:var(--gold)}
+
+/* TABLA */
+.tbl-wrap{background:var(--surface);border-radius:12px;overflow:auto;margin-bottom:14px;position:relative}
+.tbl-wrap::before{content:'';position:absolute;inset:0;border-radius:12px;padding:1.5px;background:linear-gradient(135deg,var(--nb),var(--np));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:1}
+table{width:100%;border-collapse:collapse;font-size:12px;position:relative;z-index:2}
+th{background:var(--surface2);padding:9px 12px;text-align:left;font-weight:700;font-size:10px;color:#9090cc;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(100,100,200,.25);white-space:nowrap}
+td{padding:8px 12px;border-top:1px solid rgba(100,100,200,.15);vertical-align:middle}
+tr:hover td{background:rgba(74,108,247,.1)}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+input[type=text],input[type=number],input[type=date],input[type=search],input[type=tel],select,textarea{width:100%;padding:9px 12px;border:1px solid rgba(74,108,247,.4);border-radius:8px;font-size:12px;color:var(--text);background:var(--surface2);font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--np);box-shadow:0 0 0 2px rgba(192,38,211,.3)}
+select option{background:#1a1735}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.f4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+
+/* BOTONES */
+.btn{padding:9px 16px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn-gold{background:linear-gradient(135deg,#b8860b,var(--gold));color:#000;box-shadow:0 0 16px rgba(245,197,24,.35)}
+.btn-gold:hover{background:linear-gradient(135deg,var(--gold),#ffed4a);box-shadow:0 0 24px rgba(245,197,24,.55)}
+.btn-s{background:var(--surface2);border:1px solid rgba(74,108,247,.4);color:var(--text)}
+.btn-s:hover{background:#221f45;border-color:rgba(74,108,247,.7)}
+.btn-d{background:var(--red2);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-g{background:var(--green2);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.btn-wa{background:#128c7e;color:#fff}
+.btn-wa:hover{background:#25d366}
+.btn-b{background:#1a1735;color:#7c8fff;border:1px solid rgba(74,108,247,.4)}
+.btn-sm{padding:4px 9px;font-size:11px;border-radius:6px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* BADGES */
+.bdg{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700}
+.bdg-activo{background:#052e16;color:#22c55e;border:1px solid rgba(34,197,94,.3)}
+.bdg-vence{background:#2d1e00;color:#f97316;border:1px solid rgba(249,115,22,.3)}
+.bdg-vencido{background:var(--red2);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+/* DISPOSITIVOS */
+.dev-icon{font-size:16px}
+
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.sh h2{font-size:14px;font-weight:700;color:var(--text)}
+.filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filters select,.filters input{width:auto;min-width:120px}
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:12px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(7,6,28,.85);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.modal-overlay.on{display:flex}
+.modal{background:linear-gradient(135deg,#252260,#302c80);border:2px solid rgba(140,120,255,.7);border-radius:14px;padding:20px;width:min(620px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 50px rgba(100,116,255,.4),0 0 80px rgba(224,64,251,.3)}
+.modal-t{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;color:var(--gold);text-shadow:0 0 12px rgba(245,197,24,.7)}
+
+/* ALERTA VENCIMIENTOS */
+.alerta-vence{background:linear-gradient(135deg,#2d1e00,#1a1200);border:1px solid var(--orange);border-radius:10px;padding:12px 16px;margin-bottom:14px}
+
+/* WA MESSAGE */
+.wa-msg{background:#0e0c28;border:1px solid rgba(100,116,255,.5);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;white-space:pre-wrap;font-family:monospace;color:#d1fae5;margin-bottom:10px;max-height:200px;overflow-y:auto;box-shadow:inset 0 0 20px rgba(100,116,255,.05)}
+
+@media(max-width:640px){
+  .sc-grid{grid-template-columns:repeat(2,1fr)!important}
+  .f2,.f3,.f4{grid-template-columns:1fr!important}
+  .nav{flex-wrap:nowrap;overflow-x:auto}
+  .nt{flex:0 0 auto;min-width:80px}
+}
+</style>
+</head>
+<body>
+<div class="w">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="tv">📺</div>
+    <div>
+      <div class="hdr-title">GOLD TV</div>
+      <div class="hdr-sub">Panel de gestión de clientes</div>
+    </div>
+  </div>
+  <div class="hdr-pills">
+    <button class="pill" id="pill-total">👤 0 clientes</button>
+    <button class="pill" id="pill-sync">✓ Conectando...</button>
+    <button class="pill" onclick="abrirSincronizar()" style="border-color:#c026d3;color:#e879f9">🔄 Sincronizar panel</button>
+    <button class="pill" onclick="backupGold()">📤 Backup</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nt on" onclick="tab('dash',this)">📊 Inicio</button>
+  <button class="nt" onclick="tab('clientes',this)">👥 Clientes</button>
+  <button class="nt" onclick="tab('nuevo',this)">➕ Nuevo cliente</button>
+  <button class="nt" onclick="tab('vencimientos',this)">⏰ Vencimientos</button>
+  <button class="nt" onclick="tab('guias',this)">📖 Guías instalación</button>
+</div>
+
+<!-- ===== INICIO ===== -->
+<div id="pn-dash" class="pn on">
+  <div class="sc-grid">
+    <div class="sc"><div class="sc-lbl">Total clientes</div><div class="sc-val" style="color:var(--gold)" id="d-total">0</div><div class="sc-sub">registrados</div></div>
+    <div class="sc"><div class="sc-lbl">Activos</div><div class="sc-val" style="color:var(--green)" id="d-activos">0</div><div class="sc-sub">en servicio</div></div>
+    <div class="sc"><div class="sc-lbl">Vencen pronto</div><div class="sc-val" style="color:var(--orange)" id="d-pronto">0</div><div class="sc-sub">en los próximos 7 días</div></div>
+    <div class="sc"><div class="sc-lbl">Vencidos</div><div class="sc-val" style="color:var(--red)" id="d-vencidos">0</div><div class="sc-sub">requieren renovación</div></div>
+  </div>
+  <div class="card" style="margin-top:2px">
+    <div class="card-inner" style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="sc-lbl">Cobros del mes</div>
+        <div class="sc-val" style="font-size:28px;color:var(--gold)" id="d-mes">$0.00</div>
+        <div class="sc-sub" id="d-mes-sub">clientes que vencen este mes</div>
+      </div>
+      <div style="font-size:48px;opacity:.35;line-height:1">💰</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-inner">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="card-t">⏰ Próximos a vencer (7 días)</div>
+        <div style="font-size:36px;opacity:.3;line-height:1">📅</div>
+      </div>
+      <div id="d-proximos"><div class="empty">Sin vencimientos próximos</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-inner">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="card-t">🔴 Clientes vencidos</div>
+        <div style="font-size:36px;opacity:.3;line-height:1">👤</div>
+      </div>
+      <div id="d-vencidos-lista"><div class="empty">Sin clientes vencidos</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CLIENTES ===== -->
+<div id="pn-clientes" class="pn">
+  <div class="sh">
+    <h2>Todos los clientes</h2>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-gold btn-sm" onclick="tab('nuevo',document.querySelectorAll('.nav>.nt')[2])">➕ Nuevo cliente</button>
+      <button class="btn btn-s btn-sm" onclick="exportarCSV()">⬇️ Exportar</button>
+    </div>
+  </div>
+  <div class="filters">
+    <input type="search" id="cli-q" placeholder="Buscar nombre, usuario, teléfono..." oninput="renderClientes()" style="min-width:200px">
+    <select id="cli-estado" onchange="renderClientes()">
+      <option value="">Todos los estados</option>
+      <option value="activo">Activos</option>
+      <option value="vence">Vence pronto</option>
+      <option value="vencido">Vencidos</option>
+    </select>
+    <select id="cli-disp" onchange="renderClientes()">
+      <option value="">Todos los dispositivos</option>
+      <option value="android-tv">Android TV</option>
+      <option value="celular">Celular Android</option>
+      <option value="smart-tv">Smart TV</option>
+      <option value="iphone">iPhone/iPad</option>
+      <option value="tv-box">TV Box</option>
+      <option value="fire-tv">Fire TV</option>
+      <option value="pc">PC</option>
+    </select>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Cliente</th><th>Teléfono</th><th>Usuario</th><th>Dispositivo</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
+      <tbody id="tb-clientes"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== NUEVO CLIENTE ===== -->
+<div id="pn-nuevo" class="pn">
+  <div class="card">
+    <div class="card-inner">
+    <div class="card-t">➕ <span id="form-titulo">Registrar nuevo cliente</span></div>
+    <div class="f2">
+      <div class="fg"><label>Nombre del cliente</label><input type="text" id="cli-nombre" placeholder="Ej: María García"></div>
+      <div class="fg"><label>Teléfono WhatsApp</label><input type="tel" id="cli-tel" placeholder="Ej: 0987654321"></div>
+    </div>
+    <div class="f2">
+      <div class="fg"><label>Usuario (del panel OTT)</label><input type="text" id="cli-user" placeholder="usuario123"></div>
+      <div class="fg"><label>Contraseña (del panel OTT)</label><input type="text" id="cli-pass" placeholder="contraseña123"></div>
+    </div>
+    <div class="f3">
+      <div class="fg"><label>Dispositivo</label>
+        <select id="cli-device">
+          <option value="android-tv">📺 Android TV</option>
+          <option value="celular">📱 Celular Android</option>
+          <option value="smart-tv">🖥️ Smart TV (LG/Samsung)</option>
+          <option value="iphone">🍎 iPhone / iPad</option>
+          <option value="tv-box">📦 TV Box</option>
+          <option value="fire-tv">🔥 Fire TV</option>
+          <option value="pc">💻 PC</option>
+        </select>
+      </div>
+      <div class="fg"><label>Plan (meses)</label>
+        <select id="cli-plan">
+          <option value="1">1 mes</option>
+          <option value="3">3 meses</option>
+          <option value="6">6 meses</option>
+          <option value="12">12 meses</option>
+        </select>
+      </div>
+      <div class="fg"><label>Precio cobrado ($)</label><input type="number" id="cli-precio" step="0.01" min="0" placeholder="0.00"></div>
+    </div>
+    <div class="f2">
+      <div class="fg"><label>Fecha de inicio</label><input type="date" id="cli-inicio"></div>
+      <div class="fg"><label>Fecha vencimiento (calculada)</label><input type="text" id="cli-vence-preview" readonly style="background:var(--surface2);color:var(--gold);font-weight:700"></div>
+    </div>
+    <div class="fg"><label>Notas</label><input type="text" id="cli-notas" placeholder="Observaciones opcionales..."></div>
+    <input type="hidden" id="cli-edit-id" value="">
+    <div class="btn-row">
+      <button class="btn btn-gold" id="btn-guardar-cli" onclick="guardarCliente()">✅ Guardar cliente</button>
+      <button class="btn btn-s" onclick="limpiarFormCliente()">✕ Limpiar</button>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VENCIMIENTOS ===== -->
+<div id="pn-vencimientos" class="pn">
+  <div class="sh"><h2>Control de vencimientos</h2></div>
+  <div class="sc-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sc"><div class="sc-lbl">Vencen esta semana</div><div class="sc-val" style="color:var(--orange)" id="v-semana">0</div></div>
+    <div class="sc"><div class="sc-lbl">Vencen este mes</div><div class="sc-val" style="color:var(--gold)" id="v-mes">0</div></div>
+    <div class="sc"><div class="sc-lbl">Ya vencidos</div><div class="sc-val" style="color:var(--red)" id="v-vencidos">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-t" style="color:var(--orange)">⏰ Vencen en los próximos 30 días</div>
+    <div id="v-lista-proximos"><div class="empty">Sin vencimientos próximos</div></div>
+  </div>
+  <div class="card">
+    <div class="card-t" style="color:var(--red)">🔴 Clientes vencidos</div>
+    <div id="v-lista-vencidos"><div class="empty">Sin clientes vencidos</div></div>
+  </div>
+</div>
+
+<!-- ===== GUÍAS DE INSTALACIÓN ===== -->
+<div id="pn-guias" class="pn">
+  <div class="card" style="border-color:rgba(245,197,24,.3)">
+    <div class="card-t">📖 Guías de instalación por dispositivo</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Selecciona un cliente y el dispositivo para generar el mensaje de instalación listo para WhatsApp.</p>
+    <div class="f2">
+      <div class="fg"><label>Cliente</label><select id="guia-cliente"><option value="">— Seleccionar cliente —</option></select></div>
+      <div class="fg"><label>Dispositivo</label>
+        <select id="guia-device">
+          <option value="android-tv">📺 Android TV</option>
+          <option value="celular">📱 Celular Android</option>
+          <option value="smart-tv">🖥️ Smart TV (LG/Samsung)</option>
+          <option value="iphone">🍎 iPhone / iPad</option>
+          <option value="tv-box">📦 TV Box</option>
+          <option value="fire-tv">🔥 Fire TV</option>
+          <option value="pc">💻 PC</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-gold" onclick="generarGuia()">📋 Generar guía</button>
+  </div>
+  <div id="guia-resultado" style="display:none">
+    <div class="card">
+      <div class="card-t">💬 Mensaje generado — Cópialo y envíalo por WhatsApp</div>
+      <div class="wa-msg" id="guia-msg"></div>
+      <div class="btn-row">
+        <button class="btn btn-wa" onclick="enviarWA('guia')">📲 Abrir en WhatsApp</button>
+        <button class="btn btn-s" onclick="copiarMensaje('guia-msg')">📋 Copiar texto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guías estáticas por dispositivo -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+
+    <div class="card" style="border-color:rgba(91,108,240,.4);box-shadow:0 0 15px rgba(91,108,240,.08)">
+      <div class="card-t" style="color:#a0a8ff">📺 Android TV</div>
+      <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
+        <li>Descarga <b style="color:var(--text)">Downloader</b> desde Play Store</li>
+        <li>Abre Downloader e ingresa el código: <b style="color:var(--gold);font-size:14px">1566382</b></li>
+        <li>Descarga e instala la app GOLD TV</li>
+        <li>Ingresa tu usuario y contraseña</li>
+        <li>¡Listo! Ya tienes todos los canales</li>
+      </ol>
+    </div>
+
+    <div class="card" style="border-color:rgba(217,70,239,.4);box-shadow:0 0 15px rgba(217,70,239,.08)">
+      <div class="card-t" style="color:#e879f9">📱 Celular Android</div>
+      <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
+        <li>Abre Chrome en tu celular</li>
+        <li>Escribe este link: <b style="color:var(--gold)">http://aftv.news/1566382</b></li>
+        <li>Descarga e instala la app</li>
+        <li>Ingresa tu usuario y contraseña</li>
+        <li>¡Listo!</li>
+      </ol>
+    </div>
+
+    <div class="card" style="border-color:rgba(245,197,24,.4);box-shadow:0 0 15px rgba(245,197,24,.06)">
+      <div class="card-t" style="color:var(--gold)">🖥️ Smart TV LG / Samsung</div>
+      <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
+        <li>Busca e instala <b style="color:var(--text)">IPTV Master LITE</b> (gratis) en la tienda de apps</li>
+        <li>Abre la app y selecciona <b style="color:var(--text)">"Agregar lista M3U"</b></li>
+        <li>Pega el link M3U que te enviamos</li>
+        <li>Espera que cargue y ¡listo!</li>
+      </ol>
+    </div>
+
+    <div class="card" style="border-color:rgba(91,108,240,.5);box-shadow:0 0 15px rgba(91,108,240,.1)">
+      <div class="card-t" style="color:#a0a8ff">🍎 iPhone / iPad</div>
+      <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
+        <li>Busca e instala <b style="color:var(--text)">IPTV Master LITE</b> en App Store (gratis)</li>
+        <li>Abre la app y selecciona <b style="color:var(--text)">"Agregar lista M3U"</b></li>
+        <li>Pega el link M3U que te enviamos</li>
+        <li>Espera que cargue y ¡listo!</li>
+      </ol>
+    </div>
+
+    <div class="card" style="border-color:rgba(217,70,239,.3);box-shadow:0 0 15px rgba(217,70,239,.06)">
+      <div class="card-t" style="color:#e879f9">📦 TV Box</div>
+      <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
+        <li>Abre <b style="color:var(--text)">Chrome</b> en tu TV Box</li>
+        <li>Escribe o pega este link: <b style="color:var(--gold)">http://aftv.news/1566382</b></li>
+        <li>Descarga e instala la app</li>
+        <li>Ingresa tu usuario y contraseña</li>
+        <li>¡Listo!</li>
+      </ol>
+    </div>
+
+    <div class="card" style="border-color:rgba(91,108,240,.4);box-shadow:0 0 15px rgba(91,108,240,.08)">
+      <div class="card-t" style="color:#a0a8ff">🔥 Fire TV</div>
+      <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
+        <li>Descarga <b style="color:var(--text)">Downloader</b> desde Amazon App Store</li>
+        <li>Abre Downloader e ingresa el código: <b style="color:var(--gold);font-size:14px">1566382</b></li>
+        <li>Descarga e instala la app GOLD TV</li>
+        <li>Ingresa tu usuario y contraseña</li>
+        <li>¡Listo!</li>
+      </ol>
+    </div>
+
+    <div class="card" style="border-color:rgba(245,197,24,.3);grid-column:1/-1;box-shadow:0 0 15px rgba(245,197,24,.06)">
+      <div class="card-t" style="color:var(--gold)">💻 PC / Computadora</div>
+      <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
+        <li>Abre Chrome o cualquier navegador</li>
+        <li>Entra a <b style="color:var(--text)">plex.tv</b> o usa el link M3U con <b style="color:var(--text)">VLC Media Player</b></li>
+        <li>En VLC: Menú → Medio → Abrir ubicación de red → pega el link M3U</li>
+        <li>¡Listo para ver tus canales!</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+</div><!-- /w -->
+
+<!-- MODAL SINCRONIZAR -->
+<div class="modal-overlay" id="modal-sync">
+  <div class="modal" style="width:min(750px,95vw)">
+    <div class="modal-t">
+      <span>🔄 Sincronizar desde Panel GOLD TV</span>
+      <button class="btn btn-s btn-sm" onclick="cerrarModal('modal-sync')">✕</button>
+    </div>
+    <div id="sync-estado" style="background:#0d0b1f;border:1px solid rgba(74,108,247,.4);border-radius:8px;padding:14px;margin-bottom:12px;font-size:12px;color:var(--muted)">
+      Haz clic en <b style="color:var(--gold)">"📂 Seleccionar archivo JSON"</b> y elige el archivo <b style="color:#fff">users_backup_...</b> que descargaste de tu panel.
+    </div>
+    <div id="sync-lista" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <span id="sync-count" style="font-size:12px;color:var(--gold);font-weight:700"></span>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" style="background:rgba(74,108,247,.2);border:1px solid rgba(74,108,247,.5);color:#7c8fff" onclick="syncSelAll(true)">Seleccionar todos</button>
+          <button class="btn btn-sm btn-s" onclick="syncSelAll(false)">Deseleccionar</button>
+        </div>
+      </div>
+      <div style="max-height:320px;overflow-y:auto;border:1px solid rgba(74,108,247,.3);border-radius:8px">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="background:var(--surface2)">
+            <th style="padding:7px 10px;text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(74,108,247,.3)"><input type="checkbox" id="chk-all" onchange="syncSelAll(this.checked)"></th>
+            <th style="padding:7px 10px;text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(74,108,247,.3)">Usuario</th>
+            <th style="padding:7px 10px;text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(74,108,247,.3)">Contraseña</th>
+            <th style="padding:7px 10px;text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(74,108,247,.3)">Vencimiento</th>
+            <th style="padding:7px 10px;text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(74,108,247,.3)">Estado</th>
+            <th style="padding:7px 10px;text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(74,108,247,.3)">Ya existe</th>
+          </tr></thead>
+          <tbody id="tb-sync"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-gold" onclick="triggerFileImport()" style="font-size:13px;padding:10px 20px">📂 Seleccionar archivo JSON</button>
+      <button class="btn" id="btn-importar" onclick="importarSeleccionados()" style="display:none;background:linear-gradient(135deg,#7c3aed,#c026d3);color:#fff">⬇️ Importar todos</button>
+      <button class="btn btn-s" onclick="cerrarModal('modal-sync')">✕ Cerrar</button>
+    </div>
+    <input type="file" id="file-import-input" accept=".json,.csv,.txt" style="display:none" onchange="importarArchivo(this)">
+  </div>
+</div>
+
+<!-- MODAL EDITAR / VER -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-t">
+      <span id="modal-cli-titulo">Detalle del cliente</span>
+      <button class="btn btn-s btn-sm" onclick="cerrarModal('modal-cliente')">✕</button>
+    </div>
+    <div id="modal-cli-body"></div>
+  </div>
+</div>
+
+<!-- MODAL RENOVAR -->
+<div class="modal-overlay" id="modal-renovar">
+  <div class="modal">
+    <div class="modal-t">
+      <span>🔄 Renovar suscripción</span>
+      <button class="btn btn-s btn-sm" onclick="cerrarModal('modal-renovar')">✕</button>
+    </div>
+    <div id="modal-ren-info" style="background:var(--surface2);border-radius:6px;padding:10px;margin-bottom:12px;font-size:12px"></div>
+    <div class="f2">
+      <div class="fg"><label>Nuevo plan (meses)</label>
+        <select id="ren-plan">
+          <option value="1">1 mes</option>
+          <option value="3">3 meses</option>
+          <option value="6">6 meses</option>
+          <option value="12">12 meses</option>
+        </select>
+      </div>
+      <div class="fg"><label>Precio cobrado ($)</label><input type="number" id="ren-precio" step="0.01" min="0" placeholder="0.00"></div>
+    </div>
+    <input type="hidden" id="ren-cli-id">
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="guardarRenovacion()">✅ Confirmar renovación</button>
+      <button class="btn btn-s" onclick="cerrarModal('modal-renovar')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SUPABASE =====
+const SUPA_URL='https://pqluiqsvfeddmxpuxyhm.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxbHVpcXN2ZmVkZG14cHV4eWhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTI4MDYsImV4cCI6MjA5NjA4ODgwNn0.cdWKlECRLxms1y8a3sSHr1i5rsif9B94mDrvigHNm2A';
+const sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+
+const M3U_BASE='http://mundo2.pro:80/get.php?username=USER&password=PASS&type=m3u_plus&output=hls';
+const DOWNLOADER_CODE='1566382';
+const DOWNLOADER_LINK='http://aftv.news/1566382';
+
+let DB={clientes:[]};
+let syncOk=false;
+
+function setSyncStatus(s){
+  const el=document.getElementById('pill-sync');if(!el)return;
+  if(s==='ok'){el.textContent='☁️ Guardado';}
+  else if(s==='sync'){el.textContent='🔄 Guardando...';}
+  else if(s==='load'){el.textContent='⬇️ Cargando...';}
+  else{el.textContent='⚠️ Sin conexión';}
+}
+
+async function saveToCloud(){
+  try{
+    setSyncStatus('sync');
+    await sb.from('goldtv_clientes').upsert({version:'v1',data:DB.clientes,updated_at:new Date().toISOString()});
+    setSyncStatus('ok');
+  }catch(e){setSyncStatus('err');console.warn('Cloud error:',e);}
+}
+
+async function syncFromCloud(){
+  try{
+    setSyncStatus('load');
+    const{data,error}=await sb.from('goldtv_clientes').select('data').eq('version','v1').maybeSingle();
+    if(!error&&data?.data?.length>0)DB.clientes=data.data;
+    syncOk=true;
+    setSyncStatus('ok');
+  }catch(e){setSyncStatus('err');}
+  localStorage.setItem('goldtv',JSON.stringify(DB));
+  renderAll();
+}
+
+function save(){
+  try{localStorage.setItem('goldtv',JSON.stringify(DB));}catch(e){}
+  saveToCloud();
+}
+
+function load(){
+  try{
+    const d=localStorage.getItem('goldtv');
+    if(d){const p=JSON.parse(d);if(p.clientes?.length>0)DB.clientes=p.clientes;}
+  }catch(e){}
+}
+
+function uid(){return Date.now()+'_'+Math.random().toString(36).substr(2,6)}
+function today(){return new Date().toISOString().split('T')[0]}
+function fmt(n){return'$'+(parseFloat(n)||0).toFixed(2)}
+function escH(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function cerrarModal(id){document.getElementById(id).classList.remove('on')}
+function abrirModal(id){document.getElementById(id).classList.add('on')}
+
+function addMeses(fecha,meses){
+  const d=new Date(fecha+'T12:00:00');
+  d.setMonth(d.getMonth()+parseInt(meses));
+  return d.toISOString().split('T')[0];
+}
+
+function diasHasta(fecha){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const f=new Date(fecha+'T12:00:00');
+  return Math.round((f-hoy)/(1000*60*60*24));
+}
+
+function estadoCliente(c){
+  const d=diasHasta(c.vencimiento);
+  if(d<0)return'vencido';
+  if(d<=7)return'vence';
+  return'activo';
+}
+
+const DISP_LABEL={'android-tv':'📺 Android TV','celular':'📱 Celular Android','smart-tv':'🖥️ Smart TV','iphone':'🍎 iPhone/iPad','tv-box':'📦 TV Box','fire-tv':'🔥 Fire TV','pc':'💻 PC'};
+
+// ===== NAVEGACIÓN =====
+function tab(id,el){
+  document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav>.nt').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pn-'+id).classList.add('on');
+  el.classList.add('on');
+  if(id==='dash')renderDash();
+  if(id==='clientes')renderClientes();
+  if(id==='nuevo'){limpiarFormCliente();const fi=document.getElementById('cli-inicio');if(fi&&!fi.value)fi.value=today();calcVence();}
+  if(id==='vencimientos')renderVencimientos();
+  if(id==='guias')llenarSelectClientes();
+}
+
+// ===== FORMULARIO NUEVO CLIENTE =====
+document.addEventListener('DOMContentLoaded',()=>{
+  const ini=document.getElementById('cli-inicio');
+  const plan=document.getElementById('cli-plan');
+  if(ini)ini.addEventListener('change',calcVence);
+  if(plan)plan.addEventListener('change',calcVence);
+  ini.value=today();
+  calcVence();
+  load();
+  syncFromCloud();
+});
+
+function calcVence(){
+  const ini=document.getElementById('cli-inicio').value;
+  const plan=document.getElementById('cli-plan').value;
+  const prev=document.getElementById('cli-vence-preview');
+  if(ini&&plan){prev.value=addMeses(ini,plan);}
+  else{prev.value='';}
+}
+
+function guardarCliente(){
+  const nombre=(document.getElementById('cli-nombre').value||'').trim();
+  const tel=(document.getElementById('cli-tel').value||'').trim();
+  const user=(document.getElementById('cli-user').value||'').trim();
+  const pass=(document.getElementById('cli-pass').value||'').trim();
+  const device=document.getElementById('cli-device').value;
+  const plan=document.getElementById('cli-plan').value;
+  const precio=parseFloat(document.getElementById('cli-precio').value)||0;
+  const inicio=document.getElementById('cli-inicio').value||today();
+  const notas=(document.getElementById('cli-notas').value||'').trim();
+  const editId=document.getElementById('cli-edit-id').value||'';
+  if(!nombre)return alert('Ingresa el nombre del cliente');
+  if(!user||!pass)return alert('Ingresa el usuario y contraseña del panel OTT');
+  const vencimiento=addMeses(inicio,plan);
+  if(editId){
+    const idx=DB.clientes.findIndex(c=>c.id===editId);
+    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,precio,inicio,vencimiento,notas};
+    document.getElementById('cli-edit-id').value='';
+    document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
+    document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
+  }else{
+    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,precio,inicio,vencimiento,notas,activo:true});
+  }
+  save();limpiarFormCliente();renderAll();
+  tab('clientes',document.querySelectorAll('.nav>.nt')[1]);
+  setTimeout(()=>alert('✅ Cliente guardado correctamente'),100);
+}
+
+function limpiarFormCliente(){
+  ['cli-nombre','cli-tel','cli-user','cli-pass','cli-precio','cli-notas'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('cli-device').value='android-tv';
+  document.getElementById('cli-plan').value='1';
+  document.getElementById('cli-inicio').value=today();
+  document.getElementById('cli-edit-id').value='';
+  document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
+  document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
+  calcVence();
+}
+
+function editarCliente(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  document.getElementById('cli-nombre').value=c.nombre||'';
+  document.getElementById('cli-tel').value=c.tel||'';
+  document.getElementById('cli-user').value=c.user||'';
+  document.getElementById('cli-pass').value=c.pass||'';
+  document.getElementById('cli-device').value=c.device||'android-tv';
+  document.getElementById('cli-plan').value=c.plan||'1';
+  document.getElementById('cli-precio').value=c.precio||'';
+  document.getElementById('cli-inicio').value=c.inicio||today();
+  document.getElementById('cli-notas').value=c.notas||'';
+  document.getElementById('cli-edit-id').value=id;
+  document.getElementById('form-titulo').textContent='Editar: '+c.nombre;
+  document.getElementById('btn-guardar-cli').textContent='💾 Guardar cambios';
+  calcVence();
+  tab('nuevo',document.querySelectorAll('.nav>.nt')[2]);
+}
+
+function eliminarCliente(id){
+  const c=DB.clientes.find(x=>x.id===id);
+  if(!c||!confirm('¿Eliminar al cliente "'+c.nombre+'"?'))return;
+  DB.clientes=DB.clientes.filter(x=>x.id!==id);
+  save();renderAll();
+}
+
+// ===== RENOVAR =====
+function abrirRenovar(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  document.getElementById('modal-ren-info').innerHTML=
+    `<b>${escH(c.nombre)}</b> — Vence: <b style="color:var(--red)">${c.vencimiento}</b> | Precio anterior: <b>${fmt(c.precio)}</b>`;
+  document.getElementById('ren-cli-id').value=id;
+  document.getElementById('ren-plan').value='1';
+  document.getElementById('ren-precio').value=c.precio||'';
+  abrirModal('modal-renovar');
+}
+
+function guardarRenovacion(){
+  const id=document.getElementById('ren-cli-id').value;
+  const plan=document.getElementById('ren-plan').value;
+  const precio=parseFloat(document.getElementById('ren-precio').value)||0;
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const baseDate=diasHasta(c.vencimiento)<0?today():c.vencimiento;
+  c.vencimiento=addMeses(baseDate,plan);
+  c.plan=plan;c.precio=precio;
+  save();cerrarModal('modal-renovar');renderAll();
+  alert('✅ Suscripción renovada hasta: '+c.vencimiento);
+}
+
+// ===== WHATSAPP =====
+function msgCredenciales(c){
+  return`Hola ${c.nombre}! 👋\n\nAquí están tus datos de acceso *GOLD TV* 📺\n\n👤 *Usuario:* ${c.user}\n🔑 *Contraseña:* ${c.pass}\n📅 *Válido hasta:* ${c.vencimiento}\n\nCualquier consulta estoy a tu disposición 😊`;
+}
+
+function m3uLink(c){
+  return M3U_BASE.replace('USER',c.user).replace('PASS',c.pass);
+}
+
+function msgInstalacion(c,device){
+  const dev=device||c.device;
+  const user=c.user,pass=c.pass,nombre=c.nombre;
+  const cred=`\n👤 *Usuario:* ${user}\n🔑 *Contraseña:* ${pass}`;
+  if(dev==='android-tv')return`Hola ${nombre}! 📺\n\n*Instalación GOLD TV en Android TV:*\n\n1️⃣ Descarga *Downloader* desde Play Store\n2️⃣ Abre Downloader e ingresa el código:\n    📌 *${DOWNLOADER_CODE}*\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='celular')return`Hola ${nombre}! 📱\n\n*Instalación GOLD TV en Android:*\n\n1️⃣ Abre Chrome en tu celular\n2️⃣ Escribe este link:\n    🔗 ${DOWNLOADER_LINK}\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='smart-tv')return`Hola ${nombre}! 🖥️\n\n*Instalación GOLD TV en Smart TV (LG/Samsung):*\n\n1️⃣ Busca e instala *IPTV Master LITE* en la tienda de apps de tu TV (es gratis)\n2️⃣ Abre la app y selecciona *"Agregar lista M3U"*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ Espera que cargue\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='iphone')return`Hola ${nombre}! 🍎\n\n*Instalación GOLD TV en iPhone/iPad:*\n\n1️⃣ Busca e instala *IPTV Master LITE* en App Store (es gratis)\n2️⃣ Abre la app y selecciona *"Agregar lista M3U"*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ Espera que cargue\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='tv-box')return`Hola ${nombre}! 📦\n\n*Instalación GOLD TV en TV Box:*\n\n1️⃣ Abre *Chrome* en tu TV Box\n2️⃣ Escribe o pega este link:\n    🔗 ${DOWNLOADER_LINK}\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='fire-tv')return`Hola ${nombre}! 🔥\n\n*Instalación GOLD TV en Fire TV:*\n\n1️⃣ Descarga *Downloader* desde Amazon App Store\n2️⃣ Abre Downloader e ingresa el código:\n    📌 *${DOWNLOADER_CODE}*\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='pc')return`Hola ${nombre}! 💻\n\n*Ver GOLD TV en tu PC:*\n\n1️⃣ Descarga *VLC Media Player* (gratis) desde videolan.org\n2️⃣ Abre VLC → Menú *Medio* → *Abrir ubicación de red*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ ¡Listo!\n\n✅ Ya puedes ver todos los canales 🎉`;
+  return'Dispositivo no reconocido';
+}
+
+function enviarWACredenciales(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const tel=c.tel.replace(/\D/g,'');
+  const msg=encodeURIComponent(msgCredenciales(c));
+  window.open('https://wa.me/593'+tel.replace(/^0/,'')+'?text='+msg,'_blank');
+}
+
+function enviarWAInstalacion(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const tel=c.tel.replace(/\D/g,'');
+  const msg=encodeURIComponent(msgInstalacion(c));
+  window.open('https://wa.me/593'+tel.replace(/^0/,'')+'?text='+msg,'_blank');
+}
+
+let _guiaMsgActual='';
+function generarGuia(){
+  const id=document.getElementById('guia-cliente').value;
+  const device=document.getElementById('guia-device').value;
+  if(!id)return alert('Selecciona un cliente');
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const msg=msgInstalacion(c,device);
+  _guiaMsgActual=msg;
+  document.getElementById('guia-msg').textContent=msg;
+  document.getElementById('guia-resultado').style.display='block';
+}
+
+function enviarWA(tipo){
+  const c=tipo==='guia'?DB.clientes.find(x=>x.id===document.getElementById('guia-cliente').value):null;
+  const tel=c?.tel?.replace(/\D/g,'')||'';
+  const msg=encodeURIComponent(_guiaMsgActual);
+  if(tel)window.open('https://wa.me/593'+tel.replace(/^0/,'')+'?text='+msg,'_blank');
+  else window.open('https://wa.me/?text='+msg,'_blank');
+}
+
+function copiarMensaje(id){
+  const el=document.getElementById(id);if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(()=>alert('✅ Texto copiado'));
+}
+
+// ===== RENDERS =====
+function renderAll(){
+  renderDash();renderClientes();renderVencimientos();llenarSelectClientes();
+  const el=document.getElementById('pill-total');
+  if(el)el.textContent=DB.clientes.length+' clientes';
+}
+
+function renderDash(){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const activos=DB.clientes.filter(c=>estadoCliente(c)==='activo').length;
+  const pronto=DB.clientes.filter(c=>estadoCliente(c)==='vence').length;
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('d-total',DB.clientes.length);s('d-activos',activos);s('d-pronto',pronto);s('d-vencidos',vencidos);
+  // Cobros del mes actual
+  const mesActual=new Date().toISOString().substr(0,7);
+  const cobrosClientes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
+  const totalCobros=cobrosClientes.reduce((a,c)=>a+(c.precio||0),0);
+  s('d-mes',fmt(totalCobros));
+  s('d-mes-sub',cobrosClientes.length+' clientes vencen este mes');
+  // Próximos
+  const proximos=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=7;}).sort((a,b)=>a.vencimiento.localeCompare(b.vencimiento));
+  document.getElementById('d-proximos').innerHTML=proximos.length?proximos.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px">
+    <div><b>${escH(c.nombre)}</b> <span style="color:var(--muted);font-size:11px">${DISP_LABEL[c.device]||c.device}</span></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span style="color:var(--orange);font-size:11px">Vence en ${diasHasta(c.vencimiento)} día(s)</span>
+      <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">🔄 Renovar</button>
+      <button class="btn btn-wa btn-sm" onclick="enviarWACredenciales('${c.id}')">📲 WA</button>
+    </div>
+  </div>`).join(''):'<div class="empty">Sin vencimientos en los próximos 7 días</div>';
+  // Vencidos
+  const vencList=DB.clientes.filter(c=>estadoCliente(c)==='vencido').sort((a,b)=>b.vencimiento.localeCompare(a.vencimiento));
+  document.getElementById('d-vencidos-lista').innerHTML=vencList.length?vencList.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px">
+    <div><b>${escH(c.nombre)}</b> <span style="color:var(--red);font-size:11px">venció ${Math.abs(diasHasta(c.vencimiento))} día(s) atrás</span></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">🔄 Renovar</button>
+    </div>
+  </div>`).join(''):'<div class="empty">Sin clientes vencidos</div>';
+}
+
+function renderClientes(){
+  const q=(document.getElementById('cli-q')?.value||'').toLowerCase();
+  const est=document.getElementById('cli-estado')?.value||'';
+  const disp=document.getElementById('cli-disp')?.value||'';
+  let lista=DB.clientes.filter(c=>{
+    if(q&&!c.nombre?.toLowerCase().includes(q)&&!c.user?.toLowerCase().includes(q)&&!c.tel?.includes(q))return false;
+    if(est&&estadoCliente(c)!==est)return false;
+    if(disp&&c.device!==disp)return false;
+    return true;
+  }).sort((a,b)=>a.vencimiento?.localeCompare(b.vencimiento));
+  const tb=document.getElementById('tb-clientes');
+  if(!lista.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Sin clientes con ese filtro</div></td></tr>';return;}
+  const BADGE={'activo':'<span class="bdg bdg-activo">Activo</span>','vence':'<span class="bdg bdg-vence">Vence pronto</span>','vencido':'<span class="bdg bdg-vencido">Vencido</span>'};
+  tb.innerHTML=lista.map(c=>{
+    const est=estadoCliente(c);
+    const dias=diasHasta(c.vencimiento);
+    return`<tr>
+      <td><b>${escH(c.nombre)}</b>${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}></td>
+      <td style="font-family:monospace">${escH(c.tel||'—')}</td>
+      <td style="font-family:monospace;font-size:11px">${escH(c.user)}</td>
+      <td>${DISP_LABEL[c.device]||c.device}</td>
+      <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
+      <td>${BADGE[est]||''}</td>
+      <td style="font-family:monospace">${fmt(c.precio)}</td>
+      <td>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">
+          <button class="btn btn-wa btn-sm" onclick="enviarWACredenciales('${c.id}')" title="Enviar credenciales por WhatsApp">🔑</button>
+          <button class="btn btn-wa btn-sm" onclick="enviarWAInstalacion('${c.id}')" title="Enviar guía de instalación">📖</button>
+          <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')" title="Renovar">🔄</button>
+          <button class="btn btn-s btn-sm" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>
+          <button class="btn btn-d btn-sm" onclick="eliminarCliente('${c.id}')" title="Eliminar">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderVencimientos(){
+  const semana=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=7;}).length;
+  const mes=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=30;}).length;
+  const venc=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('v-semana',semana);s('v-mes',mes);s('v-vencidos',venc);
+  const proximos=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=30;}).sort((a,b)=>a.vencimiento.localeCompare(b.vencimiento));
+  document.getElementById('v-lista-proximos').innerHTML=proximos.length?proximos.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+    <div>
+      <b>${escH(c.nombre)}</b> <span style="font-size:11px;color:var(--muted)">${DISP_LABEL[c.device]||''}</span>
+      <div style="font-size:11px;color:var(--muted);font-family:monospace">${c.user}</div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <span style="color:${diasHasta(c.vencimiento)<=7?'var(--orange)':'var(--gold)'};font-size:12px;font-weight:600">Vence: ${c.vencimiento} (${diasHasta(c.vencimiento)} días)</span>
+      <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">🔄 Renovar</button>
+      <button class="btn btn-wa btn-sm" onclick="enviarWACredenciales('${c.id}')">📲 Credenciales</button>
+    </div>
+  </div>`).join(''):'<div class="empty">Sin vencimientos en los próximos 30 días</div>';
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').sort((a,b)=>b.vencimiento.localeCompare(a.vencimiento));
+  document.getElementById('v-lista-vencidos').innerHTML=vencidos.length?vencidos.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+    <div>
+      <b>${escH(c.nombre)}</b>
+      <div style="font-size:11px;color:var(--red)">Venció el ${c.vencimiento} (hace ${Math.abs(diasHasta(c.vencimiento))} días)</div>
+    </div>
+    <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">🔄 Renovar</button>
+  </div>`).join(''):'<div class="empty">Sin clientes vencidos</div>';
+}
+
+function llenarSelectClientes(){
+  const sel=document.getElementById('guia-cliente');if(!sel)return;
+  sel.innerHTML='<option value="">— Seleccionar cliente —</option>'+
+    DB.clientes.sort((a,b)=>a.nombre?.localeCompare(b.nombre)).map(c=>`<option value="${c.id}">${escH(c.nombre)} (${c.user})</option>`).join('');
+}
+
+function exportarCSV(){
+  if(!DB.clientes.length)return alert('No hay clientes registrados');
+  const filas=[['Nombre','Teléfono','Usuario','Contraseña','Dispositivo','Plan','Precio','Inicio','Vencimiento','Estado','Notas']];
+  DB.clientes.forEach(c=>filas.push([c.nombre,c.tel,c.user,c.pass,DISP_LABEL[c.device]||c.device,c.plan+' mes(es)',c.precio,c.inicio,c.vencimiento,estadoCliente(c),c.notas||'']));
+  const csv=filas.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,"'")}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='goldtv_clientes_'+today()+'.csv';a.click();
+}
+
+function backupGold(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}));
+  a.download='goldtv_backup_'+today()+'.json';a.click();
+}
+
+// ===== SINCRONIZAR PANEL OTT =====
+const PANEL_URL='http://goldtv.lat:2086';
+const PANEL_USER='MONYAR90';
+const PANEL_PASS='Nenita25';
+let syncData=[];
+
+function abrirSincronizar(){
+  syncData=[];
+  var el=document.getElementById('sync-estado');
+  if(el) el.innerHTML='Haz clic en el boton dorado para seleccionar el archivo JSON que descargaste de tu panel (Backup Users > JSON).';
+  var sl=document.getElementById('sync-lista');
+  if(sl) sl.style.display='none';
+  var bi=document.getElementById('btn-importar');
+  if(bi) bi.style.display='none';
+  abrirModal('modal-sync');
+}
+function conectarPanel(){}
+
+function normalizarLinea(l){
+  // Soporta formato XM OTT Panel (Username/Password/Expires) y Xtream Codes (username/password/exp_date)
+  const user=l.Username||l.username||l.user||l.USER||'';
+  const pass=l.Password||l.password||l.pass||l.PASS||'';
+  const status=l.Status||l.status||l.enabled||'active';
+  const activo=typeof status==='string'?/active|activo|1/i.test(status):status===1||status==='1';
+  const notes=l.Notes||l.notes||l.Creator||l.creator||l.Owner||l.owner||'';
+  // Fecha de vencimiento
+  let vence='';
+  if(l.Expires||l.expires||l.Expiry||l.expiry){
+    vence=(l.Expires||l.expires||l.Expiry||l.expiry||'').split(' ')[0];
+  } else if(l.exp_date&&l.exp_date!=='0'){
+    vence=new Date(parseInt(l.exp_date)*1000).toISOString().split('T')[0];
+  } else if(l.expiration){
+    vence=l.expiration.split(' ')[0];
+  }
+  return{user,pass,activo,vence,notes,_raw:l};
+}
+
+function procesarLineas(raw){
+  let lineas=[];
+  if(Array.isArray(raw))lineas=raw;
+  else if(typeof raw==='object')lineas=Object.values(raw);
+  lineas=lineas.filter(l=>l&&typeof l==='object');
+
+  if(!lineas.length){
+    document.getElementById('sync-estado').innerHTML='<span style="color:#ef4444">No se encontraron clientes en el archivo.</span>';
+    return;
+  }
+
+  syncData=lineas.map(normalizarLinea);
+  const existentes=new Set(DB.clientes.map(c=>c.user));
+  const estado=document.getElementById('sync-estado');
+  const nuevos=syncData.filter(l=>!existentes.has(l.user)).length;
+  estado.innerHTML=`<span style="color:#22c55e">✅ Se encontraron <b>${lineas.length}</b> clientes — <b>${nuevos}</b> nuevos, <b>${lineas.length-nuevos}</b> ya existen.</span>`;
+
+  const tb=document.getElementById('tb-sync');
+  tb.innerHTML=syncData.map((l,i)=>{
+    const yaExiste=existentes.has(l.user);
+    return`<tr style="border-top:1px solid rgba(74,108,247,.15)">
+      <td style="padding:6px 10px"><input type="checkbox" class="sync-chk" data-idx="${i}" ${yaExiste?'':'checked'}></td>
+      <td style="padding:6px 10px;font-family:monospace;color:#f0eeff">${escH(l.user)}</td>
+      <td style="padding:6px 10px;font-family:monospace;color:var(--muted)">${escH(l.pass)}</td>
+      <td style="padding:6px 10px;color:${l.vence&&l.vence<today()?'var(--red)':'var(--gold)'}">${l.vence||'—'}</td>
+      <td style="padding:6px 10px"><span class="bdg ${l.activo?'bdg-activo':'bdg-vencido'}">${l.activo?'Activo':'Vencido'}</span></td>
+      <td style="padding:6px 10px">${yaExiste?'<span style="color:#f97316;font-size:11px">⚠️ Ya existe</span>':'<span style="color:#22c55e;font-size:11px">✓ Nuevo</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('sync-count').textContent=`${lineas.length} clientes — selecciona cuáles importar`;
+  document.getElementById('sync-lista').style.display='block';
+  document.getElementById('btn-importar').style.display='inline-flex';
+}
+
+function syncSelAll(v){
+  document.querySelectorAll('.sync-chk').forEach(c=>c.checked=v);
+  document.getElementById('chk-all').checked=v;
+}
+
+function importarSeleccionados(){
+  const selIdx=[];
+  document.querySelectorAll('.sync-chk:checked').forEach(c=>selIdx.push(parseInt(c.dataset.idx)));
+  if(!selIdx.length)return alert('Selecciona al menos un cliente');
+
+  let nuevos=0,actualizados=0;
+
+  selIdx.forEach(i=>{
+    const l=syncData[i];if(!l)return;
+    const vence=l.vence||addMeses(today(),1);
+    const obj={
+      id:uid(),
+      nombre:l.user,
+      tel:'',
+      user:l.user,
+      pass:l.pass,
+      device:'android-tv',
+      plan:'1',
+      precio:0,
+      inicio:today(),
+      vencimiento:vence,
+      notas:l.notes||'',
+      activo:l.activo
+    };
+    const idx=DB.clientes.findIndex(c=>c.user===obj.user);
+    if(idx!==-1){DB.clientes[idx]={...DB.clientes[idx],pass:obj.pass,vencimiento:obj.vencimiento,activo:obj.activo};actualizados++;}
+    else{DB.clientes.push(obj);nuevos++;}
+  });
+
+  save();renderAll();cerrarModal('modal-sync');
+  alert(`✅ Importación completa:\n• ${nuevos} clientes nuevos\n• ${actualizados} actualizados\n\nPuedes editar cada cliente (✏️) para agregar nombre, teléfono y dispositivo.`);
+}
+
+function importarPegado(){
+  const txt=(document.getElementById('sync-paste')?.value||'').trim();
+  if(!txt)return alert('Pega los datos primero');
+  const lineas=txt.split('\n').map(l=>l.trim()).filter(l=>l);
+  const fakeData=lineas.map(l=>{
+    const p=l.split(',');
+    return{username:(p[0]||'').trim(),password:(p[1]||'').trim(),exp_date:p[2]?Math.floor(new Date(p[2].trim())/1000).toString():'',enabled:'1',notes:''};
+  }).filter(l=>l.username);
+  if(!fakeData.length)return alert('Formato incorrecto. Usa: usuario,contraseña,fecha');
+  procesarLineas(fakeData);
+}
+
+function detectarPegado(ta){
+  const txt=(ta.value||'').trim();
+  const lineas=txt.split('\n').filter(l=>l.trim()&&l.includes(','));
+  const prev=document.getElementById('sync-preview');
+  if(lineas.length>0){
+    prev.innerHTML=`<span style="color:#22c55e">✅ ${lineas.length} clientes detectados — </span><button class="btn btn-sm" style="background:linear-gradient(135deg,#7c3aed,#c026d3);color:#fff;padding:3px 10px" onclick="importarDesdePaste()">⬇️ Importar todos ahora</button>`;
+  }else{
+    prev.innerHTML='';
+  }
+}
+
+function importarDesdePaste(){
+  const txt=(document.getElementById('sync-paste')?.value||'').trim();
+  if(!txt)return;
+  const lineas=txt.split('\n').map(l=>l.trim()).filter(l=>l&&l.includes(','));
+  const datos=lineas.map(l=>{
+    const p=l.split(',');
+    const expRaw=(p[2]||'').trim();
+    const expTs=expRaw?Math.floor(new Date(expRaw)/1000).toString():'';
+    return{username:(p[0]||'').trim(),password:(p[1]||'').trim(),exp_date:expTs,enabled:'1',notes:''};
+  }).filter(l=>l.username);
+  if(!datos.length)return alert('No se encontraron datos válidos');
+  procesarLineas(datos);
+}
+
+function triggerFileImport(){
+  document.getElementById('file-import-input').value='';
+  document.getElementById('file-import-input').click();
+}
+
+function importarArchivo(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const txt=e.target.result;
+    try{
+      // Intentar JSON primero
+      const json=JSON.parse(txt);
+      procesarLineas(Array.isArray(json)?json:Object.values(json));
+    }catch{
+      // Parsear CSV
+      const lineas=txt.split('\n').filter(l=>l.trim());
+      const header=lineas[0].toLowerCase();
+      let datos=[];
+      if(header.includes('username')||header.includes('usuario')){
+        // Tiene encabezado
+        const cols=lineas[0].split(',').map(c=>c.trim().toLowerCase().replace(/"/g,''));
+        const uIdx=cols.findIndex(c=>c.includes('user'));
+        const pIdx=cols.findIndex(c=>c.includes('pass')||c.includes('contra'));
+        const eIdx=cols.findIndex(c=>c.includes('exp')||c.includes('venc'));
+        datos=lineas.slice(1).map(l=>{
+          const p=l.split(',').map(c=>c.trim().replace(/"/g,''));
+          const expRaw=eIdx>=0?p[eIdx]:'';
+          const expTs=expRaw?Math.floor(new Date(expRaw)/1000).toString():'';
+          return{username:p[uIdx]||'',password:p[pIdx]||'',exp_date:expTs,enabled:'1',notes:''};
+        }).filter(l=>l.username);
+      }else{
+        datos=lineas.map(l=>{const p=l.split(',');return{username:(p[0]||'').trim().replace(/"/g,''),password:(p[1]||'').trim().replace(/"/g,''),exp_date:p[2]?Math.floor(new Date(p[2].trim().replace(/"/g,''))/1000).toString():'',enabled:'1',notes:''};}).filter(l=>l.username);
+      }
+      procesarLineas(datos);
+    }
+  };
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>
+
