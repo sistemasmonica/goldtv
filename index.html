@@ -156,6 +156,7 @@ select option{background:#1a1735}
   <div class="sc-grid">
     <div class="sc"><div class="sc-lbl">Total clientes</div><div class="sc-val" style="color:var(--gold)" id="d-total">0</div><div class="sc-sub">registrados</div></div>
     <div class="sc"><div class="sc-lbl">Activos</div><div class="sc-val" style="color:var(--green)" id="d-activos">0</div><div class="sc-sub">en servicio</div></div>
+    <div class="sc"><div class="sc-lbl">Trial / Prueba</div><div class="sc-val" style="color:#a78bfa" id="d-trials">0</div><div class="sc-sub">clientes de prueba</div></div>
     <div class="sc"><div class="sc-lbl">Vencen pronto</div><div class="sc-val" style="color:var(--orange)" id="d-pronto">0</div><div class="sc-sub">en los próximos 7 días</div></div>
     <div class="sc"><div class="sc-lbl">Vencidos</div><div class="sc-val" style="color:var(--red)" id="d-vencidos">0</div><div class="sc-sub">requieren renovación</div></div>
   </div>
@@ -216,10 +217,16 @@ select option{background:#1a1735}
       <option value="fire-tv">Fire TV</option>
       <option value="pc">PC</option>
     </select>
+    <select id="cli-tipo-fil" onchange="renderClientes()">
+      <option value="">Todos los tipos</option>
+      <option value="mensual">💳 Mensual</option>
+      <option value="trial">🆓 Trial</option>
+      <option value="anual">⭐ Anual</option>
+    </select>
   </div>
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Cliente</th><th>Teléfono</th><th>Usuario</th><th>Dispositivo</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Cliente</th><th>Teléfono</th><th>Usuario</th><th>Dispositivo</th><th>Tipo</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
       <tbody id="tb-clientes"></tbody>
     </table>
   </div>
@@ -256,6 +263,13 @@ select option{background:#1a1735}
           <option value="3">3 meses</option>
           <option value="6">6 meses</option>
           <option value="12">12 meses</option>
+        </select>
+      </div>
+      <div class="fg"><label>Tipo de cliente</label>
+        <select id="cli-tipo">
+          <option value="mensual">💳 Mensual</option>
+          <option value="trial">🆓 Trial / Prueba</option>
+          <option value="anual">⭐ Anual</option>
         </select>
       </div>
       <div class="fg"><label>Precio cobrado ($)</label><input type="number" id="cli-precio" step="0.01" min="0" placeholder="0.00"></div>
@@ -611,15 +625,16 @@ function guardarCliente(){
   const editId=document.getElementById('cli-edit-id').value||'';
   if(!nombre)return alert('Ingresa el nombre del cliente');
   if(!user||!pass)return alert('Ingresa el usuario y contraseña del panel OTT');
+  const tipo=document.getElementById('cli-tipo').value||'mensual';
   const vencimiento=addMeses(inicio,plan);
   if(editId){
     const idx=DB.clientes.findIndex(c=>c.id===editId);
-    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,precio,inicio,vencimiento,notas};
+    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,tipo,precio,inicio,vencimiento,notas};
     document.getElementById('cli-edit-id').value='';
     document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
     document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
   }else{
-    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,precio,inicio,vencimiento,notas,activo:true});
+    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,tipo,precio,inicio,vencimiento,notas,activo:true});
   }
   save();limpiarFormCliente();renderAll();
   tab('clientes',document.querySelectorAll('.nav>.nt')[1]);
@@ -630,6 +645,7 @@ function limpiarFormCliente(){
   ['cli-nombre','cli-tel','cli-user','cli-pass','cli-precio','cli-notas'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('cli-device').value='android-tv';
   document.getElementById('cli-plan').value='1';
+  document.getElementById('cli-tipo').value='mensual';
   document.getElementById('cli-inicio').value=today();
   document.getElementById('cli-edit-id').value='';
   document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
@@ -645,6 +661,7 @@ function editarCliente(id){
   document.getElementById('cli-pass').value=c.pass||'';
   document.getElementById('cli-device').value=c.device||'android-tv';
   document.getElementById('cli-plan').value=c.plan||'1';
+  document.getElementById('cli-tipo').value=c.tipo||'mensual';
   document.getElementById('cli-precio').value=c.precio||'';
   document.getElementById('cli-inicio').value=c.inicio||today();
   document.getElementById('cli-notas').value=c.notas||'';
@@ -759,8 +776,9 @@ function renderDash(){
   const activos=DB.clientes.filter(c=>estadoCliente(c)==='activo').length;
   const pronto=DB.clientes.filter(c=>estadoCliente(c)==='vence').length;
   const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const trials=DB.clientes.filter(c=>(c.tipo||'mensual')==='trial').length;
   const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  s('d-total',DB.clientes.length);s('d-activos',activos);s('d-pronto',pronto);s('d-vencidos',vencidos);
+  s('d-total',DB.clientes.length);s('d-activos',activos);s('d-trials',trials);s('d-pronto',pronto);s('d-vencidos',vencidos);
   // Cobros del mes actual
   const mesActual=new Date().toISOString().substr(0,7);
   const cobrosClientes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
@@ -787,27 +805,33 @@ function renderDash(){
   </div>`).join(''):'<div class="empty">Sin clientes vencidos</div>';
 }
 
+const TIPO_BADGE={'mensual':'<span class="bdg" style="background:#1565c0">💳 Mensual</span>','trial':'<span class="bdg" style="background:#6b3fa0">🆓 Trial</span>','anual':'<span class="bdg" style="background:#b8860b">⭐ Anual</span>'};
+
 function renderClientes(){
   const q=(document.getElementById('cli-q')?.value||'').toLowerCase();
   const est=document.getElementById('cli-estado')?.value||'';
   const disp=document.getElementById('cli-disp')?.value||'';
+  const tipoFil=document.getElementById('cli-tipo-fil')?.value||'';
   let lista=DB.clientes.filter(c=>{
     if(q&&!c.nombre?.toLowerCase().includes(q)&&!c.user?.toLowerCase().includes(q)&&!c.tel?.includes(q))return false;
     if(est&&estadoCliente(c)!==est)return false;
     if(disp&&c.device!==disp)return false;
+    if(tipoFil&&(c.tipo||'mensual')!==tipoFil)return false;
     return true;
   }).sort((a,b)=>a.vencimiento?.localeCompare(b.vencimiento));
   const tb=document.getElementById('tb-clientes');
-  if(!lista.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Sin clientes con ese filtro</div></td></tr>';return;}
+  if(!lista.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Sin clientes con ese filtro</div></td></tr>';return;}
   const BADGE={'activo':'<span class="bdg bdg-activo">Activo</span>','vence':'<span class="bdg bdg-vence">Vence pronto</span>','vencido':'<span class="bdg bdg-vencido">Vencido</span>'};
   tb.innerHTML=lista.map(c=>{
     const est=estadoCliente(c);
     const dias=diasHasta(c.vencimiento);
+    const tipo=c.tipo||'mensual';
     return`<tr>
       <td><b>${escH(c.nombre)}</b>${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}></td>
       <td style="font-family:monospace">${escH(c.tel||'—')}</td>
       <td style="font-family:monospace;font-size:11px">${escH(c.user)}</td>
       <td>${DISP_LABEL[c.device]||c.device}</td>
+      <td>${TIPO_BADGE[tipo]||tipo}</td>
       <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
       <td>${BADGE[est]||''}</td>
       <td style="font-family:monospace">${fmt(c.precio)}</td>
@@ -908,7 +932,12 @@ function normalizarLinea(l){
   } else if(l.expiration){
     vence=l.expiration.split(' ')[0];
   }
-  return{user,pass,activo,vence,notes,_raw:l};
+  // Detectar tipo desde nombre del paquete
+  const pkg=(l.Package||l.package||l.Bouquet||l.bouquet||l.plan||'').toString().toLowerCase();
+  let tipo='mensual';
+  if(/trial|prueba|demo|test|free/i.test(pkg))tipo='trial';
+  else if(/anual|annual|year|12\s*mes/i.test(pkg))tipo='anual';
+  return{user,pass,activo,vence,notes,tipo,_raw:l};
 }
 
 function procesarLineas(raw){
