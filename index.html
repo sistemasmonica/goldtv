@@ -330,6 +330,12 @@ select option{background:#1a1735}
           <option value="pc">💻 PC</option>
         </select>
       </div>
+      <div class="fg"><label>Aplicación</label>
+        <select id="guia-app">
+          <option value="propia">📲 App propia GOLD TV</option>
+          <option value="smarters">📡 IPTV Smarters Lite</option>
+        </select>
+      </div>
     </div>
     <button class="btn btn-gold" onclick="generarGuia()">📋 Generar guía</button>
   </div>
@@ -723,10 +729,25 @@ function m3uLink(c){
   return M3U_BASE.replace('USER',c.user).replace('PASS',c.pass);
 }
 
-function msgInstalacion(c,device){
+function msgInstalacion(c,device,app){
   const dev=device||c.device;
   const user=c.user,pass=c.pass,nombre=c.nombre;
   const cred=`\n👤 *Usuario:* ${user}\n🔑 *Contraseña:* ${pass}`;
+  const srv='http://mundo2.pro:80';
+  const credSmarters=`\n🌐 *URL:* ${srv}\n👤 *Usuario:* ${user}\n🔑 *Contraseña:* ${pass}`;
+  if(app==='smarters'){
+    const paso1={
+      'android-tv':'1️⃣ Descarga *IPTV Smarters Lite* desde *Play Store*',
+      'celular':'1️⃣ Descarga *IPTV Smarters Lite* desde *Play Store*',
+      'tv-box':'1️⃣ Descarga *IPTV Smarters Lite* desde *Play Store*',
+      'fire-tv':'1️⃣ Descarga *IPTV Smarters Lite* desde *Amazon App Store*',
+      'smart-tv':'1️⃣ Descarga *IPTV Smarters Lite* desde la tienda de tu Smart TV',
+      'iphone':'1️⃣ Descarga *IPTV Smarters Pro* desde *App Store*',
+      'pc':'1️⃣ Descarga *IPTV Smarters Player* desde Microsoft Store o smarters.live'
+    }[dev]||'1️⃣ Descarga *IPTV Smarters Lite*';
+    const emoji={'android-tv':'📺','celular':'📱','tv-box':'📦','fire-tv':'🔥','smart-tv':'🖥️','iphone':'🍎','pc':'💻'}[dev]||'📺';
+    return`Hola ${nombre}! ${emoji}\n\n*Instalación GOLD TV con IPTV Smarters Lite:*\n\n${paso1}\n2️⃣ Abre la app → toca *"Agregar usuario"*\n3️⃣ Selecciona *Xtream Codes API*\n4️⃣ Ingresa estos datos:${credSmarters}\n5️⃣ Toca *Agregar usuario*\n\n✅ ¡Listo! Disfruta todos los canales 🎉`;
+  }
   if(dev==='android-tv')return`Hola ${nombre}! 📺\n\n*Instalación GOLD TV en Android TV:*\n\n1️⃣ Descarga *Downloader* desde Play Store\n2️⃣ Abre Downloader e ingresa el código:\n    📌 *${DOWNLOADER_CODE}*\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
   if(dev==='celular')return`Hola ${nombre}! 📱\n\n*Instalación GOLD TV en Android:*\n\n1️⃣ Abre Chrome en tu celular\n2️⃣ Escribe este link:\n    🔗 ${DOWNLOADER_LINK}\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
   if(dev==='smart-tv')return`Hola ${nombre}! 🖥️\n\n*Instalación GOLD TV en Smart TV (LG/Samsung):*\n\n1️⃣ Busca e instala *IPTV Master LITE* en la tienda de apps de tu TV (es gratis)\n2️⃣ Abre la app y selecciona *"Agregar lista M3U"*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ Espera que cargue\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
@@ -755,9 +776,10 @@ let _guiaMsgActual='';
 function generarGuia(){
   const id=document.getElementById('guia-cliente').value;
   const device=document.getElementById('guia-device').value;
+  const app=document.getElementById('guia-app').value;
   if(!id)return alert('Selecciona un cliente');
   const c=DB.clientes.find(x=>x.id===id);if(!c)return;
-  const msg=msgInstalacion(c,device);
+  const msg=msgInstalacion(c,device,app);
   _guiaMsgActual=msg;
   document.getElementById('guia-msg').textContent=msg;
   document.getElementById('guia-resultado').style.display='block';
