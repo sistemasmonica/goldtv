@@ -421,9 +421,10 @@ select option{background:#1a1735}
     <div class="card" style="border-color:rgba(245,197,24,.3);grid-column:1/-1;box-shadow:0 0 15px rgba(245,197,24,.06)">
       <div class="card-t" style="color:var(--gold)">💻 PC / Computadora</div>
       <ol style="font-size:12px;color:var(--muted);line-height:2;padding-left:18px">
-        <li>Abre Chrome o cualquier navegador</li>
-        <li>Entra a <b style="color:var(--text)">plex.tv</b> o usa el link M3U con <b style="color:var(--text)">VLC Media Player</b></li>
-        <li>En VLC: Menú → Medio → Abrir ubicación de red → pega el link M3U</li>
+        <li>Busca e instala <b style="color:var(--text)">IPTV Smarters Player</b> en <b style="color:var(--text)">Microsoft Store</b> (gratis)</li>
+        <li>Abre la app → toca <b style="color:var(--text)">"Agregar usuario"</b></li>
+        <li>Selecciona <b style="color:var(--text)">Xtream Codes API</b></li>
+        <li>Ingresa la URL del servidor, tu usuario y contraseña</li>
         <li>¡Listo para ver tus canales!</li>
       </ol>
     </div>
@@ -858,7 +859,7 @@ function msgInstalacion(c,device,app){
   if(dev==='iphone')return`Hola ${nombre}! 🍎\n\n*Instalación GOLD TV en iPhone/iPad:*\n\n1️⃣ Busca e instala *IPTV Master LITE* en App Store (es gratis)\n2️⃣ Abre la app y selecciona *"Agregar lista M3U"*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ Espera que cargue\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
   if(dev==='tv-box')return`Hola ${nombre}! 📦\n\n*Instalación GOLD TV en TV Box:*\n\n1️⃣ Abre *Chrome* en tu TV Box\n2️⃣ Escribe o pega este link:\n    🔗 ${DOWNLOADER_LINK}\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
   if(dev==='fire-tv')return`Hola ${nombre}! 🔥\n\n*Instalación GOLD TV en Fire TV:*\n\n1️⃣ Descarga *Downloader* desde Amazon App Store\n2️⃣ Abre Downloader e ingresa el código:\n    📌 *${DOWNLOADER_CODE}*\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
-  if(dev==='pc')return`Hola ${nombre}! 💻\n\n*Ver GOLD TV en tu PC:*\n\n1️⃣ Descarga *VLC Media Player* (gratis) desde videolan.org\n2️⃣ Abre VLC → Menú *Medio* → *Abrir ubicación de red*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ ¡Listo!\n\n✅ Ya puedes ver todos los canales 🎉`;
+  if(dev==='pc')return`Hola ${nombre}! 💻\n\n*Ver GOLD TV en PC con IPTV Smarters Player:*\n\n1️⃣ Busca *IPTV Smarters Player* en *Microsoft Store* e instálalo (gratis)\n2️⃣ Abre la app → *"Agregar usuario"*\n3️⃣ Selecciona *Xtream Codes API*\n4️⃣ Ingresa tus datos:\n    🌐 URL: http://mundo2.pro:80\n    👤 Usuario: ${user}\n    🔑 Contraseña: ${pass}\n5️⃣ Haz clic en *Agregar usuario*\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
   return'Dispositivo no reconocido';
 }
 
