@@ -139,6 +139,8 @@ select option{background:#1a1735}
     <button class="pill" id="pill-sync">✓ Conectando...</button>
     <button class="pill" onclick="abrirSincronizar()" style="border-color:#c026d3;color:#e879f9">🔄 Sincronizar panel</button>
     <button class="pill" onclick="backupGold()">📤 Backup</button>
+    <button class="pill" onclick="document.getElementById('restore-input').click()" style="background:#1a4a1a">📥 Restaurar</button>
+    <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restaurarBackup(this)">
   </div>
 </div>
 
@@ -890,6 +892,24 @@ function exportarCSV(){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
   a.download='goldtv_clientes_'+today()+'.csv';a.click();
+}
+
+function restaurarBackup(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(parsed.clientes&&Array.isArray(parsed.clientes)){
+        DB=parsed;
+        save();
+        renderAll();
+        alert('✅ Backup restaurado: '+DB.clientes.length+' clientes cargados y guardados en la nube.');
+      }else{alert('❌ Archivo no válido. Usa un backup de GOLD TV.');}
+    }catch(err){alert('❌ Error al leer el archivo.');}
+  };
+  reader.readAsText(file);
+  input.value='';
 }
 
 function backupGold(){
