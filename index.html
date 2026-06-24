@@ -972,7 +972,7 @@ function renderClientes(){
     const dias=diasHasta(c.vencimiento);
     const tipo=c.tipo||'mensual';
     return`<tr>
-      <td><b>${escH(c.nombre)}</b>${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}></td>
+      <td><b>${escH(c.nombre)}</b>${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
       <td style="font-family:monospace">${escH(c.tel||'—')}</td>
       <td style="font-family:monospace;font-size:11px">${escH(c.user)}</td>
       <td>${DISP_LABEL[c.device]||c.device}</td>
