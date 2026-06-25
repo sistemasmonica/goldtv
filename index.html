@@ -172,6 +172,7 @@ select option{background:#1a1735}
   <button class="nt" onclick="tab('vencimientos',this)">⏰ Vencimientos</button>
   <button class="nt" onclick="tab('guias',this)">📖 Guías instalación</button>
   <button class="nt" onclick="tab('renovaciones',this)">📋 Renovaciones</button>
+  <button class="nt" onclick="tab('misistema',this)">⚙️ Mi Sistema</button>
 </div>
 
 <!-- ===== INICIO ===== -->
@@ -490,6 +491,76 @@ select option{background:#1a1735}
         <tbody id="tb-renovaciones"></tbody></table>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="pn-misistema" class="pn">
+  <div class="card" style="border:2px solid rgba(245,158,11,.4)">
+    <div class="card-t" style="color:var(--gold)">🔐 Clave de propietaria (acceso al panel admin)</div>
+    <div style="background:#1a1a2e;border-radius:10px;padding:16px;margin-bottom:12px">
+      <div style="color:#fde68a;font-size:13px;font-weight:700;margin-bottom:8px">Tu clave actual:</div>
+      <div style="font-family:monospace;font-size:20px;color:#fff;letter-spacing:3px;background:#0d0b1f;padding:10px 16px;border-radius:8px;display:inline-block">GoldTV2026!</div>
+      <div style="font-size:11px;color:#64748b;margin-top:8px">Úsala cada vez que abras el panel de administración. La sesión dura hasta que cierres el navegador.</div>
+    </div>
+    <div style="background:#1a1a2e;border-radius:10px;padding:14px">
+      <div style="color:#fde68a;font-size:12px;font-weight:700;margin-bottom:8px">¿Cómo cambiar la clave?</div>
+      <ol style="font-size:12px;color:#94a3b8;padding-left:18px;line-height:2">
+        <li>Escríbeme (a Claude) diciendo: <em>"Quiero cambiar la clave a XXXXX"</em></li>
+        <li>Yo actualizo el código automáticamente</li>
+        <li>Listo — nadie más puede entrar sin la nueva clave</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card" style="border:2px solid rgba(107,63,160,.4);margin-top:12px">
+    <div class="card-t" style="color:#a78bfa">🎁 Cómo dar acceso DEMO a un vendedor</div>
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:14px">El modo DEMO permite que el vendedor explore el panel pero solo puede agregar hasta 3 clientes. Tú decides cuándo activarlo completo.</div>
+
+    <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="color:#c4b5fd;font-size:12px;font-weight:700;margin-bottom:8px">PASO 1 — Crear el vendedor en Supabase</div>
+      <ol style="font-size:12px;color:#94a3b8;padding-left:18px;line-height:2">
+        <li>Entra a <a href="https://supabase.com" target="_blank" style="color:#818cf8">supabase.com</a> → tu proyecto → Table Editor</li>
+        <li>Abre la tabla <strong style="color:#fff">gtv_licencias</strong></li>
+        <li>Clic en <strong style="color:#fff">Insert row</strong></li>
+        <li>Llena los campos:<br>
+          &nbsp;&nbsp;• <code style="color:#fde68a">vendor_id</code> = un código único, ej: <code>VEN-001</code><br>
+          &nbsp;&nbsp;• <code style="color:#fde68a">license_key</code> = cualquier clave, ej: <code>DEMO123</code><br>
+          &nbsp;&nbsp;• <code style="color:#fde68a">vendor_name</code> = nombre del vendedor<br>
+          &nbsp;&nbsp;• <code style="color:#fde68a">active</code> = <strong>true</strong><br>
+          &nbsp;&nbsp;• <code style="color:#fde68a">demo</code> = <strong>true</strong>
+        </li>
+        <li>Guarda el registro</li>
+      </ol>
+    </div>
+
+    <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="color:#c4b5fd;font-size:12px;font-weight:700;margin-bottom:8px">PASO 2 — Enviar el link al vendedor</div>
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:8px">El vendedor accede con este link (reemplaza con los datos que pusiste):</div>
+      <div style="font-family:monospace;font-size:11px;color:#fde68a;background:#0d0b1f;padding:10px;border-radius:6px;word-break:break-all">
+        https://sistemasmonica.github.io/goldtv-panel/?v=VEN-001&k=DEMO123
+      </div>
+      <div style="font-size:11px;color:#64748b;margin-top:6px">Donde <strong>VEN-001</strong> es el vendor_id y <strong>DEMO123</strong> es la license_key que pusiste.</div>
+    </div>
+
+    <div style="background:#1a1a2e;border-radius:10px;padding:14px">
+      <div style="color:#c4b5fd;font-size:12px;font-weight:700;margin-bottom:8px">PASO 3 — Activar cuando el vendedor pague</div>
+      <ol style="font-size:12px;color:#94a3b8;padding-left:18px;line-height:2">
+        <li>Vuelve a Supabase → tabla <strong style="color:#fff">gtv_licencias</strong></li>
+        <li>Busca la fila del vendedor</li>
+        <li>Cambia <code style="color:#fde68a">demo</code> de <strong>true</strong> a <strong>false</strong></li>
+        <li>El vendedor ya tiene acceso completo sin límites — el banner desaparece solo</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card" style="border:2px solid rgba(239,68,68,.3);margin-top:12px">
+    <div class="card-t" style="color:#f87171">🚫 Cómo desactivar a un vendedor</div>
+    <ol style="font-size:12px;color:#94a3b8;padding-left:18px;line-height:2">
+      <li>Supabase → tabla <strong style="color:#fff">gtv_licencias</strong></li>
+      <li>Busca la fila del vendedor</li>
+      <li>Cambia <code style="color:#fde68a">active</code> de <strong>true</strong> a <strong>false</strong></li>
+      <li>Inmediatamente ve el candado bloqueado al intentar entrar</li>
+    </ol>
   </div>
 </div>
 
