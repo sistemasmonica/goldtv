@@ -138,6 +138,7 @@ select option{background:#1a1735}
     <button class="pill" id="pill-total">👤 0 clientes</button>
     <button class="pill" id="pill-sync">✓ Conectando...</button>
     <button class="pill" onclick="abrirSincronizar()" style="border-color:#c026d3;color:#e879f9">🔄 Sincronizar panel</button>
+    <button class="pill" onclick="generarReporte()" style="border-color:#f97316;color:#f97316">📊 Reporte</button>
     <button class="pill" onclick="backupGold()">📤 Backup</button>
     <button class="pill" onclick="document.getElementById('restore-input').click()" style="background:#1a4a1a">📥 Restaurar</button>
     <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restaurarBackup(this)">
@@ -163,6 +164,7 @@ select option{background:#1a1735}
     <div class="sc"><div class="sc-lbl">Vendedores</div><div class="sc-val" style="color:#6ee7b7" id="d-vendedores">0</div><div class="sc-sub">revendedores activos</div></div>
     <div class="sc"><div class="sc-lbl">Vencen pronto</div><div class="sc-val" style="color:var(--orange)" id="d-pronto">0</div><div class="sc-sub">en los próximos 7 días</div></div>
     <div class="sc"><div class="sc-lbl">Vencidos</div><div class="sc-val" style="color:var(--red)" id="d-vencidos">0</div><div class="sc-sub">requieren renovación</div></div>
+    <div class="sc" style="cursor:pointer" onclick="tab('clientes',document.querySelectorAll('.nav>.nt')[1]);document.getElementById('cli-tipo-fil').value='';document.getElementById('cli-estado').value='';renderClientes()"><div class="sc-lbl">💸 Con deuda</div><div class="sc-val" style="color:#f97316" id="d-deudores">0</div><div class="sc-sub" id="d-deudores-total">pendiente: $0.00</div></div>
   </div>
   <div class="card" style="margin-top:2px">
     <div class="card-inner" style="display:flex;justify-content:space-between;align-items:center">
@@ -285,7 +287,10 @@ select option{background:#1a1735}
       <div class="fg"><label>Fecha vencimiento (calculada)</label><input type="text" id="cli-vence-preview" readonly style="background:var(--surface2);color:var(--gold);font-weight:700"></div>
     </div>
     <div class="fg" id="fg-creditos" style="display:none"><label>Créditos OTT actuales</label><input type="number" id="cli-creditos" min="0" placeholder="Ej: 50"></div>
-    <div class="fg"><label>Notas</label><input type="text" id="cli-notas" placeholder="Observaciones opcionales..."></div>
+    <div class="f2">
+      <div class="fg"><label>Notas</label><input type="text" id="cli-notas" placeholder="Observaciones opcionales..."></div>
+      <div class="fg"><label>💸 Cobro pendiente ($)</label><input type="number" id="cli-debe" step="0.01" min="0" placeholder="0.00 — si debe algo"></div>
+    </div>
     <input type="hidden" id="cli-edit-id" value="">
     <div class="btn-row">
       <button class="btn btn-gold" id="btn-guardar-cli" onclick="guardarCliente()">✅ Guardar cliente</button>
@@ -304,11 +309,23 @@ select option{background:#1a1735}
     <div class="sc"><div class="sc-lbl">Ya vencidos</div><div class="sc-val" style="color:var(--red)" id="v-vencidos">0</div></div>
   </div>
   <div class="card">
-    <div class="card-t" style="color:var(--orange)">⏰ Vencen en los próximos 30 días</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div class="card-t" style="color:var(--orange);margin-bottom:0">⏰ Vencen en los próximos 30 días</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-s btn-sm" onclick="seleccionarTodosVenc('proximos')">☑️ Todos</button>
+        <button class="btn btn-wa btn-sm" onclick="abrirEnvioMasivo()">📲 Avisar a seleccionados</button>
+      </div>
+    </div>
     <div id="v-lista-proximos"><div class="empty">Sin vencimientos próximos</div></div>
   </div>
   <div class="card">
-    <div class="card-t" style="color:var(--red)">🔴 Clientes vencidos</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div class="card-t" style="color:var(--red);margin-bottom:0">🔴 Clientes vencidos</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-s btn-sm" onclick="seleccionarTodosVenc('vencidos')">☑️ Todos</button>
+        <button class="btn btn-wa btn-sm" onclick="abrirEnvioMasivo()">📲 Avisar a seleccionados</button>
+      </div>
+    </div>
     <div id="v-lista-vencidos"><div class="empty">Sin clientes vencidos</div></div>
   </div>
 </div>
@@ -556,6 +573,39 @@ select option{background:#1a1735}
   </div>
 </div>
 
+<!-- MODAL ENVIO MASIVO -->
+<div class="modal-overlay" id="modal-envio">
+  <div class="modal" style="width:min(520px,95vw)">
+    <div class="modal-t">
+      <span>📲 Envío masivo por WhatsApp</span>
+      <button class="btn btn-s btn-sm" onclick="cerrarModal('modal-envio')">✕</button>
+    </div>
+    <div id="envio-lista" style="max-height:340px;overflow-y:auto;margin-bottom:14px"></div>
+    <div style="background:rgba(74,108,247,.1);border:1px solid rgba(74,108,247,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#93c5fd;margin-bottom:14px">
+      💡 Se abrirá WhatsApp por cada cliente seleccionado con su mensaje personalizado. Haz clic en "Enviar" en cada ventana.
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-wa" onclick="ejecutarEnvioMasivo()">📲 Iniciar envío</button>
+      <button class="btn btn-s" onclick="cerrarModal('modal-envio')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REPORTE -->
+<div class="modal-overlay" id="modal-reporte">
+  <div class="modal" style="width:min(580px,95vw)">
+    <div class="modal-t">
+      <span>📊 Reporte mensual del negocio</span>
+      <button class="btn btn-s btn-sm" onclick="cerrarModal('modal-reporte')">✕</button>
+    </div>
+    <div id="reporte-body" style="max-height:70vh;overflow-y:auto"></div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-gold" onclick="copiarReporte()">📋 Copiar reporte</button>
+      <button class="btn btn-s" onclick="cerrarModal('modal-reporte')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== SUPABASE =====
 const SUPA_URL='https://pqluiqsvfeddmxpuxyhm.supabase.co';
@@ -737,6 +787,7 @@ function guardarCliente(){
   const precio=parseFloat(document.getElementById('cli-precio').value)||0;
   const inicio=document.getElementById('cli-inicio').value||today();
   const notas=(document.getElementById('cli-notas').value||'').trim();
+  const debe=parseFloat(document.getElementById('cli-debe')?.value)||0;
   const editId=document.getElementById('cli-edit-id').value||'';
   if(!nombre)return alert('Ingresa el nombre del cliente');
   if(!user||!pass)return alert('Ingresa el usuario y contraseña del panel OTT');
@@ -745,12 +796,12 @@ function guardarCliente(){
   const vencimiento=addMeses(inicio,plan);
   if(editId){
     const idx=DB.clientes.findIndex(c=>c.id===editId);
-    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas};
+    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas,debe};
     document.getElementById('cli-edit-id').value='';
     document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
     document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
   }else{
-    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas,activo:true});
+    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas,debe,activo:true});
   }
   save();limpiarFormCliente();renderAll();
   tab('clientes',document.querySelectorAll('.nav>.nt')[1]);
@@ -758,7 +809,7 @@ function guardarCliente(){
 }
 
 function limpiarFormCliente(){
-  ['cli-nombre','cli-tel','cli-user','cli-pass','cli-precio','cli-notas'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['cli-nombre','cli-tel','cli-user','cli-pass','cli-precio','cli-notas','cli-debe'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('cli-device').value='android-tv';
   document.getElementById('cli-plan').value='1';
   document.getElementById('cli-tipo').value='mensual';
@@ -785,6 +836,7 @@ function editarCliente(id){
   document.getElementById('cli-precio').value=c.precio||'';
   document.getElementById('cli-inicio').value=c.inicio||today();
   document.getElementById('cli-notas').value=c.notas||'';
+  const debeEl=document.getElementById('cli-debe');if(debeEl)debeEl.value=c.debe||'';
   document.getElementById('cli-edit-id').value=id;
   document.getElementById('form-titulo').textContent='Editar: '+c.nombre;
   document.getElementById('btn-guardar-cli').textContent='💾 Guardar cambios';
@@ -919,6 +971,11 @@ function renderDash(){
   const vendedores=DB.clientes.filter(c=>(c.tipo||'mensual')==='vendedor').length;
   const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   s('d-total',DB.clientes.length);s('d-activos',activos);s('d-trials',trials);s('d-vendedores',vendedores);s('d-pronto',pronto);s('d-vencidos',vencidos);
+  // Deudores
+  const conDeuda=DB.clientes.filter(c=>c.debe&&c.debe>0);
+  const totalDeuda=conDeuda.reduce((a,c)=>a+(c.debe||0),0);
+  s('d-deudores',conDeuda.length);
+  const subDeu=document.getElementById('d-deudores-total');if(subDeu)subDeu.textContent='pendiente: $'+totalDeuda.toFixed(2);
   // Cobros del mes actual
   const mesActual=new Date().toISOString().substr(0,7);
   const cobrosClientes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
@@ -972,7 +1029,7 @@ function renderClientes(){
     const dias=diasHasta(c.vencimiento);
     const tipo=c.tipo||'mensual';
     return`<tr>
-      <td><b>${escH(c.nombre)}</b>${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
+      <td><b>${escH(c.nombre)}</b>${c.debe&&c.debe>0?`<span style="background:#f97316;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:5px;font-weight:600">💸 $${parseFloat(c.debe).toFixed(2)}</span>`:''}${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
       <td style="font-family:monospace">${escH(c.tel||'—')}</td>
       <td style="font-family:monospace;font-size:11px">${escH(c.user)}</td>
       <td>${DISP_LABEL[c.device]||c.device}</td>
@@ -1001,8 +1058,9 @@ function renderVencimientos(){
   const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   s('v-semana',semana);s('v-mes',mes);s('v-vencidos',venc);
   const proximos=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=30;}).sort((a,b)=>a.vencimiento.localeCompare(b.vencimiento));
-  document.getElementById('v-lista-proximos').innerHTML=proximos.length?proximos.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
-    <div>
+  document.getElementById('v-lista-proximos').innerHTML=proximos.length?proximos.map(c=>`<div style="display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+    <input type="checkbox" class="venc-chk" data-id="${c.id}" style="width:16px;height:16px;accent-color:var(--orange);flex-shrink:0">
+    <div style="flex:1">
       <b>${escH(c.nombre)}</b> <span style="font-size:11px;color:var(--muted)">${DISP_LABEL[c.device]||''}</span>
       <div style="font-size:11px;color:var(--muted);font-family:monospace">${c.user}</div>
     </div>
@@ -1013,8 +1071,9 @@ function renderVencimientos(){
     </div>
   </div>`).join(''):'<div class="empty">Sin vencimientos en los próximos 30 días</div>';
   const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').sort((a,b)=>b.vencimiento.localeCompare(a.vencimiento));
-  document.getElementById('v-lista-vencidos').innerHTML=vencidos.length?vencidos.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
-    <div>
+  document.getElementById('v-lista-vencidos').innerHTML=vencidos.length?vencidos.map(c=>`<div style="display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+    <input type="checkbox" class="venc-chk" data-id="${c.id}" style="width:16px;height:16px;accent-color:var(--red);flex-shrink:0">
+    <div style="flex:1">
       <b>${escH(c.nombre)}</b>
       <div style="font-size:11px;color:var(--red)">Venció el ${c.vencimiento} (hace ${Math.abs(diasHasta(c.vencimiento))} días)</div>
     </div>
@@ -1252,6 +1311,146 @@ function importarArchivo(input){
     }
   };
   reader.readAsText(file);
+}
+
+// ===== ENVÍO MASIVO =====
+let _selEnvioIds=[];
+
+function seleccionarTodosVenc(grupo){
+  const chks=document.querySelectorAll('.venc-chk');
+  const alguDesm=[...chks].some(c=>!c.checked);
+  chks.forEach(c=>c.checked=alguDesm);
+}
+
+function abrirEnvioMasivo(){
+  const chks=[...document.querySelectorAll('.venc-chk:checked')];
+  if(!chks.length)return alert('Selecciona al menos un cliente marcando las casillas ☑️');
+  _selEnvioIds=chks.map(c=>c.dataset.id);
+  const clientes=_selEnvioIds.map(id=>DB.clientes.find(c=>c.id===id)).filter(Boolean);
+  document.getElementById('envio-lista').innerHTML=`
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600">${clientes.length} cliente(s) seleccionados:</div>
+    ${clientes.map(c=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:18px">${c.device==='iphone'?'🍎':c.device==='pc'?'💻':c.device==='celular'?'📱':c.device==='smart-tv'?'🖥️':'📺'}</span>
+        <div style="flex:1">
+          <b style="font-size:13px">${escH(c.nombre)}</b>
+          <div style="font-size:11px;color:${diasHasta(c.vencimiento)<0?'var(--red)':'var(--orange)'}">${diasHasta(c.vencimiento)<0?'Vencido hace '+Math.abs(diasHasta(c.vencimiento))+' días':'Vence en '+diasHasta(c.vencimiento)+' días ('+c.vencimiento+')'}</div>
+        </div>
+        <span style="font-size:11px;color:var(--muted);font-family:monospace">${c.tel||'sin tel'}</span>
+      </div>`).join('')}`;
+  abrirModal('modal-envio');
+}
+
+function ejecutarEnvioMasivo(){
+  const clientes=_selEnvioIds.map(id=>DB.clientes.find(c=>c.id===id)).filter(Boolean);
+  if(!clientes.length)return;
+  cerrarModal('modal-envio');
+  let i=0;
+  function enviarSiguiente(){
+    if(i>=clientes.length)return;
+    const c=clientes[i];i++;
+    const dias=diasHasta(c.vencimiento);
+    let msg;
+    if(dias<0){
+      msg=`Hola ${c.nombre}! 👋\n\n⚠️ Tu servicio GOLD TV *venció hace ${Math.abs(dias)} días*.\n\nPara volver a activarlo, escríbeme y coordinamos tu renovación. 🙏\n\nGOLD TV 📺`;
+    }else{
+      msg=`Hola ${c.nombre}! 👋\n\n🔔 Te recuerdo que tu servicio GOLD TV *vence en ${dias} día(s)* (${c.vencimiento}).\n\nEscríbeme para renovar y no quedarte sin servicio. 😊\n\nGOLD TV 📺`;
+    }
+    const tel=c.tel?c.tel.replace(/\D/g,''):'';
+    const url=tel?`https://wa.me/593${tel.startsWith('0')?tel.slice(1):tel}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(url,'_blank');
+    setTimeout(enviarSiguiente,1200);
+  }
+  enviarSiguiente();
+}
+
+// ===== REPORTE MENSUAL =====
+function generarReporte(){
+  const hoy=new Date();
+  const mesActual=hoy.toISOString().substr(0,7);
+  const nombreMes=hoy.toLocaleString('es',{month:'long',year:'numeric'});
+  const activos=DB.clientes.filter(c=>estadoCliente(c)==='activo').length;
+  const pronto=DB.clientes.filter(c=>estadoCliente(c)==='vence').length;
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const trials=DB.clientes.filter(c=>(c.tipo||'mensual')==='trial').length;
+  const vendedores=DB.clientes.filter(c=>(c.tipo||'mensual')==='vendedor').length;
+  const conDeuda=DB.clientes.filter(c=>c.debe&&c.debe>0);
+  const totalDeuda=conDeuda.reduce((a,c)=>a+(c.debe||0),0);
+  const venEsteMes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
+  const cobrosEsteMes=venEsteMes.reduce((a,c)=>a+(c.precio||0),0);
+  // Renovaciones del mes
+  const renMes=DB.clientes.flatMap(c=>(c.historial||[]).filter(h=>h.fecha?.startsWith(mesActual)));
+  const totalRenMes=renMes.reduce((a,h)=>a+(h.precio||0),0);
+  // Top dispositivos
+  const dispCount={};
+  DB.clientes.forEach(c=>{const d=c.device||'otro';dispCount[d]=(dispCount[d]||0)+1;});
+  const topDisp=Object.entries(dispCount).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  // Vencimientos próximos 7 días
+  const proxSem=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=7;});
+
+  const html=`
+    <div style="font-size:13px;line-height:1.7">
+      <div style="text-align:center;padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:14px">
+        <div style="font-size:22px">📊</div>
+        <div style="font-size:16px;font-weight:700;color:var(--gold)">Reporte ${nombreMes}</div>
+        <div style="font-size:11px;color:var(--muted)">GOLD TV · ${hoy.toLocaleDateString('es')}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        ${stat('👥 Total clientes',DB.clientes.length,'#fff')}
+        ${stat('✅ Activos',activos,'#4ade80')}
+        ${stat('⏰ Vencen pronto',pronto,'#fb923c')}
+        ${stat('🔴 Vencidos',vencidos,'#f87171')}
+        ${stat('🆓 Trials',trials,'#a78bfa')}
+        ${stat('🏪 Vendedores',vendedores,'#67e8f9')}
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;color:var(--gold);margin-bottom:6px">💰 Dinero este mes</div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Clientes que vencen este mes:</span><b>${venEsteMes.length} clientes · ${fmt(cobrosEsteMes)}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Renovaciones registradas:</span><b>${renMes.length} · ${fmt(totalRenMes)}</b></div>
+        ${conDeuda.length?`<div style="display:flex;justify-content:space-between;color:#f97316"><span>💸 Cobros pendientes (${conDeuda.length} clientes):</span><b>${fmt(totalDeuda)}</b></div>`:''}
+      </div>
+      ${proxSem.length?`<div style="background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;color:#fb923c;margin-bottom:6px">⏰ Vencen en los próximos 7 días (${proxSem.length})</div>
+        ${proxSem.map(c=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0"><span>${escH(c.nombre)}</span><span style="color:var(--muted)">${c.vencimiento} · ${diasHasta(c.vencimiento)}d</span></div>`).join('')}
+      </div>`:''}
+      <div style="background:var(--surface2);border-radius:8px;padding:12px">
+        <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📱 Dispositivos</div>
+        ${topDisp.map(([d,n])=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span>${DISP_LABEL[d]||d}</span><b>${n}</b></div>`).join('')}
+      </div>
+    </div>`;
+
+  function stat(lbl,val,color){
+    return`<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:11px;color:var(--muted)">${lbl}</div>
+      <div style="font-size:22px;font-weight:700;color:${color}">${val}</div>
+    </div>`;
+  }
+
+  document.getElementById('reporte-body').innerHTML=html;
+  abrirModal('modal-reporte');
+}
+
+function copiarReporte(){
+  const hoy=new Date();
+  const mesActual=hoy.toISOString().substr(0,7);
+  const activos=DB.clientes.filter(c=>estadoCliente(c)==='activo').length;
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const pronto=DB.clientes.filter(c=>estadoCliente(c)==='vence').length;
+  const venEsteMes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
+  const cobros=venEsteMes.reduce((a,c)=>a+(c.precio||0),0);
+  const conDeuda=DB.clientes.filter(c=>c.debe&&c.debe>0);
+  const totalDeuda=conDeuda.reduce((a,c)=>a+(c.debe||0),0);
+  const txt=`📊 REPORTE GOLD TV — ${hoy.toLocaleDateString('es',{month:'long',year:'numeric'}).toUpperCase()}
+
+👥 Total clientes: ${DB.clientes.length}
+✅ Activos: ${activos}
+⏰ Por vencer: ${pronto}
+🔴 Vencidos: ${vencidos}
+
+💰 Cobros este mes: ${fmt(cobros)} (${venEsteMes.length} clientes)
+${conDeuda.length?`💸 Cobros pendientes: ${fmt(totalDeuda)} (${conDeuda.length} clientes)\n`:''}
+Generado: ${hoy.toLocaleDateString('es')} · GOLD TV`;
+  navigator.clipboard.writeText(txt).then(()=>alert('✅ Reporte copiado al portapapeles'));
 }
 </script>
 </body>
