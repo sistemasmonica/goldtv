@@ -123,6 +123,25 @@ select option{background:#1a1735}
 </style>
 </head>
 <body>
+
+<!-- PANTALLA LOGIN PROPIETARIA -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0d0b1f,#1a0a2e);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:20px;text-align:center;padding:30px">
+  <div style="font-size:60px">📺</div>
+  <div style="font-size:22px;font-weight:900;color:#f59e0b;letter-spacing:2px">GOLD TV</div>
+  <div style="font-size:13px;color:#94a3b8;margin-bottom:8px">Panel de administración · Acceso privado</div>
+  <div style="background:#13112a;border:2px solid rgba(245,158,11,.4);border-radius:16px;padding:32px;max-width:360px;width:100%">
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:16px">Ingresa tu clave de propietaria</div>
+    <input id="owner-input" type="password" placeholder="••••••••••••"
+      style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(245,158,11,.4);background:#0d0b1f;color:#fff;font-size:16px;font-family:inherit;text-align:center;letter-spacing:4px;margin-bottom:16px"
+      onkeydown="if(event.key==='Enter')verificarClave()">
+    <button onclick="verificarClave()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#f59e0b,#d97706);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+      🔓 Ingresar
+    </button>
+    <div id="login-error" style="color:#f87171;font-size:12px;margin-top:12px;display:none">Clave incorrecta. Intenta de nuevo.</div>
+  </div>
+  <div style="color:#334155;font-size:10px">Sistema exclusivo de la propietaria · GOLD TV Monica</div>
+</div>
+
 <div class="w">
 
 <!-- HEADER -->
@@ -608,6 +627,37 @@ select option{background:#1a1735}
 
 <script>
 // ===== SUPABASE =====
+// ===== CLAVE PROPIETARIA =====
+// Para cambiar la clave: reemplaza OWNER_HASH por el SHA-256 de tu nueva clave
+// Clave actual: GoldTV2026!
+const OWNER_HASH='2f665154a24f13c1b17e17a27d6240d9ae415bd13b7e038216c7f8202cb9bc2d';
+const SESSION_KEY='goldtv_owner_auth';
+
+async function sha256(text){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function verificarClave(){
+  const input=document.getElementById('owner-input').value;
+  const hash=await sha256(input);
+  if(hash===OWNER_HASH){
+    sessionStorage.setItem(SESSION_KEY,'1');
+    document.getElementById('login-screen').style.display='none';
+    iniciarApp();
+  }else{
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('owner-input').value='';
+    document.getElementById('owner-input').focus();
+  }
+}
+
+async function checkOwnerAuth(){
+  if(sessionStorage.getItem(SESSION_KEY)==='1'){iniciarApp();return;}
+  document.getElementById('login-screen').style.display='flex';
+  setTimeout(()=>document.getElementById('owner-input')?.focus(),100);
+}
+
 const SUPA_URL='https://pqluiqsvfeddmxpuxyhm.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxbHVpcXN2ZmVkZG14cHV4eWhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTI4MDYsImV4cCI6MjA5NjA4ODgwNn0.cdWKlECRLxms1y8a3sSHr1i5rsif9B94mDrvigHNm2A';
 const sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -758,16 +808,18 @@ function renderRenovaciones(){
 }
 
 // ===== FORMULARIO NUEVO CLIENTE =====
-document.addEventListener('DOMContentLoaded',()=>{
+function iniciarApp(){
   const ini=document.getElementById('cli-inicio');
   const plan=document.getElementById('cli-plan');
   if(ini)ini.addEventListener('change',calcVence);
   if(plan)plan.addEventListener('change',calcVence);
-  ini.value=today();
+  if(ini)ini.value=today();
   calcVence();
   load();
   syncFromCloud();
-});
+}
+
+document.addEventListener('DOMContentLoaded',()=>checkOwnerAuth());
 
 function calcVence(){
   const ini=document.getElementById('cli-inicio').value;
