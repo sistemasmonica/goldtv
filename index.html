@@ -700,7 +700,965 @@ select option{background:#1a1735}
 </div>
 
 <script>
-const OWNER_HASH='2f665154a24f13c1b17e17a27d6240d9ae415bd13b7e038216c7f8202cb9bc2d',SESSION_KEY='goldtv_owner_auth';async function sha256(_0x494141){const _0x5110e8=await crypto['subtle']['digest']('SHA-256',new TextEncoder()['encode'](_0x494141));return Array['from'](new Uint8Array(_0x5110e8))['map'](_0x2f079a=>_0x2f079a['toString'](0x10)['padStart'](0x2,'0'))['join']('');}async function verificarClave(){const _0x2c9602=document['getElementById']('owner-input')['value'],_0x40771a=await sha256(_0x2c9602);_0x40771a===OWNER_HASH?(sessionStorage['setItem'](SESSION_KEY,'1'),document['getElementById']('login-screen')['style']['display']='none',iniciarApp()):(document['getElementById']('login-error')['style']['display']='block',document['getElementById']('owner-input')['value']='',document['getElementById']('owner-input')['focus']());}async function checkOwnerAuth(){if(sessionStorage['getItem'](SESSION_KEY)==='1'){iniciarApp();return;}document['getElementById']('login-screen')['style']['display']='flex',setTimeout(()=>document['getElementById']('owner-input')?.['focus'](),0x64);}const SUPA_URL='https://pqluiqsvfeddmxpuxyhm.supabase.co',SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxbHVpcXN2ZmVkZG14cHV4eWhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTI4MDYsImV4cCI6MjA5NjA4ODgwNn0.cdWKlECRLxms1y8a3sSHr1i5rsif9B94mDrvigHNm2A',sb=window['supabase']['createClient'](SUPA_URL,SUPA_KEY),M3U_BASE='http://mundo2.pro:80/get.php?username=USER&password=PASS&type=m3u_plus&output=hls',DOWNLOADER_CODE='1566382',DOWNLOADER_LINK='http://aftv.news/1566382';let DB={'clientes':[]},syncOk=![];function setSyncStatus(_0x5b37f0){const _0x3c02dd=document['getElementById']('pill-sync');if(!_0x3c02dd)return;if(_0x5b37f0==='ok')_0x3c02dd['textContent']='☁️\x20Guardado';else{if(_0x5b37f0==='sync')_0x3c02dd['textContent']='🔄\x20Guardando...';else _0x5b37f0==='load'?_0x3c02dd['textContent']='⬇️\x20Cargando...':_0x3c02dd['textContent']='⚠️\x20Sin\x20conexión';}}async function saveToCloud(){try{setSyncStatus('sync'),await sb['from']('goldtv_clientes')['upsert']({'version':'v1','data':DB['clientes'],'updated_at':new Date()['toISOString']()}),setSyncStatus('ok');}catch(_0xf80961){setSyncStatus('err'),console['warn']('Cloud\x20error:',_0xf80961);}}async function syncFromCloud(){try{setSyncStatus('load');const {data:_0x2cde1d,error:_0x5af25b}=await sb['from']('goldtv_clientes')['select']('data')['eq']('version','v1')['maybeSingle']();if(!_0x5af25b&&_0x2cde1d?.['data']?.['length']>0x0)DB['clientes']=_0x2cde1d['data'];syncOk=!![],setSyncStatus('ok');}catch(_0x11d325){setSyncStatus('err');}localStorage['setItem']('goldtv',JSON['stringify'](DB)),renderAll();}function save(){try{localStorage['setItem']('goldtv',JSON['stringify'](DB));}catch(_0x3b5476){}saveToCloud();}function load(){try{const _0x125567=localStorage['getItem']('goldtv');if(_0x125567){const _0x38960c=JSON['parse'](_0x125567);if(_0x38960c['clientes']?.['length']>0x0)DB['clientes']=_0x38960c['clientes'];}}catch(_0x4780ac){}}function uid(){return Date['now']()+'_'+Math['random']()['toString'](0x24)['substr'](0x2,0x6);}function today(){return new Date()['toISOString']()['split']('T')[0x0];}function fmt(_0x5bef28){return'$'+(parseFloat(_0x5bef28)||0x0)['toFixed'](0x2);}function escH(_0x51550f){return String(_0x51550f??'')['replace'](/&/g,'&amp;')['replace'](/</g,'&lt;')['replace'](/>/g,'&gt;');}function cerrarModal(_0x176c3b){document['getElementById'](_0x176c3b)['classList']['remove']('on');}function abrirModal(_0x188e22){document['getElementById'](_0x188e22)['classList']['add']('on');}function addMeses(_0x3eaf58,_0x1690f6){const _0x428c1f=new Date(_0x3eaf58+'T12:00:00');return _0x428c1f['setMonth'](_0x428c1f['getMonth']()+parseInt(_0x1690f6)),_0x428c1f['toISOString']()['split']('T')[0x0];}function diasHasta(_0x4e6dea){const _0x3fe640=new Date();_0x3fe640['setHours'](0x0,0x0,0x0,0x0);const _0x33b57a=new Date(_0x4e6dea+'T12:00:00');return Math['round']((_0x33b57a-_0x3fe640)/(0x3e8*0x3c*0x3c*0x18));}function estadoCliente(_0x2a151f){const _0x1a4aaa=diasHasta(_0x2a151f['vencimiento']);if(_0x1a4aaa<0x0)return'vencido';if(_0x1a4aaa<=0x7)return'vence';return'activo';}const DISP_LABEL={'android-tv':'📺\x20Android\x20TV','celular':'📱\x20Celular\x20Android','smart-tv':'🖥️\x20Smart\x20TV','iphone':'🍎\x20iPhone/iPad','tv-box':'📦\x20TV\x20Box','fire-tv':'🔥\x20Fire\x20TV','pc':'💻\x20PC'};function tab(_0x4a1bc7,_0x483807){document['querySelectorAll']('.pn')['forEach'](_0x38a613=>_0x38a613['classList']['remove']('on')),document['querySelectorAll']('.nav>.nt')['forEach'](_0x36a0ae=>_0x36a0ae['classList']['remove']('on')),document['getElementById']('pn-'+_0x4a1bc7)['classList']['add']('on'),_0x483807['classList']['add']('on');if(_0x4a1bc7==='dash')renderDash();if(_0x4a1bc7==='clientes')renderClientes();if(_0x4a1bc7==='nuevo'){limpiarFormCliente();const _0x3033ef=document['getElementById']('cli-inicio');if(_0x3033ef&&!_0x3033ef['value'])_0x3033ef['value']=today();calcVence();}if(_0x4a1bc7==='vencimientos')renderVencimientos();if(_0x4a1bc7==='guias')llenarSelectClientes();if(_0x4a1bc7==='renovaciones')renderRenovaciones();if(_0x4a1bc7==='misistema')cargarVendedores();}function verHistorial(_0x3ddc38){const _0x3ddba7=DB['clientes']['find'](_0x2675da=>_0x2675da['id']===_0x3ddc38);if(!_0x3ddba7)return;const _0x385e4e=_0x3ddba7['historial']||[],_0x652c1d=_0x385e4e['reduce']((_0x78127,_0x401cd3)=>_0x78127+(_0x401cd3['precio']||0x0),0x0);document['getElementById']('hist-titulo')['textContent']='📋\x20'+_0x3ddba7['nombre']+'\x20—\x20Historial',document['getElementById']('hist-body')['innerHTML']=!_0x385e4e['length']?'<tr><td\x20colspan=\x224\x22\x20style=\x22text-align:center;color:var(--muted);padding:20px\x22>Sin\x20renovaciones\x20registradas\x20aún</td></tr>':_0x385e4e['slice']()['reverse']()['map'](_0x25a55b=>'<tr>\x0a\x20\x20\x20\x20\x20\x20<td>'+_0x25a55b['fecha']+'</td>\x0a\x20\x20\x20\x20\x20\x20<td>'+_0x25a55b['meses']+'\x20mes'+(_0x25a55b['meses']>0x1?'es':'')+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22font-family:monospace;color:var(--green)\x22>'+fmt(_0x25a55b['precio'])+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22font-family:monospace\x22>'+(_0x25a55b['nueva_fecha']||'—')+'</td>\x0a\x20\x20\x20\x20</tr>')['join'](''),document['getElementById']('hist-total')['textContent']=fmt(_0x652c1d),abrirModal('modal-hist');}function renderRenovaciones(){const _0x5adf50=new Date()['toISOString']()['substr'](0x0,0x7),_0x2dfa73=[];DB['clientes']['forEach'](_0x1a0f8d=>{(_0x1a0f8d['historial']||[])['forEach'](_0x29cb88=>{_0x2dfa73['push']({..._0x29cb88,'nombre':_0x1a0f8d['nombre'],'tipo':_0x1a0f8d['tipo']||'mensual','cid':_0x1a0f8d['id']});});}),_0x2dfa73['sort']((_0x20c773,_0x4082f1)=>_0x4082f1['fecha']['localeCompare'](_0x20c773['fecha']));const _0xacaadf=_0x2dfa73['filter'](_0x17d39c=>_0x17d39c['fecha']['startsWith'](_0x5adf50)),_0x2fcb4b=(_0x3e18c6,_0x49be52)=>{const _0x1aaf14=document['getElementById'](_0x3e18c6);if(_0x1aaf14)_0x1aaf14['textContent']=_0x49be52;};_0x2fcb4b('rn-mes',_0xacaadf['length']),_0x2fcb4b('rn-mes-total',fmt(_0xacaadf['reduce']((_0x430088,_0x383357)=>_0x430088+(_0x383357['precio']||0x0),0x0))),_0x2fcb4b('rn-total',fmt(_0x2dfa73['reduce']((_0x2d121a,_0x26072e)=>_0x2d121a+(_0x26072e['precio']||0x0),0x0)));const _0x2c232a=[...new Set(_0x2dfa73['map'](_0x4fd412=>_0x4fd412['fecha']['substr'](0x0,0x7)))]['sort']()['reverse'](),_0x5c608c=document['getElementById']('rn-mes-fil');if(_0x5c608c){const _0x29e83b=_0x5c608c['value'];_0x5c608c['innerHTML']='<option\x20value=\x22\x22>Todos\x20los\x20meses</option>'+_0x2c232a['map'](_0x150c86=>'<option\x20value=\x22'+_0x150c86+'\x22'+(_0x150c86===_0x29e83b?'\x20selected':'')+'>'+_0x150c86+'</option>')['join']('');}const _0x4e9d38=_0x5c608c?.['value']||'',_0x129d79=(document['getElementById']('rn-q')?.['value']||'')['toLowerCase']();let _0x17e558=_0x2dfa73;if(_0x4e9d38)_0x17e558=_0x17e558['filter'](_0x7e3624=>_0x7e3624['fecha']['startsWith'](_0x4e9d38));if(_0x129d79)_0x17e558=_0x17e558['filter'](_0x400b62=>_0x400b62['nombre']['toLowerCase']()['includes'](_0x129d79));const _0x46d08f=document['getElementById']('tb-renovaciones');if(!_0x46d08f)return;if(!_0x17e558['length']){_0x46d08f['innerHTML']='<tr><td\x20colspan=\x226\x22\x20style=\x22text-align:center;color:var(--muted);padding:20px\x22>Sin\x20renovaciones\x20registradas</td></tr>';return;}_0x46d08f['innerHTML']=_0x17e558['map'](_0x9c5162=>'<tr>\x0a\x20\x20\x20\x20<td>'+_0x9c5162['fecha']+'</td>\x0a\x20\x20\x20\x20<td><b>'+escH(_0x9c5162['nombre'])+'</b></td>\x0a\x20\x20\x20\x20<td>'+(TIPO_BADGE[_0x9c5162['tipo']]||_0x9c5162['tipo'])+'</td>\x0a\x20\x20\x20\x20<td\x20style=\x22text-align:center\x22>'+_0x9c5162['meses']+'</td>\x0a\x20\x20\x20\x20<td\x20style=\x22font-family:monospace;color:var(--green)\x22>'+fmt(_0x9c5162['precio'])+'</td>\x0a\x20\x20\x20\x20<td\x20style=\x22font-family:monospace\x22>'+(_0x9c5162['nueva_fecha']||'—')+'</td>\x0a\x20\x20</tr>')['join']('');}function iniciarApp(){const _0x2dcfa9=document['getElementById']('cli-inicio'),_0x2ea261=document['getElementById']('cli-plan');if(_0x2dcfa9)_0x2dcfa9['addEventListener']('change',calcVence);if(_0x2ea261)_0x2ea261['addEventListener']('change',calcVence);if(_0x2dcfa9)_0x2dcfa9['value']=today();calcVence(),load(),syncFromCloud();}document['addEventListener']('DOMContentLoaded',()=>checkOwnerAuth());function calcVence(){const _0x18fd29=document['getElementById']('cli-inicio')['value'],_0x49b7e1=document['getElementById']('cli-plan')['value'],_0x34625f=document['getElementById']('cli-vence-preview');_0x18fd29&&_0x49b7e1?_0x34625f['value']=addMeses(_0x18fd29,_0x49b7e1):_0x34625f['value']='';}function guardarCliente(){const _0x4a6ba0=(document['getElementById']('cli-nombre')['value']||'')['trim'](),_0x43be62=(document['getElementById']('cli-tel')['value']||'')['trim'](),_0x459af8=(document['getElementById']('cli-user')['value']||'')['trim'](),_0x15cf8c=(document['getElementById']('cli-pass')['value']||'')['trim'](),_0x5c9f62=document['getElementById']('cli-device')['value'],_0x283ecb=document['getElementById']('cli-plan')['value'],_0x3e942f=parseFloat(document['getElementById']('cli-precio')['value'])||0x0,_0x299c26=document['getElementById']('cli-inicio')['value']||today(),_0x558eca=(document['getElementById']('cli-notas')['value']||'')['trim'](),_0x159361=parseFloat(document['getElementById']('cli-debe')?.['value'])||0x0,_0x3357e7=document['getElementById']('cli-edit-id')['value']||'';if(!_0x4a6ba0)return alert('Ingresa\x20el\x20nombre\x20del\x20cliente');if(!_0x459af8||!_0x15cf8c)return alert('Ingresa\x20el\x20usuario\x20y\x20contraseña\x20del\x20panel\x20OTT');const _0x28071e=document['getElementById']('cli-tipo')['value']||'mensual',_0xd9368e=_0x28071e==='vendedor'?parseInt(document['getElementById']('cli-creditos')['value'])||0x0:0x0,_0x2e4304=addMeses(_0x299c26,_0x283ecb);if(_0x3357e7){const _0x1cf8b8=DB['clientes']['findIndex'](_0x2fc391=>_0x2fc391['id']===_0x3357e7);if(_0x1cf8b8!==-0x1)DB['clientes'][_0x1cf8b8]={...DB['clientes'][_0x1cf8b8],'nombre':_0x4a6ba0,'tel':_0x43be62,'user':_0x459af8,'pass':_0x15cf8c,'device':_0x5c9f62,'plan':_0x283ecb,'tipo':_0x28071e,'creditos':_0xd9368e,'precio':_0x3e942f,'inicio':_0x299c26,'vencimiento':_0x2e4304,'notas':_0x558eca,'debe':_0x159361};document['getElementById']('cli-edit-id')['value']='',document['getElementById']('form-titulo')['textContent']='Registrar\x20nuevo\x20cliente',document['getElementById']('btn-guardar-cli')['textContent']='✅\x20Guardar\x20cliente';}else DB['clientes']['push']({'id':uid(),'nombre':_0x4a6ba0,'tel':_0x43be62,'user':_0x459af8,'pass':_0x15cf8c,'device':_0x5c9f62,'plan':_0x283ecb,'tipo':_0x28071e,'creditos':_0xd9368e,'precio':_0x3e942f,'inicio':_0x299c26,'vencimiento':_0x2e4304,'notas':_0x558eca,'debe':_0x159361,'activo':!![]});save(),limpiarFormCliente(),renderAll(),tab('clientes',document['querySelectorAll']('.nav>.nt')[0x1]),setTimeout(()=>alert('✅\x20Cliente\x20guardado\x20correctamente'),0x64);}function limpiarFormCliente(){['cli-nombre','cli-tel','cli-user','cli-pass','cli-precio','cli-notas','cli-debe']['forEach'](_0x15fb19=>{const _0x4b7175=document['getElementById'](_0x15fb19);if(_0x4b7175)_0x4b7175['value']='';}),document['getElementById']('cli-device')['value']='android-tv',document['getElementById']('cli-plan')['value']='1',document['getElementById']('cli-tipo')['value']='mensual',document['getElementById']('cli-creditos')['value']='',document['getElementById']('fg-creditos')['style']['display']='none',document['getElementById']('cli-inicio')['value']=today(),document['getElementById']('cli-edit-id')['value']='',document['getElementById']('form-titulo')['textContent']='Registrar\x20nuevo\x20cliente',document['getElementById']('btn-guardar-cli')['textContent']='✅\x20Guardar\x20cliente',calcVence();}function editarCliente(_0x578aa1){const _0xe340d0=DB['clientes']['find'](_0x211abf=>_0x211abf['id']===_0x578aa1);if(!_0xe340d0)return;document['getElementById']('cli-nombre')['value']=_0xe340d0['nombre']||'',document['getElementById']('cli-tel')['value']=_0xe340d0['tel']||'',document['getElementById']('cli-user')['value']=_0xe340d0['user']||'',document['getElementById']('cli-pass')['value']=_0xe340d0['pass']||'',document['getElementById']('cli-device')['value']=_0xe340d0['device']||'android-tv',document['getElementById']('cli-plan')['value']=_0xe340d0['plan']||'1',document['getElementById']('cli-tipo')['value']=_0xe340d0['tipo']||'mensual',document['getElementById']('cli-creditos')['value']=_0xe340d0['creditos']||'',toggleCreditosField(),document['getElementById']('cli-precio')['value']=_0xe340d0['precio']||'',document['getElementById']('cli-inicio')['value']=_0xe340d0['inicio']||today(),document['getElementById']('cli-notas')['value']=_0xe340d0['notas']||'';const _0x48095b=document['getElementById']('cli-debe');if(_0x48095b)_0x48095b['value']=_0xe340d0['debe']||'';document['getElementById']('cli-edit-id')['value']=_0x578aa1,document['getElementById']('form-titulo')['textContent']='Editar:\x20'+_0xe340d0['nombre'],document['getElementById']('btn-guardar-cli')['textContent']='💾\x20Guardar\x20cambios',calcVence(),tab('nuevo',document['querySelectorAll']('.nav>.nt')[0x2]);}function eliminarCliente(_0x36433b){const _0x10c39f=DB['clientes']['find'](_0x1210cb=>_0x1210cb['id']===_0x36433b);if(!_0x10c39f||!confirm('¿Eliminar\x20al\x20cliente\x20\x22'+_0x10c39f['nombre']+'\x22?'))return;DB['clientes']=DB['clientes']['filter'](_0x2b192b=>_0x2b192b['id']!==_0x36433b),save(),renderAll();}function abrirRenovar(_0x5c655d){const _0x43c4c1=DB['clientes']['find'](_0x390472=>_0x390472['id']===_0x5c655d);if(!_0x43c4c1)return;document['getElementById']('modal-ren-info')['innerHTML']='<b>'+escH(_0x43c4c1['nombre'])+'</b>\x20—\x20Vence:\x20<b\x20style=\x22color:var(--red)\x22>'+_0x43c4c1['vencimiento']+'</b>\x20|\x20Precio\x20anterior:\x20<b>'+fmt(_0x43c4c1['precio'])+'</b>',document['getElementById']('ren-cli-id')['value']=_0x5c655d,document['getElementById']('ren-plan')['value']='1',document['getElementById']('ren-precio')['value']=_0x43c4c1['precio']||'',abrirModal('modal-renovar');}function guardarRenovacion(){const _0x1d2769=document['getElementById']('ren-cli-id')['value'],_0x456111=document['getElementById']('ren-plan')['value'],_0x11bdaf=parseFloat(document['getElementById']('ren-precio')['value'])||0x0,_0x21ee86=DB['clientes']['find'](_0x5a10e2=>_0x5a10e2['id']===_0x1d2769);if(!_0x21ee86)return;const _0xf9d739=_0x21ee86['vencimiento'],_0x270ccb=diasHasta(_0x21ee86['vencimiento'])<0x0?today():_0x21ee86['vencimiento'];_0x21ee86['vencimiento']=addMeses(_0x270ccb,_0x456111),_0x21ee86['plan']=_0x456111,_0x21ee86['precio']=_0x11bdaf;if(!_0x21ee86['historial'])_0x21ee86['historial']=[];_0x21ee86['historial']['push']({'fecha':today(),'fecha_anterior':_0xf9d739,'meses':parseInt(_0x456111),'precio':_0x11bdaf,'nueva_fecha':_0x21ee86['vencimiento']}),save(),cerrarModal('modal-renovar'),renderAll(),alert('✅\x20Suscripción\x20actualizada\x20hasta:\x20'+_0x21ee86['vencimiento']);}function msgCredenciales(_0x2b294f){return'Hola\x20'+_0x2b294f['nombre']+'!\x20👋\x0a\x0aAquí\x20están\x20tus\x20datos\x20de\x20acceso\x20*GOLD\x20TV*\x20📺\x0a\x0a👤\x20*Usuario:*\x20'+_0x2b294f['user']+'\x0a🔑\x20*Contraseña:*\x20'+_0x2b294f['pass']+'\x0a📅\x20*Válido\x20hasta:*\x20'+_0x2b294f['vencimiento']+'\x0a\x0aCualquier\x20consulta\x20estoy\x20a\x20tu\x20disposición\x20😊';}function m3uLink(_0x310629){return M3U_BASE['replace']('USER',_0x310629['user'])['replace']('PASS',_0x310629['pass']);}function msgInstalacion(_0x17e8c9,_0x506e65,_0xd08215){const _0x2f85c0=_0x506e65||_0x17e8c9['device'],_0x544ea0=_0x17e8c9['user'],_0x579f21=_0x17e8c9['pass'],_0x443e3e=_0x17e8c9['nombre'],_0x1d46cd='\x0a👤\x20*Usuario:*\x20'+_0x544ea0+'\x0a🔑\x20*Contraseña:*\x20'+_0x579f21,_0x32669f='http://mundo2.pro:80',_0x3fb4dd='\x0a🌐\x20*URL:*\x20'+_0x32669f+'\x0a👤\x20*Usuario:*\x20'+_0x544ea0+'\x0a🔑\x20*Contraseña:*\x20'+_0x579f21;if(_0xd08215==='smarters'){const _0x51a478={'android-tv':'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Lite*\x20desde\x20*Play\x20Store*','celular':'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Lite*\x20desde\x20*Play\x20Store*','tv-box':'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Lite*\x20desde\x20*Play\x20Store*','fire-tv':'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Lite*\x20desde\x20*Amazon\x20App\x20Store*','smart-tv':'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Lite*\x20desde\x20la\x20tienda\x20de\x20tu\x20Smart\x20TV','iphone':'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Pro*\x20desde\x20*App\x20Store*','pc':'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Player*\x20desde\x20Microsoft\x20Store\x20o\x20smarters.live'}[_0x2f85c0]||'1️⃣\x20Descarga\x20*IPTV\x20Smarters\x20Lite*',_0xf66bee={'android-tv':'📺','celular':'📱','tv-box':'📦','fire-tv':'🔥','smart-tv':'🖥️','iphone':'🍎','pc':'💻'}[_0x2f85c0]||'📺';return'Hola\x20'+_0x443e3e+'!\x20'+_0xf66bee+'\x0a\x0a*Instalación\x20GOLD\x20TV\x20con\x20IPTV\x20Smarters\x20Lite:*\x0a\x0a'+_0x51a478+'\x0a2️⃣\x20Abre\x20la\x20app\x20→\x20toca\x20*\x22Agregar\x20usuario\x22*\x0a3️⃣\x20Selecciona\x20*Xtream\x20Codes\x20API*\x0a4️⃣\x20Ingresa\x20estos\x20datos:'+_0x3fb4dd+'\x0a5️⃣\x20Toca\x20*Agregar\x20usuario*\x0a\x0a✅\x20¡Listo!\x20Disfruta\x20todos\x20los\x20canales\x20🎉';}if(_0x2f85c0==='android-tv')return'Hola\x20'+_0x443e3e+'!\x20📺\x0a\x0a*Instalación\x20GOLD\x20TV\x20en\x20Android\x20TV:*\x0a\x0a1️⃣\x20Descarga\x20*Downloader*\x20desde\x20Play\x20Store\x0a2️⃣\x20Abre\x20Downloader\x20e\x20ingresa\x20el\x20código:\x0a\x20\x20\x20\x20📌\x20*'+DOWNLOADER_CODE+'*\x0a3️⃣\x20Descarga\x20e\x20instala\x20la\x20app\x0a4️⃣\x20Ingresa\x20tus\x20datos:'+_0x1d46cd+'\x0a\x0a✅\x20¡Listo!\x20Ya\x20puedes\x20ver\x20todos\x20los\x20canales\x20🎉';if(_0x2f85c0==='celular')return'Hola\x20'+_0x443e3e+'!\x20📱\x0a\x0a*Instalación\x20GOLD\x20TV\x20en\x20Android:*\x0a\x0a1️⃣\x20Abre\x20Chrome\x20en\x20tu\x20celular\x0a2️⃣\x20Escribe\x20este\x20link:\x0a\x20\x20\x20\x20🔗\x20'+DOWNLOADER_LINK+'\x0a3️⃣\x20Descarga\x20e\x20instala\x20la\x20app\x0a4️⃣\x20Ingresa\x20tus\x20datos:'+_0x1d46cd+'\x0a\x0a✅\x20¡Listo!\x20Ya\x20puedes\x20ver\x20todos\x20los\x20canales\x20🎉';if(_0x2f85c0==='smart-tv')return'Hola\x20'+_0x443e3e+'!\x20🖥️\x0a\x0a*Instalación\x20GOLD\x20TV\x20en\x20Smart\x20TV\x20(LG/Samsung):*\x0a\x0a1️⃣\x20Busca\x20e\x20instala\x20*IPTV\x20Master\x20LITE*\x20en\x20la\x20tienda\x20de\x20apps\x20de\x20tu\x20TV\x20(es\x20gratis)\x0a2️⃣\x20Abre\x20la\x20app\x20y\x20selecciona\x20*\x22Agregar\x20lista\x20M3U\x22*\x0a3️⃣\x20Pega\x20este\x20link:\x0a\x20\x20\x20\x20🔗\x20'+m3uLink(_0x17e8c9)+'\x0a4️⃣\x20Espera\x20que\x20cargue\x0a\x0a✅\x20¡Listo!\x20Ya\x20puedes\x20ver\x20todos\x20los\x20canales\x20🎉';if(_0x2f85c0==='iphone')return'Hola\x20'+_0x443e3e+'!\x20🍎\x0a\x0a*Instalación\x20GOLD\x20TV\x20en\x20iPhone/iPad:*\x0a\x0a1️⃣\x20Busca\x20e\x20instala\x20*IPTV\x20Master\x20LITE*\x20en\x20App\x20Store\x20(es\x20gratis)\x0a2️⃣\x20Abre\x20la\x20app\x20y\x20selecciona\x20*\x22Agregar\x20lista\x20M3U\x22*\x0a3️⃣\x20Pega\x20este\x20link:\x0a\x20\x20\x20\x20🔗\x20'+m3uLink(_0x17e8c9)+'\x0a4️⃣\x20Espera\x20que\x20cargue\x0a\x0a✅\x20¡Listo!\x20Ya\x20puedes\x20ver\x20todos\x20los\x20canales\x20🎉';if(_0x2f85c0==='tv-box')return'Hola\x20'+_0x443e3e+'!\x20📦\x0a\x0a*Instalación\x20GOLD\x20TV\x20en\x20TV\x20Box:*\x0a\x0a1️⃣\x20Abre\x20*Chrome*\x20en\x20tu\x20TV\x20Box\x0a2️⃣\x20Escribe\x20o\x20pega\x20este\x20link:\x0a\x20\x20\x20\x20🔗\x20'+DOWNLOADER_LINK+'\x0a3️⃣\x20Descarga\x20e\x20instala\x20la\x20app\x0a4️⃣\x20Ingresa\x20tus\x20datos:'+_0x1d46cd+'\x0a\x0a✅\x20¡Listo!\x20Ya\x20puedes\x20ver\x20todos\x20los\x20canales\x20🎉';if(_0x2f85c0==='fire-tv')return'Hola\x20'+_0x443e3e+'!\x20🔥\x0a\x0a*Instalación\x20GOLD\x20TV\x20en\x20Fire\x20TV:*\x0a\x0a1️⃣\x20Descarga\x20*Downloader*\x20desde\x20Amazon\x20App\x20Store\x0a2️⃣\x20Abre\x20Downloader\x20e\x20ingresa\x20el\x20código:\x0a\x20\x20\x20\x20📌\x20*'+DOWNLOADER_CODE+'*\x0a3️⃣\x20Descarga\x20e\x20instala\x20la\x20app\x0a4️⃣\x20Ingresa\x20tus\x20datos:'+_0x1d46cd+'\x0a\x0a✅\x20¡Listo!\x20Ya\x20puedes\x20ver\x20todos\x20los\x20canales\x20🎉';if(_0x2f85c0==='pc')return'Hola\x20'+_0x443e3e+'!\x20💻\x0a\x0a*Ver\x20GOLD\x20TV\x20en\x20PC\x20con\x20IPTV\x20Smarters\x20Player:*\x0a\x0a1️⃣\x20Busca\x20*IPTV\x20Smarters\x20Player*\x20en\x20*Microsoft\x20Store*\x20e\x20instálalo\x20(gratis)\x0a2️⃣\x20Abre\x20la\x20app\x20→\x20*\x22Agregar\x20usuario\x22*\x0a3️⃣\x20Selecciona\x20*Xtream\x20Codes\x20API*\x0a4️⃣\x20Ingresa\x20tus\x20datos:\x0a\x20\x20\x20\x20🌐\x20URL:\x20http://mundo2.pro:80\x0a\x20\x20\x20\x20👤\x20Usuario:\x20'+_0x544ea0+'\x0a\x20\x20\x20\x20🔑\x20Contraseña:\x20'+_0x579f21+'\x0a5️⃣\x20Haz\x20clic\x20en\x20*Agregar\x20usuario*\x0a\x0a✅\x20¡Listo!\x20Ya\x20puedes\x20ver\x20todos\x20los\x20canales\x20🎉';return'Dispositivo\x20no\x20reconocido';}function enviarWACredenciales(_0x1923bd){const _0x4dc3c8=DB['clientes']['find'](_0x3cc5ae=>_0x3cc5ae['id']===_0x1923bd);if(!_0x4dc3c8)return;const _0xee0642=_0x4dc3c8['tel']['replace'](/\D/g,''),_0x14b121=encodeURIComponent(msgCredenciales(_0x4dc3c8));window['open']('https://wa.me/593'+_0xee0642['replace'](/^0/,'')+'?text='+_0x14b121,'_blank');}function enviarWAInstalacion(_0x24c7d7){const _0xb29619=DB['clientes']['find'](_0x114e8f=>_0x114e8f['id']===_0x24c7d7);if(!_0xb29619)return;const _0x4e73a8=_0xb29619['tel']['replace'](/\D/g,''),_0x1665ec=encodeURIComponent(msgInstalacion(_0xb29619));window['open']('https://wa.me/593'+_0x4e73a8['replace'](/^0/,'')+'?text='+_0x1665ec,'_blank');}let _guiaMsgActual='';function generarGuia(){const _0x2fa827=document['getElementById']('guia-cliente')['value'],_0x5b34bd=document['getElementById']('guia-device')['value'],_0x354651=document['getElementById']('guia-app')['value'];if(!_0x2fa827)return alert('Selecciona\x20un\x20cliente');const _0x5d4fcf=DB['clientes']['find'](_0x4b8da6=>_0x4b8da6['id']===_0x2fa827);if(!_0x5d4fcf)return;const _0x14500e=msgInstalacion(_0x5d4fcf,_0x5b34bd,_0x354651);_guiaMsgActual=_0x14500e,document['getElementById']('guia-msg')['textContent']=_0x14500e,document['getElementById']('guia-resultado')['style']['display']='block';}function enviarWA(_0x210c42){const _0x41a9db=_0x210c42==='guia'?DB['clientes']['find'](_0x418794=>_0x418794['id']===document['getElementById']('guia-cliente')['value']):null,_0x1b6dc4=_0x41a9db?.['tel']?.['replace'](/\D/g,'')||'',_0x5487f8=encodeURIComponent(_guiaMsgActual);if(_0x1b6dc4)window['open']('https://wa.me/593'+_0x1b6dc4['replace'](/^0/,'')+'?text='+_0x5487f8,'_blank');else window['open']('https://wa.me/?text='+_0x5487f8,'_blank');}function copiarMensaje(_0xfd070d){const _0xa3b2f9=document['getElementById'](_0xfd070d);if(!_0xa3b2f9)return;navigator['clipboard']['writeText'](_0xa3b2f9['textContent'])['then'](()=>alert('✅\x20Texto\x20copiado'));}function renderAll(){renderDash(),renderClientes(),renderVencimientos(),llenarSelectClientes();const _0x15a057=document['getElementById']('pill-total');if(_0x15a057)_0x15a057['textContent']=DB['clientes']['length']+'\x20clientes';}function renderDash(){const _0x22e4f0=new Date();_0x22e4f0['setHours'](0x0,0x0,0x0,0x0);const _0x245698=DB['clientes']['filter'](_0x5cffe8=>estadoCliente(_0x5cffe8)==='activo')['length'],_0x14483f=DB['clientes']['filter'](_0x34d3a7=>estadoCliente(_0x34d3a7)==='vence')['length'],_0x233a6b=DB['clientes']['filter'](_0x29cd9a=>estadoCliente(_0x29cd9a)==='vencido')['length'],_0x355859=DB['clientes']['filter'](_0x5a8646=>(_0x5a8646['tipo']||'mensual')==='trial')['length'],_0x34951b=DB['clientes']['filter'](_0xe61e75=>(_0xe61e75['tipo']||'mensual')==='vendedor')['length'],_0x1ed7cd=(_0x3d8c5,_0x40e0b9)=>{const _0x5db048=document['getElementById'](_0x3d8c5);if(_0x5db048)_0x5db048['textContent']=_0x40e0b9;};_0x1ed7cd('d-total',DB['clientes']['length']),_0x1ed7cd('d-activos',_0x245698),_0x1ed7cd('d-trials',_0x355859),_0x1ed7cd('d-vendedores',_0x34951b),_0x1ed7cd('d-pronto',_0x14483f),_0x1ed7cd('d-vencidos',_0x233a6b);const _0x52c4c4=DB['clientes']['filter'](_0x11012d=>_0x11012d['debe']&&_0x11012d['debe']>0x0),_0xc58a6=_0x52c4c4['reduce']((_0xf2f7e2,_0x299d7d)=>_0xf2f7e2+(_0x299d7d['debe']||0x0),0x0);_0x1ed7cd('d-deudores',_0x52c4c4['length']);const _0x3a2251=document['getElementById']('d-deudores-total');if(_0x3a2251)_0x3a2251['textContent']='pendiente:\x20$'+_0xc58a6['toFixed'](0x2);const _0x909e6c=new Date()['toISOString']()['substr'](0x0,0x7),_0x44fafa=DB['clientes']['filter'](_0x2bffd7=>_0x2bffd7['vencimiento']?.['startsWith'](_0x909e6c)),_0x43e606=_0x44fafa['reduce']((_0x2f4ba0,_0xf9e347)=>_0x2f4ba0+(_0xf9e347['precio']||0x0),0x0);_0x1ed7cd('d-mes',fmt(_0x43e606)),_0x1ed7cd('d-mes-sub',_0x44fafa['length']+'\x20clientes\x20vencen\x20este\x20mes');const _0x3071c4=DB['clientes']['filter'](_0x37a653=>{const _0x3e8d89=diasHasta(_0x37a653['vencimiento']);return _0x3e8d89>=0x0&&_0x3e8d89<=0x7;})['sort']((_0x3327be,_0x1695ae)=>_0x3327be['vencimiento']['localeCompare'](_0x1695ae['vencimiento']));document['getElementById']('d-proximos')['innerHTML']=_0x3071c4['length']?_0x3071c4['map'](_0x55a257=>'<div\x20style=\x22display:flex;justify-content:space-between;align-items:center;padding:8px\x200;border-bottom:1px\x20solid\x20var(--border);flex-wrap:wrap;gap:6px\x22>\x0a\x20\x20\x20\x20<div><b>'+escH(_0x55a257['nombre'])+'</b>\x20<span\x20style=\x22color:var(--muted);font-size:11px\x22>'+(DISP_LABEL[_0x55a257['device']]||_0x55a257['device'])+'</span></div>\x0a\x20\x20\x20\x20<div\x20style=\x22display:flex;gap:6px;align-items:center\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20style=\x22color:var(--orange);font-size:11px\x22>Vence\x20en\x20'+diasHasta(_0x55a257['vencimiento'])+'\x20día(s)</span>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-g\x20btn-sm\x22\x20onclick=\x22abrirRenovar(\x27'+_0x55a257['id']+'\x27)\x22>📅\x20Actualizar\x20fecha</button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-wa\x20btn-sm\x22\x20onclick=\x22enviarWACredenciales(\x27'+_0x55a257['id']+'\x27)\x22>📲\x20WA</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>')['join'](''):'<div\x20class=\x22empty\x22>Sin\x20vencimientos\x20en\x20los\x20próximos\x207\x20días</div>';const _0x228f54=DB['clientes']['filter'](_0x229900=>estadoCliente(_0x229900)==='vencido')['sort']((_0x3c7e19,_0x5deea7)=>_0x5deea7['vencimiento']['localeCompare'](_0x3c7e19['vencimiento']));document['getElementById']('d-vencidos-lista')['innerHTML']=_0x228f54['length']?_0x228f54['map'](_0x2719d7=>'<div\x20style=\x22display:flex;justify-content:space-between;align-items:center;padding:8px\x200;border-bottom:1px\x20solid\x20var(--border);flex-wrap:wrap;gap:6px\x22>\x0a\x20\x20\x20\x20<div><b>'+escH(_0x2719d7['nombre'])+'</b>\x20<span\x20style=\x22color:var(--red);font-size:11px\x22>venció\x20'+Math['abs'](diasHasta(_0x2719d7['vencimiento']))+'\x20día(s)\x20atrás</span></div>\x0a\x20\x20\x20\x20<div\x20style=\x22display:flex;gap:6px\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-g\x20btn-sm\x22\x20onclick=\x22abrirRenovar(\x27'+_0x2719d7['id']+'\x27)\x22>📅\x20Actualizar\x20fecha</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>')['join'](''):'<div\x20class=\x22empty\x22>Sin\x20clientes\x20vencidos</div>';}const TIPO_BADGE={'mensual':'<span\x20class=\x22bdg\x22\x20style=\x22background:#1565c0\x22>💳\x20Mensual</span>','trial':'<span\x20class=\x22bdg\x22\x20style=\x22background:#6b3fa0\x22>🆓\x20Trial</span>','anual':'<span\x20class=\x22bdg\x22\x20style=\x22background:#b8860b\x22>⭐\x20Anual</span>','vendedor':'<span\x20class=\x22bdg\x22\x20style=\x22background:#065f46\x22>🏪\x20Vendedor</span>'};function toggleCreditosField(){const _0xe8c6df=document['getElementById']('cli-tipo')['value'];document['getElementById']('fg-creditos')['style']['display']=_0xe8c6df==='vendedor'?'':'none';}function renderClientes(){const _0x5f1cf5=(document['getElementById']('cli-q')?.['value']||'')['toLowerCase'](),_0x3cc237=document['getElementById']('cli-estado')?.['value']||'',_0x3db391=document['getElementById']('cli-disp')?.['value']||'',_0x1f2840=document['getElementById']('cli-tipo-fil')?.['value']||'';let _0x7c21e7=DB['clientes']['filter'](_0x1ef36a=>{if(_0x5f1cf5&&!_0x1ef36a['nombre']?.['toLowerCase']()['includes'](_0x5f1cf5)&&!_0x1ef36a['user']?.['toLowerCase']()['includes'](_0x5f1cf5)&&!_0x1ef36a['tel']?.['includes'](_0x5f1cf5))return![];if(_0x3cc237&&estadoCliente(_0x1ef36a)!==_0x3cc237)return![];if(_0x3db391&&_0x1ef36a['device']!==_0x3db391)return![];if(_0x1f2840&&(_0x1ef36a['tipo']||'mensual')!==_0x1f2840)return![];return!![];})['sort']((_0x1d3cdc,_0x481a86)=>_0x1d3cdc['vencimiento']?.['localeCompare'](_0x481a86['vencimiento']));const _0x26a1b2=document['getElementById']('tb-clientes');if(!_0x7c21e7['length']){_0x26a1b2['innerHTML']='<tr><td\x20colspan=\x229\x22><div\x20class=\x22empty\x22>Sin\x20clientes\x20con\x20ese\x20filtro</div></td></tr>';return;}const _0xc37b9b={'activo':'<span\x20class=\x22bdg\x20bdg-activo\x22>Activo</span>','vence':'<span\x20class=\x22bdg\x20bdg-vence\x22>Vence\x20pronto</span>','vencido':'<span\x20class=\x22bdg\x20bdg-vencido\x22>Vencido</span>'};_0x26a1b2['innerHTML']=_0x7c21e7['map'](_0x2c5db9=>{const _0x559548=estadoCliente(_0x2c5db9),_0x8130a6=diasHasta(_0x2c5db9['vencimiento']),_0x1cbc01=_0x2c5db9['tipo']||'mensual';return'<tr>\x0a\x20\x20\x20\x20\x20\x20<td><b>'+escH(_0x2c5db9['nombre'])+'</b>'+(_0x2c5db9['debe']&&_0x2c5db9['debe']>0x0?'<span\x20style=\x22background:#f97316;color:#fff;border-radius:8px;padding:1px\x206px;font-size:10px;margin-left:5px;font-weight:600\x22>💸\x20$'+parseFloat(_0x2c5db9['debe'])['toFixed'](0x2)+'</span>':'')+(_0x2c5db9['notas']?'<div\x20style=\x22font-size:10px;color:var(--muted)\x22>'+escH(_0x2c5db9['notas'])+'</div>':'')+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22font-family:monospace\x22>'+escH(_0x2c5db9['tel']||'—')+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22font-family:monospace;font-size:11px\x22>'+escH(_0x2c5db9['user'])+'</td>\x0a\x20\x20\x20\x20\x20\x20<td>'+(DISP_LABEL[_0x2c5db9['device']]||_0x2c5db9['device'])+'</td>\x0a\x20\x20\x20\x20\x20\x20<td>'+(TIPO_BADGE[_0x1cbc01]||_0x1cbc01)+(_0x1cbc01==='vendedor'&&_0x2c5db9['creditos']?'<div\x20style=\x22font-size:11px;color:#6ee7b7;margin-top:2px\x22>💎\x20'+_0x2c5db9['creditos']+'\x20créditos</div>':'')+'</td>\x0a\x20\x20\x20\x20\x20\x20<td><span\x20style=\x22font-family:monospace\x22>'+_0x2c5db9['vencimiento']+'</span><div\x20style=\x22font-size:10px;color:'+(_0x8130a6<0x0?'var(--red)':_0x8130a6<=0x7?'var(--orange)':'var(--muted)')+'\x22>'+(_0x8130a6<0x0?Math['abs'](_0x8130a6)+'\x20días\x20vencido':_0x8130a6+'\x20días')+'</div></td>\x0a\x20\x20\x20\x20\x20\x20<td>'+(_0xc37b9b[_0x559548]||'')+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22font-family:monospace\x22>'+fmt(_0x2c5db9['precio'])+'</td>\x0a\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;gap:3px;flex-wrap:wrap\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-wa\x20btn-sm\x22\x20onclick=\x22enviarWACredenciales(\x27'+_0x2c5db9['id']+'\x27)\x22\x20title=\x22Enviar\x20credenciales\x20por\x20WhatsApp\x22>🔑</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-wa\x20btn-sm\x22\x20onclick=\x22enviarWAInstalacion(\x27'+_0x2c5db9['id']+'\x27)\x22\x20title=\x22Enviar\x20guía\x20de\x20instalación\x22>📖</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-g\x20btn-sm\x22\x20onclick=\x22abrirRenovar(\x27'+_0x2c5db9['id']+'\x27)\x22\x20title=\x22Actualizar\x20fecha\x22>📅</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-s\x20btn-sm\x22\x20onclick=\x22verHistorial(\x27'+_0x2c5db9['id']+'\x27)\x22\x20title=\x22Ver\x20historial\x20de\x20renovaciones\x22>📋</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-s\x20btn-sm\x22\x20onclick=\x22editarCliente(\x27'+_0x2c5db9['id']+'\x27)\x22\x20title=\x22Editar\x22>✏️</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-d\x20btn-sm\x22\x20onclick=\x22eliminarCliente(\x27'+_0x2c5db9['id']+'\x27)\x22\x20title=\x22Eliminar\x22>🗑️</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20</tr>';})['join']('');}function renderVencimientos(){const _0x2bf061=DB['clientes']['filter'](_0x8cb66d=>{const _0x54d16c=diasHasta(_0x8cb66d['vencimiento']);return _0x54d16c>=0x0&&_0x54d16c<=0x7;})['length'],_0x42ee50=DB['clientes']['filter'](_0x53c0c0=>{const _0x11ad13=diasHasta(_0x53c0c0['vencimiento']);return _0x11ad13>=0x0&&_0x11ad13<=0x1e;})['length'],_0x48f18f=DB['clientes']['filter'](_0x4e4083=>estadoCliente(_0x4e4083)==='vencido')['length'],_0x221a4e=(_0x2b4abc,_0x886189)=>{const _0x1d00c1=document['getElementById'](_0x2b4abc);if(_0x1d00c1)_0x1d00c1['textContent']=_0x886189;};_0x221a4e('v-semana',_0x2bf061),_0x221a4e('v-mes',_0x42ee50),_0x221a4e('v-vencidos',_0x48f18f);const _0x4b7edc=DB['clientes']['filter'](_0x26f0f2=>{const _0x333614=diasHasta(_0x26f0f2['vencimiento']);return _0x333614>=0x0&&_0x333614<=0x1e;})['sort']((_0x505a7a,_0x2c0480)=>_0x505a7a['vencimiento']['localeCompare'](_0x2c0480['vencimiento']));document['getElementById']('v-lista-proximos')['innerHTML']=_0x4b7edc['length']?_0x4b7edc['map'](_0x4b69f8=>'<div\x20style=\x22display:flex;align-items:center;padding:9px\x200;border-bottom:1px\x20solid\x20var(--border);flex-wrap:wrap;gap:8px\x22>\x0a\x20\x20\x20\x20<input\x20type=\x22checkbox\x22\x20class=\x22venc-chk\x22\x20data-id=\x22'+_0x4b69f8['id']+'\x22\x20style=\x22width:16px;height:16px;accent-color:var(--orange);flex-shrink:0\x22>\x0a\x20\x20\x20\x20<div\x20style=\x22flex:1\x22>\x0a\x20\x20\x20\x20\x20\x20<b>'+escH(_0x4b69f8['nombre'])+'</b>\x20<span\x20style=\x22font-size:11px;color:var(--muted)\x22>'+(DISP_LABEL[_0x4b69f8['device']]||'')+'</span>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;color:var(--muted);font-family:monospace\x22>'+_0x4b69f8['user']+'</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<div\x20style=\x22display:flex;gap:6px;align-items:center;flex-wrap:wrap\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20style=\x22color:'+(diasHasta(_0x4b69f8['vencimiento'])<=0x7?'var(--orange)':'var(--gold)')+';font-size:12px;font-weight:600\x22>Vence:\x20'+_0x4b69f8['vencimiento']+'\x20('+diasHasta(_0x4b69f8['vencimiento'])+'\x20días)</span>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-g\x20btn-sm\x22\x20onclick=\x22abrirRenovar(\x27'+_0x4b69f8['id']+'\x27)\x22>📅\x20Actualizar\x20fecha</button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-wa\x20btn-sm\x22\x20onclick=\x22enviarWACredenciales(\x27'+_0x4b69f8['id']+'\x27)\x22>📲\x20Credenciales</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>')['join'](''):'<div\x20class=\x22empty\x22>Sin\x20vencimientos\x20en\x20los\x20próximos\x2030\x20días</div>';const _0x2f3fdf=DB['clientes']['filter'](_0x53a005=>estadoCliente(_0x53a005)==='vencido')['sort']((_0x5bf426,_0x23f485)=>_0x23f485['vencimiento']['localeCompare'](_0x5bf426['vencimiento']));document['getElementById']('v-lista-vencidos')['innerHTML']=_0x2f3fdf['length']?_0x2f3fdf['map'](_0x5e47fb=>'<div\x20style=\x22display:flex;align-items:center;padding:9px\x200;border-bottom:1px\x20solid\x20var(--border);flex-wrap:wrap;gap:8px\x22>\x0a\x20\x20\x20\x20<input\x20type=\x22checkbox\x22\x20class=\x22venc-chk\x22\x20data-id=\x22'+_0x5e47fb['id']+'\x22\x20style=\x22width:16px;height:16px;accent-color:var(--red);flex-shrink:0\x22>\x0a\x20\x20\x20\x20<div\x20style=\x22flex:1\x22>\x0a\x20\x20\x20\x20\x20\x20<b>'+escH(_0x5e47fb['nombre'])+'</b>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;color:var(--red)\x22>Venció\x20el\x20'+_0x5e47fb['vencimiento']+'\x20(hace\x20'+Math['abs'](diasHasta(_0x5e47fb['vencimiento']))+'\x20días)</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-g\x20btn-sm\x22\x20onclick=\x22abrirRenovar(\x27'+_0x5e47fb['id']+'\x27)\x22>📅\x20Actualizar\x20fecha</button>\x0a\x20\x20</div>')['join'](''):'<div\x20class=\x22empty\x22>Sin\x20clientes\x20vencidos</div>';}function llenarSelectClientes(){const _0x5410a6=document['getElementById']('guia-cliente');if(!_0x5410a6)return;_0x5410a6['innerHTML']='<option\x20value=\x22\x22>—\x20Seleccionar\x20cliente\x20—</option>'+DB['clientes']['sort']((_0x2990bc,_0x5cb9f9)=>_0x2990bc['nombre']?.['localeCompare'](_0x5cb9f9['nombre']))['map'](_0x2af13c=>'<option\x20value=\x22'+_0x2af13c['id']+'\x22>'+escH(_0x2af13c['nombre'])+'\x20('+_0x2af13c['user']+')</option>')['join']('');}function exportarCSV(){if(!DB['clientes']['length'])return alert('No\x20hay\x20clientes\x20registrados');const _0x151724=[['Nombre','Teléfono','Usuario','Contraseña','Dispositivo','Plan','Precio','Inicio','Vencimiento','Estado','Notas']];DB['clientes']['forEach'](_0x1bfc32=>_0x151724['push']([_0x1bfc32['nombre'],_0x1bfc32['tel'],_0x1bfc32['user'],_0x1bfc32['pass'],DISP_LABEL[_0x1bfc32['device']]||_0x1bfc32['device'],_0x1bfc32['plan']+'\x20mes(es)',_0x1bfc32['precio'],_0x1bfc32['inicio'],_0x1bfc32['vencimiento'],estadoCliente(_0x1bfc32),_0x1bfc32['notas']||'']));const _0x2ed881=_0x151724['map'](_0x490ed1=>_0x490ed1['map'](_0x944449=>'\x22'+String(_0x944449||'')['replace'](/"/g,'\x27')+'\x22')['join'](','))['join']('\x0a'),_0x2de208=document['createElement']('a');_0x2de208['href']=URL['createObjectURL'](new Blob(['\ufeff'+_0x2ed881],{'type':'text/csv;charset=utf-8'})),_0x2de208['download']='goldtv_clientes_'+today()+'.csv',_0x2de208['click']();}function restaurarBackup(_0x55d495){const _0x1798b8=_0x55d495['files'][0x0];if(!_0x1798b8)return;const _0x4746bf=new FileReader();_0x4746bf['onload']=function(_0x238b2c){try{const _0x2f7bad=JSON['parse'](_0x238b2c['target']['result']);_0x2f7bad['clientes']&&Array['isArray'](_0x2f7bad['clientes'])?(DB=_0x2f7bad,save(),renderAll(),alert('✅\x20Backup\x20restaurado:\x20'+DB['clientes']['length']+'\x20clientes\x20cargados\x20y\x20guardados\x20en\x20la\x20nube.')):alert('❌\x20Archivo\x20no\x20válido.\x20Usa\x20un\x20backup\x20de\x20GOLD\x20TV.');}catch(_0x5e23cd){alert('❌\x20Error\x20al\x20leer\x20el\x20archivo.');}},_0x4746bf['readAsText'](_0x1798b8),_0x55d495['value']='';}function backupGold(){const _0xf32326=document['createElement']('a');_0xf32326['href']=URL['createObjectURL'](new Blob([JSON['stringify'](DB,null,0x2)],{'type':'application/json'})),_0xf32326['download']='goldtv_backup_'+today()+'.json',_0xf32326['click']();}const PANEL_URL='http://goldtv.lat:2086',PANEL_USER='MONYAR90',PANEL_PASS='Nenita25';let syncData=[];function abrirSincronizar(){syncData=[];var _0x48dbb8=document['getElementById']('sync-estado');if(_0x48dbb8)_0x48dbb8['innerHTML']='Haz\x20clic\x20en\x20el\x20boton\x20dorado\x20para\x20seleccionar\x20el\x20archivo\x20JSON\x20que\x20descargaste\x20de\x20tu\x20panel\x20(Backup\x20Users\x20>\x20JSON).';var _0x59684c=document['getElementById']('sync-lista');if(_0x59684c)_0x59684c['style']['display']='none';var _0x32f825=document['getElementById']('btn-importar');if(_0x32f825)_0x32f825['style']['display']='none';abrirModal('modal-sync');}function conectarPanel(){}function normalizarLinea(_0x51bc55){const _0x9ee45e=_0x51bc55['Username']||_0x51bc55['username']||_0x51bc55['user']||_0x51bc55['USER']||'',_0x123988=_0x51bc55['Password']||_0x51bc55['password']||_0x51bc55['pass']||_0x51bc55['PASS']||'',_0x14f44f=_0x51bc55['Status']||_0x51bc55['status']||_0x51bc55['enabled']||'active',_0x792bd2=typeof _0x14f44f==='string'?/active|activo|1/i['test'](_0x14f44f):_0x14f44f===0x1||_0x14f44f==='1',_0x48c9cf=_0x51bc55['Notes']||_0x51bc55['notes']||_0x51bc55['Creator']||_0x51bc55['creator']||_0x51bc55['Owner']||_0x51bc55['owner']||'';let _0x7a5544='';if(_0x51bc55['Expires']||_0x51bc55['expires']||_0x51bc55['Expiry']||_0x51bc55['expiry'])_0x7a5544=(_0x51bc55['Expires']||_0x51bc55['expires']||_0x51bc55['Expiry']||_0x51bc55['expiry']||'')['split']('\x20')[0x0];else{if(_0x51bc55['exp_date']&&_0x51bc55['exp_date']!=='0')_0x7a5544=new Date(parseInt(_0x51bc55['exp_date'])*0x3e8)['toISOString']()['split']('T')[0x0];else _0x51bc55['expiration']&&(_0x7a5544=_0x51bc55['expiration']['split']('\x20')[0x0]);}const _0x2bbfdc=(_0x51bc55['Package']||_0x51bc55['package']||_0x51bc55['Bouquet']||_0x51bc55['bouquet']||_0x51bc55['plan']||'')['toString']()['toLowerCase']();let _0x38e81b='mensual';if(/trial|prueba|demo|test|free/i['test'](_0x2bbfdc))_0x38e81b='trial';else{if(/anual|annual|year|12\s*mes/i['test'](_0x2bbfdc))_0x38e81b='anual';}return{'user':_0x9ee45e,'pass':_0x123988,'activo':_0x792bd2,'vence':_0x7a5544,'notes':_0x48c9cf,'tipo':_0x38e81b,'_raw':_0x51bc55};}function procesarLineas(_0x3c9a53){let _0x26d9a2=[];if(Array['isArray'](_0x3c9a53))_0x26d9a2=_0x3c9a53;else{if(typeof _0x3c9a53==='object')_0x26d9a2=Object['values'](_0x3c9a53);}_0x26d9a2=_0x26d9a2['filter'](_0x7fe27d=>_0x7fe27d&&typeof _0x7fe27d==='object');if(!_0x26d9a2['length']){document['getElementById']('sync-estado')['innerHTML']='<span\x20style=\x22color:#ef4444\x22>No\x20se\x20encontraron\x20clientes\x20en\x20el\x20archivo.</span>';return;}syncData=_0x26d9a2['map'](normalizarLinea);const _0x286c2f=new Set(DB['clientes']['map'](_0xa47b0b=>_0xa47b0b['user'])),_0x298889=document['getElementById']('sync-estado'),_0x56a4cf=syncData['filter'](_0x283818=>!_0x286c2f['has'](_0x283818['user']))['length'];_0x298889['innerHTML']='<span\x20style=\x22color:#22c55e\x22>✅\x20Se\x20encontraron\x20<b>'+_0x26d9a2['length']+'</b>\x20clientes\x20—\x20<b>'+_0x56a4cf+'</b>\x20nuevos,\x20<b>'+(_0x26d9a2['length']-_0x56a4cf)+'</b>\x20ya\x20existen.</span>';const _0x4b3e77=document['getElementById']('tb-sync');_0x4b3e77['innerHTML']=syncData['map']((_0xe07ce1,_0x4b456d)=>{const _0x3ff51b=_0x286c2f['has'](_0xe07ce1['user']);return'<tr\x20style=\x22border-top:1px\x20solid\x20rgba(74,108,247,.15)\x22>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:6px\x2010px\x22><input\x20type=\x22checkbox\x22\x20class=\x22sync-chk\x22\x20data-idx=\x22'+_0x4b456d+'\x22\x20'+(_0x3ff51b?'':'checked')+'></td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:6px\x2010px;font-family:monospace;color:#f0eeff\x22>'+escH(_0xe07ce1['user'])+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:6px\x2010px;font-family:monospace;color:var(--muted)\x22>'+escH(_0xe07ce1['pass'])+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:6px\x2010px;color:'+(_0xe07ce1['vence']&&_0xe07ce1['vence']<today()?'var(--red)':'var(--gold)')+'\x22>'+(_0xe07ce1['vence']||'—')+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:6px\x2010px\x22><span\x20class=\x22bdg\x20'+(_0xe07ce1['activo']?'bdg-activo':'bdg-vencido')+'\x22>'+(_0xe07ce1['activo']?'Activo':'Vencido')+'</span></td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:6px\x2010px\x22>'+(_0x3ff51b?'<span\x20style=\x22color:#f97316;font-size:11px\x22>⚠️\x20Ya\x20existe</span>':'<span\x20style=\x22color:#22c55e;font-size:11px\x22>✓\x20Nuevo</span>')+'</td>\x0a\x20\x20\x20\x20</tr>';})['join'](''),document['getElementById']('sync-count')['textContent']=_0x26d9a2['length']+'\x20clientes\x20—\x20selecciona\x20cuáles\x20importar',document['getElementById']('sync-lista')['style']['display']='block',document['getElementById']('btn-importar')['style']['display']='inline-flex';}function syncSelAll(_0x4bd50d){document['querySelectorAll']('.sync-chk')['forEach'](_0x4c9023=>_0x4c9023['checked']=_0x4bd50d),document['getElementById']('chk-all')['checked']=_0x4bd50d;}function importarSeleccionados(){const _0x2e2a52=[];document['querySelectorAll']('.sync-chk:checked')['forEach'](_0x2fca25=>_0x2e2a52['push'](parseInt(_0x2fca25['dataset']['idx'])));if(!_0x2e2a52['length'])return alert('Selecciona\x20al\x20menos\x20un\x20cliente');let _0x2b3653=0x0,_0xe111ae=0x0;_0x2e2a52['forEach'](_0x12ce30=>{const _0x29e234=syncData[_0x12ce30];if(!_0x29e234)return;const _0x558de1=_0x29e234['vence']||addMeses(today(),0x1),_0x3be499={'id':uid(),'nombre':_0x29e234['user'],'tel':'','user':_0x29e234['user'],'pass':_0x29e234['pass'],'device':'android-tv','plan':'1','precio':0x0,'inicio':today(),'vencimiento':_0x558de1,'notas':_0x29e234['notes']||'','activo':_0x29e234['activo']},_0x48539d=DB['clientes']['findIndex'](_0x5c51ad=>_0x5c51ad['user']===_0x3be499['user']);_0x48539d!==-0x1?(DB['clientes'][_0x48539d]={...DB['clientes'][_0x48539d],'pass':_0x3be499['pass'],'vencimiento':_0x3be499['vencimiento'],'activo':_0x3be499['activo']},_0xe111ae++):(DB['clientes']['push'](_0x3be499),_0x2b3653++);}),save(),renderAll(),cerrarModal('modal-sync'),alert('✅\x20Importación\x20completa:\x0a•\x20'+_0x2b3653+'\x20clientes\x20nuevos\x0a•\x20'+_0xe111ae+'\x20actualizados\x0a\x0aPuedes\x20editar\x20cada\x20cliente\x20(✏️)\x20para\x20agregar\x20nombre,\x20teléfono\x20y\x20dispositivo.');}function importarPegado(){const _0x400a2f=(document['getElementById']('sync-paste')?.['value']||'')['trim']();if(!_0x400a2f)return alert('Pega\x20los\x20datos\x20primero');const _0x4ca76f=_0x400a2f['split']('\x0a')['map'](_0x24b26b=>_0x24b26b['trim']())['filter'](_0x150194=>_0x150194),_0x1a58a2=_0x4ca76f['map'](_0x3a9cd1=>{const _0x709b51=_0x3a9cd1['split'](',');return{'username':(_0x709b51[0x0]||'')['trim'](),'password':(_0x709b51[0x1]||'')['trim'](),'exp_date':_0x709b51[0x2]?Math['floor'](new Date(_0x709b51[0x2]['trim']())/0x3e8)['toString']():'','enabled':'1','notes':''};})['filter'](_0x2acadf=>_0x2acadf['username']);if(!_0x1a58a2['length'])return alert('Formato\x20incorrecto.\x20Usa:\x20usuario,contraseña,fecha');procesarLineas(_0x1a58a2);}function detectarPegado(_0x224c0c){const _0xc9c2d0=(_0x224c0c['value']||'')['trim'](),_0x436efe=_0xc9c2d0['split']('\x0a')['filter'](_0x22aeb1=>_0x22aeb1['trim']()&&_0x22aeb1['includes'](',')),_0x31c95f=document['getElementById']('sync-preview');_0x436efe['length']>0x0?_0x31c95f['innerHTML']='<span\x20style=\x22color:#22c55e\x22>✅\x20'+_0x436efe['length']+'\x20clientes\x20detectados\x20—\x20</span><button\x20class=\x22btn\x20btn-sm\x22\x20style=\x22background:linear-gradient(135deg,#7c3aed,#c026d3);color:#fff;padding:3px\x2010px\x22\x20onclick=\x22importarDesdePaste()\x22>⬇️\x20Importar\x20todos\x20ahora</button>':_0x31c95f['innerHTML']='';}function importarDesdePaste(){const _0x442ac3=(document['getElementById']('sync-paste')?.['value']||'')['trim']();if(!_0x442ac3)return;const _0x57c7d6=_0x442ac3['split']('\x0a')['map'](_0x335825=>_0x335825['trim']())['filter'](_0x4a4df0=>_0x4a4df0&&_0x4a4df0['includes'](',')),_0x10faef=_0x57c7d6['map'](_0x4a945c=>{const _0x19b309=_0x4a945c['split'](','),_0x1eef4=(_0x19b309[0x2]||'')['trim'](),_0x300350=_0x1eef4?Math['floor'](new Date(_0x1eef4)/0x3e8)['toString']():'';return{'username':(_0x19b309[0x0]||'')['trim'](),'password':(_0x19b309[0x1]||'')['trim'](),'exp_date':_0x300350,'enabled':'1','notes':''};})['filter'](_0x356c76=>_0x356c76['username']);if(!_0x10faef['length'])return alert('No\x20se\x20encontraron\x20datos\x20válidos');procesarLineas(_0x10faef);}function triggerFileImport(){document['getElementById']('file-import-input')['value']='',document['getElementById']('file-import-input')['click']();}function importarArchivo(_0x3a6367){const _0xe26b39=_0x3a6367['files'][0x0];if(!_0xe26b39)return;const _0x4142a4=new FileReader();_0x4142a4['onload']=_0x6df143=>{const _0x4161a4=_0x6df143['target']['result'];try{const _0x1412a8=JSON['parse'](_0x4161a4);procesarLineas(Array['isArray'](_0x1412a8)?_0x1412a8:Object['values'](_0x1412a8));}catch{const _0x4c68ff=_0x4161a4['split']('\x0a')['filter'](_0x5d7ea3=>_0x5d7ea3['trim']()),_0x4933da=_0x4c68ff[0x0]['toLowerCase']();let _0x4be2aa=[];if(_0x4933da['includes']('username')||_0x4933da['includes']('usuario')){const _0x3fd538=_0x4c68ff[0x0]['split'](',')['map'](_0x3ca19b=>_0x3ca19b['trim']()['toLowerCase']()['replace'](/"/g,'')),_0x250bd2=_0x3fd538['findIndex'](_0x365b28=>_0x365b28['includes']('user')),_0x34b396=_0x3fd538['findIndex'](_0x43519e=>_0x43519e['includes']('pass')||_0x43519e['includes']('contra')),_0x13dbc6=_0x3fd538['findIndex'](_0x14cdbf=>_0x14cdbf['includes']('exp')||_0x14cdbf['includes']('venc'));_0x4be2aa=_0x4c68ff['slice'](0x1)['map'](_0x5646a4=>{const _0x506d7f=_0x5646a4['split'](',')['map'](_0x547f6b=>_0x547f6b['trim']()['replace'](/"/g,'')),_0x28a1c5=_0x13dbc6>=0x0?_0x506d7f[_0x13dbc6]:'',_0x13b3c1=_0x28a1c5?Math['floor'](new Date(_0x28a1c5)/0x3e8)['toString']():'';return{'username':_0x506d7f[_0x250bd2]||'','password':_0x506d7f[_0x34b396]||'','exp_date':_0x13b3c1,'enabled':'1','notes':''};})['filter'](_0x5574fc=>_0x5574fc['username']);}else _0x4be2aa=_0x4c68ff['map'](_0x159904=>{const _0x3d4bd6=_0x159904['split'](',');return{'username':(_0x3d4bd6[0x0]||'')['trim']()['replace'](/"/g,''),'password':(_0x3d4bd6[0x1]||'')['trim']()['replace'](/"/g,''),'exp_date':_0x3d4bd6[0x2]?Math['floor'](new Date(_0x3d4bd6[0x2]['trim']()['replace'](/"/g,''))/0x3e8)['toString']():'','enabled':'1','notes':''};})['filter'](_0x4364f7=>_0x4364f7['username']);procesarLineas(_0x4be2aa);}},_0x4142a4['readAsText'](_0xe26b39);}let _selEnvioIds=[];function seleccionarTodosVenc(_0x3f1a47){const _0x32ed74=document['querySelectorAll']('.venc-chk'),_0x448d00=[..._0x32ed74]['some'](_0x1bc06d=>!_0x1bc06d['checked']);_0x32ed74['forEach'](_0x358c85=>_0x358c85['checked']=_0x448d00);}function abrirEnvioMasivo(){const _0x1442d4=[...document['querySelectorAll']('.venc-chk:checked')];if(!_0x1442d4['length'])return alert('Selecciona\x20al\x20menos\x20un\x20cliente\x20marcando\x20las\x20casillas\x20☑️');_selEnvioIds=_0x1442d4['map'](_0x212d91=>_0x212d91['dataset']['id']);const _0x3e6089=_selEnvioIds['map'](_0x1980bd=>DB['clientes']['find'](_0x25a53e=>_0x25a53e['id']===_0x1980bd))['filter'](Boolean);document['getElementById']('envio-lista')['innerHTML']='\x0a\x20\x20\x20\x20<div\x20style=\x22font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600\x22>'+_0x3e6089['length']+'\x20cliente(s)\x20seleccionados:</div>\x0a\x20\x20\x20\x20'+_0x3e6089['map'](_0x3b1e32=>'\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;align-items:center;gap:10px;padding:8px\x200;border-bottom:1px\x20solid\x20var(--border)\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-size:18px\x22>'+(_0x3b1e32['device']==='iphone'?'🍎':_0x3b1e32['device']==='pc'?'💻':_0x3b1e32['device']==='celular'?'📱':_0x3b1e32['device']==='smart-tv'?'🖥️':'📺')+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22flex:1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b\x20style=\x22font-size:13px\x22>'+escH(_0x3b1e32['nombre'])+'</b>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;color:'+(diasHasta(_0x3b1e32['vencimiento'])<0x0?'var(--red)':'var(--orange)')+'\x22>'+(diasHasta(_0x3b1e32['vencimiento'])<0x0?'Vencido\x20hace\x20'+Math['abs'](diasHasta(_0x3b1e32['vencimiento']))+'\x20días':'Vence\x20en\x20'+diasHasta(_0x3b1e32['vencimiento'])+'\x20días\x20('+_0x3b1e32['vencimiento']+')')+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-size:11px;color:var(--muted);font-family:monospace\x22>'+(_0x3b1e32['tel']||'sin\x20tel')+'</span>\x0a\x20\x20\x20\x20\x20\x20</div>')['join'](''),abrirModal('modal-envio');}function ejecutarEnvioMasivo(){const _0x4766d0=_selEnvioIds['map'](_0x141bc5=>DB['clientes']['find'](_0x1055b1=>_0x1055b1['id']===_0x141bc5))['filter'](Boolean);if(!_0x4766d0['length'])return;cerrarModal('modal-envio');let _0x2ec596=0x0;function _0x423ce1(){if(_0x2ec596>=_0x4766d0['length'])return;const _0x2cc1b6=_0x4766d0[_0x2ec596];_0x2ec596++;const _0x4e24c7=diasHasta(_0x2cc1b6['vencimiento']);let _0x500a69;_0x4e24c7<0x0?_0x500a69='Hola\x20'+_0x2cc1b6['nombre']+'!\x20👋\x0a\x0a⚠️\x20Tu\x20servicio\x20GOLD\x20TV\x20*venció\x20hace\x20'+Math['abs'](_0x4e24c7)+'\x20días*.\x0a\x0aPara\x20volver\x20a\x20activarlo,\x20escríbeme\x20y\x20coordinamos\x20tu\x20renovación.\x20🙏\x0a\x0aGOLD\x20TV\x20📺':_0x500a69='Hola\x20'+_0x2cc1b6['nombre']+'!\x20👋\x0a\x0a🔔\x20Te\x20recuerdo\x20que\x20tu\x20servicio\x20GOLD\x20TV\x20*vence\x20en\x20'+_0x4e24c7+'\x20día(s)*\x20('+_0x2cc1b6['vencimiento']+').\x0a\x0aEscríbeme\x20para\x20renovar\x20y\x20no\x20quedarte\x20sin\x20servicio.\x20😊\x0a\x0aGOLD\x20TV\x20📺';const _0x78a1d7=_0x2cc1b6['tel']?_0x2cc1b6['tel']['replace'](/\D/g,''):'',_0x95e9b6=_0x78a1d7?'https://wa.me/593'+(_0x78a1d7['startsWith']('0')?_0x78a1d7['slice'](0x1):_0x78a1d7)+'?text='+encodeURIComponent(_0x500a69):'https://wa.me/?text='+encodeURIComponent(_0x500a69);window['open'](_0x95e9b6,'_blank'),setTimeout(_0x423ce1,0x4b0);}_0x423ce1();}function generarReporte(){const _0x39226e=new Date(),_0x3271ff=_0x39226e['toISOString']()['substr'](0x0,0x7),_0x4d523a=_0x39226e['toLocaleString']('es',{'month':'long','year':'numeric'}),_0x2c92bb=DB['clientes']['filter'](_0x2b6345=>estadoCliente(_0x2b6345)==='activo')['length'],_0x44c0d2=DB['clientes']['filter'](_0x2be282=>estadoCliente(_0x2be282)==='vence')['length'],_0x10fe4c=DB['clientes']['filter'](_0x2abe05=>estadoCliente(_0x2abe05)==='vencido')['length'],_0x12f1b7=DB['clientes']['filter'](_0x5694d9=>(_0x5694d9['tipo']||'mensual')==='trial')['length'],_0x40dddf=DB['clientes']['filter'](_0x58911d=>(_0x58911d['tipo']||'mensual')==='vendedor')['length'],_0x43f3ef=DB['clientes']['filter'](_0x4ef2bc=>_0x4ef2bc['debe']&&_0x4ef2bc['debe']>0x0),_0x17066b=_0x43f3ef['reduce']((_0x721305,_0x3c6837)=>_0x721305+(_0x3c6837['debe']||0x0),0x0),_0x1b6186=DB['clientes']['filter'](_0x5cf6be=>_0x5cf6be['vencimiento']?.['startsWith'](_0x3271ff)),_0x4b1fe7=_0x1b6186['reduce']((_0x8d8d90,_0x1fe923)=>_0x8d8d90+(_0x1fe923['precio']||0x0),0x0),_0x475971=DB['clientes']['flatMap'](_0x4c4d83=>(_0x4c4d83['historial']||[])['filter'](_0x42bf04=>_0x42bf04['fecha']?.['startsWith'](_0x3271ff))),_0x2537e9=_0x475971['reduce']((_0x2165b8,_0x1c8a06)=>_0x2165b8+(_0x1c8a06['precio']||0x0),0x0),_0x3147bf={};DB['clientes']['forEach'](_0x236b45=>{const _0x14fa12=_0x236b45['device']||'otro';_0x3147bf[_0x14fa12]=(_0x3147bf[_0x14fa12]||0x0)+0x1;});const _0xdba755=Object['entries'](_0x3147bf)['sort']((_0x5737f6,_0x141eb7)=>_0x141eb7[0x1]-_0x5737f6[0x1])['slice'](0x0,0x4),_0x589a96=DB['clientes']['filter'](_0x5a2167=>{const _0x34c018=diasHasta(_0x5a2167['vencimiento']);return _0x34c018>=0x0&&_0x34c018<=0x7;}),_0x1b183c='\x0a\x20\x20\x20\x20<div\x20style=\x22font-size:13px;line-height:1.7\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:center;padding:14px\x200\x2010px;border-bottom:1px\x20solid\x20var(--border);margin-bottom:14px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:22px\x22>📊</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:16px;font-weight:700;color:var(--gold)\x22>Reporte\x20'+_0x4d523a+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;color:var(--muted)\x22>GOLD\x20TV\x20·\x20'+_0x39226e['toLocaleDateString']('es')+'</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:grid;grid-template-columns:1fr\x201fr;gap:10px;margin-bottom:14px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x29b61a('👥\x20Total\x20clientes',DB['clientes']['length'],'#fff')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x29b61a('✅\x20Activos',_0x2c92bb,'#4ade80')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x29b61a('⏰\x20Vencen\x20pronto',_0x44c0d2,'#fb923c')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x29b61a('🔴\x20Vencidos',_0x10fe4c,'#f87171')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x29b61a('🆓\x20Trials',_0x12f1b7,'#a78bfa')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x29b61a('🏪\x20Vendedores',_0x40dddf,'#67e8f9')+'\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:10px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-weight:700;color:var(--gold);margin-bottom:6px\x22>💰\x20Dinero\x20este\x20mes</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;justify-content:space-between\x22><span\x20style=\x22color:var(--muted)\x22>Clientes\x20que\x20vencen\x20este\x20mes:</span><b>'+_0x1b6186['length']+'\x20clientes\x20·\x20'+fmt(_0x4b1fe7)+'</b></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;justify-content:space-between\x22><span\x20style=\x22color:var(--muted)\x22>Renovaciones\x20registradas:</span><b>'+_0x475971['length']+'\x20·\x20'+fmt(_0x2537e9)+'</b></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+(_0x43f3ef['length']?'<div\x20style=\x22display:flex;justify-content:space-between;color:#f97316\x22><span>💸\x20Cobros\x20pendientes\x20('+_0x43f3ef['length']+'\x20clientes):</span><b>'+fmt(_0x17066b)+'</b></div>':'')+'\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20'+(_0x589a96['length']?'<div\x20style=\x22background:rgba(249,115,22,.1);border:1px\x20solid\x20rgba(249,115,22,.3);border-radius:8px;padding:12px;margin-bottom:10px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-weight:700;color:#fb923c;margin-bottom:6px\x22>⏰\x20Vencen\x20en\x20los\x20próximos\x207\x20días\x20('+_0x589a96['length']+')</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x589a96['map'](_0x150bea=>'<div\x20style=\x22display:flex;justify-content:space-between;font-size:12px;padding:3px\x200\x22><span>'+escH(_0x150bea['nombre'])+'</span><span\x20style=\x22color:var(--muted)\x22>'+_0x150bea['vencimiento']+'\x20·\x20'+diasHasta(_0x150bea['vencimiento'])+'d</span></div>')['join']('')+'\x0a\x20\x20\x20\x20\x20\x20</div>':'')+'\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:var(--surface2);border-radius:8px;padding:12px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-weight:700;color:var(--gold);margin-bottom:6px\x22>📱\x20Dispositivos</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0xdba755['map'](([_0x192690,_0x4754ec])=>'<div\x20style=\x22display:flex;justify-content:space-between;font-size:12px;padding:2px\x200\x22><span>'+(DISP_LABEL[_0x192690]||_0x192690)+'</span><b>'+_0x4754ec+'</b></div>')['join']('')+'\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>';function _0x29b61a(_0x2b0c65,_0x3ed139,_0x15b3cd){return'<div\x20style=\x22background:var(--surface2);border-radius:8px;padding:10px;text-align:center\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;color:var(--muted)\x22>'+_0x2b0c65+'</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:22px;font-weight:700;color:'+_0x15b3cd+'\x22>'+_0x3ed139+'</div>\x0a\x20\x20\x20\x20</div>';}document['getElementById']('reporte-body')['innerHTML']=_0x1b183c,abrirModal('modal-reporte');}function copiarReporte(){const _0x440bf5=new Date(),_0xd38c7f=_0x440bf5['toISOString']()['substr'](0x0,0x7),_0x34a330=DB['clientes']['filter'](_0x1355ed=>estadoCliente(_0x1355ed)==='activo')['length'],_0x1a46bb=DB['clientes']['filter'](_0xe02935=>estadoCliente(_0xe02935)==='vencido')['length'],_0x5b06c7=DB['clientes']['filter'](_0x3e03f7=>estadoCliente(_0x3e03f7)==='vence')['length'],_0xf67b88=DB['clientes']['filter'](_0x1d49ab=>_0x1d49ab['vencimiento']?.['startsWith'](_0xd38c7f)),_0x31f52e=_0xf67b88['reduce']((_0x168b7b,_0x274085)=>_0x168b7b+(_0x274085['precio']||0x0),0x0),_0x34baf9=DB['clientes']['filter'](_0x227122=>_0x227122['debe']&&_0x227122['debe']>0x0),_0x4e2a8a=_0x34baf9['reduce']((_0x58dcb8,_0x24626a)=>_0x58dcb8+(_0x24626a['debe']||0x0),0x0),_0xe59036='📊\x20REPORTE\x20GOLD\x20TV\x20—\x20'+_0x440bf5['toLocaleDateString']('es',{'month':'long','year':'numeric'})['toUpperCase']()+'\x0a\x0a👥\x20Total\x20clientes:\x20'+DB['clientes']['length']+'\x0a✅\x20Activos:\x20'+_0x34a330+'\x0a⏰\x20Por\x20vencer:\x20'+_0x5b06c7+'\x0a🔴\x20Vencidos:\x20'+_0x1a46bb+'\x0a\x0a💰\x20Cobros\x20este\x20mes:\x20'+fmt(_0x31f52e)+'\x20('+_0xf67b88['length']+'\x20clientes)\x0a'+(_0x34baf9['length']?'💸\x20Cobros\x20pendientes:\x20'+fmt(_0x4e2a8a)+'\x20('+_0x34baf9['length']+'\x20clientes)\x0a':'')+'\x0aGenerado:\x20'+_0x440bf5['toLocaleDateString']('es')+'\x20·\x20GOLD\x20TV';navigator['clipboard']['writeText'](_0xe59036)['then'](()=>alert('✅\x20Reporte\x20copiado\x20al\x20portapapeles'));}async function crearVendedor(){const _0x2f7664=document['getElementById']('nv-nombre')['value']['trim']();if(!_0x2f7664){alert('Ingresa\x20el\x20nombre\x20del\x20vendedor');return;}const _0x35b0a9=document['getElementById']('nv-tipo')['value'],_0xc93a47=_0x2f7664['toLowerCase']()['normalize']('NFD')['replace'](/[̀-ͯ]/g,'')['replace'](/\s+/g,'')['replace'](/[^a-z0-9]/g,''),_0x3ee73b=_0xc93a47+(Math['floor'](Math['random']()*0x5a)+0xa),_0x9f40fe=_0x2f7664['toUpperCase']()['replace'](/\s+/g,'')['substring'](0x0,0x8),_0x33a803='GOLD-'+_0x9f40fe+'-2026',_0xf1e118=document['getElementById']('btn-crear-v');_0xf1e118['textContent']='Creando...',_0xf1e118['disabled']=!![];const {error:_0x328f26}=await sb['from']('gtv_licencias')['insert']({'vendor_id':_0x3ee73b,'license_key':_0x33a803,'vendor_name':_0x2f7664,'active':!![],'demo':_0x35b0a9==='demo'});_0xf1e118['textContent']='Crear\x20→',_0xf1e118['disabled']=![];if(_0x328f26){alert('Error\x20al\x20crear:\x20'+_0x328f26['message']);return;}const _0xd6c7d5='https://sistemasmonica.github.io/goldtv-panel/?v='+_0x3ee73b+'&k='+_0x33a803;document['getElementById']('nv-resultado')['style']['display']='block',document['getElementById']('nv-link')['value']=_0xd6c7d5,document['getElementById']('nv-info')['textContent']=_0x2f7664+'\x20—\x20'+(_0x35b0a9==='demo'?'DEMO\x20(hasta\x203\x20clientes)':'Completo'),document['getElementById']('nv-nombre')['value']='',cargarVendedores();}function copiarNvLink(){navigator['clipboard']['writeText'](document['getElementById']('nv-link')['value']),mostrarToastGV('✓\x20Link\x20copiado');}async function cargarVendedores(){const _0x4bfff2=document['getElementById']('tb-vendedores');if(!_0x4bfff2)return;_0x4bfff2['innerHTML']='<tr><td\x20colspan=\x224\x22\x20style=\x22text-align:center;color:#475569;padding:16px\x22>Cargando...</td></tr>';const {data:_0x2fcc56,error:_0x4e0795}=await sb['from']('gtv_licencias')['select']('*')['order']('vendor_name');if(_0x4e0795||!_0x2fcc56){_0x4bfff2['innerHTML']='<tr><td\x20colspan=\x224\x22\x20style=\x22text-align:center;color:#ef4444;padding:16px\x22>Error\x20al\x20cargar\x20vendedores</td></tr>';return;}if(!_0x2fcc56['length']){_0x4bfff2['innerHTML']='<tr><td\x20colspan=\x224\x22\x20style=\x22text-align:center;color:#475569;padding:16px\x22>Sin\x20vendedores\x20aún</td></tr>';return;}_0x4bfff2['innerHTML']=_0x2fcc56['map'](_0x33f8be=>{const _0x3cb396='https://sistemasmonica.github.io/goldtv-panel/?v='+encodeURIComponent(_0x33f8be['vendor_id'])+'&k='+encodeURIComponent(_0x33f8be['license_key']),_0x43ccae=_0x33f8be['demo']?'<span\x20style=\x22background:rgba(245,158,11,.2);color:#fbbf24;border-radius:4px;padding:2px\x208px;font-size:10px;font-weight:700\x22>DEMO</span>':'<span\x20style=\x22background:rgba(74,108,247,.15);color:#7c8fff;border-radius:4px;padding:2px\x208px;font-size:10px;font-weight:700\x22>COMPLETO</span>',_0x3bca62=_0x33f8be['active']?'<span\x20style=\x22background:rgba(34,197,94,.15);color:#22c55e;border-radius:4px;padding:2px\x208px;font-size:10px;font-weight:700\x22>ACTIVO</span>':'<span\x20style=\x22background:rgba(239,68,68,.15);color:#ef4444;border-radius:4px;padding:2px\x208px;font-size:10px;font-weight:700\x22>INACTIVO</span>',_0xab5c7c=_0x33f8be['demo']?'<button\x20onclick=\x22activarCompleto(\x27'+escH(_0x33f8be['vendor_id'])+'\x27)\x22\x20style=\x22background:rgba(34,197,94,.2);border:1px\x20solid\x20rgba(34,197,94,.5);color:#22c55e;border-radius:5px;padding:3px\x208px;font-size:10px;cursor:pointer;font-family:inherit\x22>✅\x20Activar\x20completo</button>\x20':'',_0x4b3e49=_0x33f8be['active']?'<button\x20onclick=\x22toggleActivoV(\x27'+escH(_0x33f8be['vendor_id'])+'\x27,true)\x22\x20style=\x22background:rgba(239,68,68,.2);border:1px\x20solid\x20rgba(239,68,68,.5);color:#ef4444;border-radius:5px;padding:3px\x208px;font-size:10px;cursor:pointer;font-family:inherit\x22>Desactivar</button>\x20':'<button\x20onclick=\x22toggleActivoV(\x27'+escH(_0x33f8be['vendor_id'])+'\x27,false)\x22\x20style=\x22background:rgba(34,197,94,.2);border:1px\x20solid\x20rgba(34,197,94,.5);color:#22c55e;border-radius:5px;padding:3px\x208px;font-size:10px;cursor:pointer;font-family:inherit\x22>Activar</button>\x20',_0x3266c6='<button\x20onclick=\x22navigator.clipboard.writeText(\x27'+_0x3cb396+'\x27);mostrarToastGV(\x27✓\x20Link\x20copiado\x27)\x22\x20style=\x22background:rgba(107,63,160,.2);border:1px\x20solid\x20rgba(107,63,160,.5);color:#a78bfa;border-radius:5px;padding:3px\x208px;font-size:10px;cursor:pointer;font-family:inherit\x22>📋\x20Link</button>';return'<tr\x20style=\x22border-bottom:1px\x20solid\x20rgba(107,63,160,.12)\x22>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:8px\x2010px;color:#e2e8f0;font-weight:600\x22>'+escH(_0x33f8be['vendor_name'])+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:8px\x2010px\x22>'+_0x43ccae+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:8px\x2010px\x22>'+_0x3bca62+'</td>\x0a\x20\x20\x20\x20\x20\x20<td\x20style=\x22padding:8px\x2010px\x22>'+_0xab5c7c+_0x4b3e49+_0x3266c6+'</td>\x0a\x20\x20\x20\x20</tr>';})['join']('');}async function activarCompleto(_0x5c1539){if(!confirm('¿Activar\x20acceso\x20COMPLETO\x20para\x20este\x20vendedor?\x20Ya\x20no\x20tendrá\x20límite\x20de\x20clientes.'))return;const {error:_0x50bfdd}=await sb['from']('gtv_licencias')['update']({'demo':![]})['eq']('vendor_id',_0x5c1539);if(_0x50bfdd){alert('Error:\x20'+_0x50bfdd['message']);return;}cargarVendedores(),mostrarToastGV('✓\x20Vendedor\x20activado\x20completo');}async function toggleActivoV(_0x3c2315,_0x15e5c0){const _0x2e616b=_0x15e5c0?'¿Desactivar\x20este\x20vendedor?\x20No\x20podrá\x20entrar\x20al\x20panel.':'¿Activar\x20este\x20vendedor\x20nuevamente?';if(!confirm(_0x2e616b))return;const {error:_0x4957af}=await sb['from']('gtv_licencias')['update']({'active':!_0x15e5c0})['eq']('vendor_id',_0x3c2315);if(_0x4957af){alert('Error:\x20'+_0x4957af['message']);return;}cargarVendedores(),mostrarToastGV(_0x15e5c0?'Vendedor\x20desactivado':'✓\x20Vendedor\x20activado');}function mostrarToastGV(_0x31bbba){let _0x22a9dd=document['getElementById']('toast-gv');!_0x22a9dd&&(_0x22a9dd=document['createElement']('div'),_0x22a9dd['id']='toast-gv',_0x22a9dd['style']['cssText']='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px\x2020px;border-radius:8px;font-size:13px;font-weight:700;z-index:9999;transition:opacity\x20.4s;pointer-events:none',document['body']['appendChild'](_0x22a9dd)),_0x22a9dd['textContent']=_0x31bbba,_0x22a9dd['style']['opacity']='1',clearTimeout(_0x22a9dd['_to']),_0x22a9dd['_to']=setTimeout(()=>_0x22a9dd['style']['opacity']='0',0x9c4);}
+// ===== SUPABASE =====
+// ===== CLAVE PROPIETARIA =====
+// Para cambiar la clave: reemplaza OWNER_HASH por el SHA-256 de tu nueva clave
+// Clave actual: GoldTV2026!
+const OWNER_HASH='2f665154a24f13c1b17e17a27d6240d9ae415bd13b7e038216c7f8202cb9bc2d';
+const SESSION_KEY='goldtv_owner_auth';
+
+async function sha256(text){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function verificarClave(){
+  const input=document.getElementById('owner-input').value;
+  const hash=await sha256(input);
+  if(hash===OWNER_HASH){
+    sessionStorage.setItem(SESSION_KEY,'1');
+    document.getElementById('login-screen').style.display='none';
+    iniciarApp();
+  }else{
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('owner-input').value='';
+    document.getElementById('owner-input').focus();
+  }
+}
+
+async function checkOwnerAuth(){
+  if(sessionStorage.getItem(SESSION_KEY)==='1'){iniciarApp();return;}
+  document.getElementById('login-screen').style.display='flex';
+  setTimeout(()=>document.getElementById('owner-input')?.focus(),100);
+}
+
+const SUPA_URL='https://pqluiqsvfeddmxpuxyhm.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxbHVpcXN2ZmVkZG14cHV4eWhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTI4MDYsImV4cCI6MjA5NjA4ODgwNn0.cdWKlECRLxms1y8a3sSHr1i5rsif9B94mDrvigHNm2A';
+const sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+
+const M3U_BASE='http://mundo2.pro:80/get.php?username=USER&password=PASS&type=m3u_plus&output=hls';
+const DOWNLOADER_CODE='1566382';
+const DOWNLOADER_LINK='http://aftv.news/1566382';
+
+let DB={clientes:[]};
+let syncOk=false;
+
+function setSyncStatus(s){
+  const el=document.getElementById('pill-sync');if(!el)return;
+  if(s==='ok'){el.textContent='☁️ Guardado';}
+  else if(s==='sync'){el.textContent='🔄 Guardando...';}
+  else if(s==='load'){el.textContent='⬇️ Cargando...';}
+  else{el.textContent='⚠️ Sin conexión';}
+}
+
+async function saveToCloud(){
+  try{
+    setSyncStatus('sync');
+    await sb.from('goldtv_clientes').upsert({version:'v1',data:DB.clientes,updated_at:new Date().toISOString()});
+    setSyncStatus('ok');
+  }catch(e){setSyncStatus('err');console.warn('Cloud error:',e);}
+}
+
+async function syncFromCloud(){
+  try{
+    setSyncStatus('load');
+    const{data,error}=await sb.from('goldtv_clientes').select('data').eq('version','v1').maybeSingle();
+    if(!error&&data?.data?.length>0)DB.clientes=data.data;
+    syncOk=true;
+    setSyncStatus('ok');
+  }catch(e){setSyncStatus('err');}
+  localStorage.setItem('goldtv',JSON.stringify(DB));
+  renderAll();
+}
+
+function save(){
+  try{localStorage.setItem('goldtv',JSON.stringify(DB));}catch(e){}
+  saveToCloud();
+}
+
+function load(){
+  try{
+    const d=localStorage.getItem('goldtv');
+    if(d){const p=JSON.parse(d);if(p.clientes?.length>0)DB.clientes=p.clientes;}
+  }catch(e){}
+}
+
+function uid(){return Date.now()+'_'+Math.random().toString(36).substr(2,6)}
+function today(){return new Date().toISOString().split('T')[0]}
+function fmt(n){return'$'+(parseFloat(n)||0).toFixed(2)}
+function escH(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function cerrarModal(id){document.getElementById(id).classList.remove('on')}
+function abrirModal(id){document.getElementById(id).classList.add('on')}
+
+function addMeses(fecha,meses){
+  const d=new Date(fecha+'T12:00:00');
+  d.setMonth(d.getMonth()+parseInt(meses));
+  return d.toISOString().split('T')[0];
+}
+
+function diasHasta(fecha){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const f=new Date(fecha+'T12:00:00');
+  return Math.round((f-hoy)/(1000*60*60*24));
+}
+
+function estadoCliente(c){
+  const d=diasHasta(c.vencimiento);
+  if(d<0)return'vencido';
+  if(d<=7)return'vence';
+  return'activo';
+}
+
+const DISP_LABEL={'android-tv':'📺 Android TV','celular':'📱 Celular Android','smart-tv':'🖥️ Smart TV','iphone':'🍎 iPhone/iPad','tv-box':'📦 TV Box','fire-tv':'🔥 Fire TV','pc':'💻 PC'};
+
+// ===== NAVEGACIÓN =====
+function tab(id,el){
+  document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav>.nt').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pn-'+id).classList.add('on');
+  el.classList.add('on');
+  if(id==='dash')renderDash();
+  if(id==='clientes')renderClientes();
+  if(id==='nuevo'){limpiarFormCliente();const fi=document.getElementById('cli-inicio');if(fi&&!fi.value)fi.value=today();calcVence();}
+  if(id==='vencimientos')renderVencimientos();
+  if(id==='guias')llenarSelectClientes();
+  if(id==='renovaciones')renderRenovaciones();
+  if(id==='misistema')cargarVendedores();
+}
+
+function verHistorial(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const hist=c.historial||[];
+  const total=hist.reduce((s,h)=>s+(h.precio||0),0);
+  document.getElementById('hist-titulo').textContent='📋 '+c.nombre+' — Historial';
+  document.getElementById('hist-body').innerHTML=!hist.length
+    ?`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Sin renovaciones registradas aún</td></tr>`
+    :hist.slice().reverse().map(h=>`<tr>
+      <td>${h.fecha}</td>
+      <td>${h.meses} mes${h.meses>1?'es':''}</td>
+      <td style="font-family:monospace;color:var(--green)">${fmt(h.precio)}</td>
+      <td style="font-family:monospace">${h.nueva_fecha||'—'}</td>
+    </tr>`).join('');
+  document.getElementById('hist-total').textContent=fmt(total);
+  abrirModal('modal-hist');
+}
+
+function renderRenovaciones(){
+  const mesActual=new Date().toISOString().substr(0,7);
+  const todas=[];
+  DB.clientes.forEach(c=>{
+    (c.historial||[]).forEach(h=>{
+      todas.push({...h,nombre:c.nombre,tipo:c.tipo||'mensual',cid:c.id});
+    });
+  });
+  todas.sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const esMes=todas.filter(h=>h.fecha.startsWith(mesActual));
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('rn-mes',esMes.length);
+  s('rn-mes-total',fmt(esMes.reduce((t,h)=>t+(h.precio||0),0)));
+  s('rn-total',fmt(todas.reduce((t,h)=>t+(h.precio||0),0)));
+  // llenar filtro meses
+  const meses=[...new Set(todas.map(h=>h.fecha.substr(0,7)))].sort().reverse();
+  const sel=document.getElementById('rn-mes-fil');
+  if(sel){
+    const cur=sel.value;
+    sel.innerHTML='<option value="">Todos los meses</option>'+meses.map(m=>`<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+  }
+  const mesFil=sel?.value||'';
+  const q=(document.getElementById('rn-q')?.value||'').toLowerCase();
+  let lista=todas;
+  if(mesFil)lista=lista.filter(h=>h.fecha.startsWith(mesFil));
+  if(q)lista=lista.filter(h=>h.nombre.toLowerCase().includes(q));
+  const tb=document.getElementById('tb-renovaciones');
+  if(!tb)return;
+  if(!lista.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Sin renovaciones registradas</td></tr>';return;}
+  tb.innerHTML=lista.map(h=>`<tr>
+    <td>${h.fecha}</td>
+    <td><b>${escH(h.nombre)}</b></td>
+    <td>${TIPO_BADGE[h.tipo]||h.tipo}</td>
+    <td style="text-align:center">${h.meses}</td>
+    <td style="font-family:monospace;color:var(--green)">${fmt(h.precio)}</td>
+    <td style="font-family:monospace">${h.nueva_fecha||'—'}</td>
+  </tr>`).join('');
+}
+
+// ===== FORMULARIO NUEVO CLIENTE =====
+function iniciarApp(){
+  const ini=document.getElementById('cli-inicio');
+  const plan=document.getElementById('cli-plan');
+  if(ini)ini.addEventListener('change',calcVence);
+  if(plan)plan.addEventListener('change',calcVence);
+  if(ini)ini.value=today();
+  calcVence();
+  load();
+  syncFromCloud();
+}
+
+document.addEventListener('DOMContentLoaded',()=>checkOwnerAuth());
+
+function calcVence(){
+  const ini=document.getElementById('cli-inicio').value;
+  const plan=document.getElementById('cli-plan').value;
+  const prev=document.getElementById('cli-vence-preview');
+  if(ini&&plan){prev.value=addMeses(ini,plan);}
+  else{prev.value='';}
+}
+
+function guardarCliente(){
+  const nombre=(document.getElementById('cli-nombre').value||'').trim();
+  const tel=(document.getElementById('cli-tel').value||'').trim();
+  const user=(document.getElementById('cli-user').value||'').trim();
+  const pass=(document.getElementById('cli-pass').value||'').trim();
+  const device=document.getElementById('cli-device').value;
+  const plan=document.getElementById('cli-plan').value;
+  const precio=parseFloat(document.getElementById('cli-precio').value)||0;
+  const inicio=document.getElementById('cli-inicio').value||today();
+  const notas=(document.getElementById('cli-notas').value||'').trim();
+  const debe=parseFloat(document.getElementById('cli-debe')?.value)||0;
+  const editId=document.getElementById('cli-edit-id').value||'';
+  if(!nombre)return alert('Ingresa el nombre del cliente');
+  if(!user||!pass)return alert('Ingresa el usuario y contraseña del panel OTT');
+  const tipo=document.getElementById('cli-tipo').value||'mensual';
+  const creditos=tipo==='vendedor'?parseInt(document.getElementById('cli-creditos').value)||0:0;
+  const vencimiento=addMeses(inicio,plan);
+  if(editId){
+    const idx=DB.clientes.findIndex(c=>c.id===editId);
+    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas,debe};
+    document.getElementById('cli-edit-id').value='';
+    document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
+    document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
+  }else{
+    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas,debe,activo:true});
+  }
+  save();limpiarFormCliente();renderAll();
+  tab('clientes',document.querySelectorAll('.nav>.nt')[1]);
+  setTimeout(()=>alert('✅ Cliente guardado correctamente'),100);
+}
+
+function limpiarFormCliente(){
+  ['cli-nombre','cli-tel','cli-user','cli-pass','cli-precio','cli-notas','cli-debe'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('cli-device').value='android-tv';
+  document.getElementById('cli-plan').value='1';
+  document.getElementById('cli-tipo').value='mensual';
+  document.getElementById('cli-creditos').value='';
+  document.getElementById('fg-creditos').style.display='none';
+  document.getElementById('cli-inicio').value=today();
+  document.getElementById('cli-edit-id').value='';
+  document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
+  document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
+  calcVence();
+}
+
+function editarCliente(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  document.getElementById('cli-nombre').value=c.nombre||'';
+  document.getElementById('cli-tel').value=c.tel||'';
+  document.getElementById('cli-user').value=c.user||'';
+  document.getElementById('cli-pass').value=c.pass||'';
+  document.getElementById('cli-device').value=c.device||'android-tv';
+  document.getElementById('cli-plan').value=c.plan||'1';
+  document.getElementById('cli-tipo').value=c.tipo||'mensual';
+  document.getElementById('cli-creditos').value=c.creditos||'';
+  toggleCreditosField();
+  document.getElementById('cli-precio').value=c.precio||'';
+  document.getElementById('cli-inicio').value=c.inicio||today();
+  document.getElementById('cli-notas').value=c.notas||'';
+  const debeEl=document.getElementById('cli-debe');if(debeEl)debeEl.value=c.debe||'';
+  document.getElementById('cli-edit-id').value=id;
+  document.getElementById('form-titulo').textContent='Editar: '+c.nombre;
+  document.getElementById('btn-guardar-cli').textContent='💾 Guardar cambios';
+  calcVence();
+  tab('nuevo',document.querySelectorAll('.nav>.nt')[2]);
+}
+
+function eliminarCliente(id){
+  const c=DB.clientes.find(x=>x.id===id);
+  if(!c||!confirm('¿Eliminar al cliente "'+c.nombre+'"?'))return;
+  DB.clientes=DB.clientes.filter(x=>x.id!==id);
+  save();renderAll();
+}
+
+// ===== RENOVAR =====
+function abrirRenovar(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  document.getElementById('modal-ren-info').innerHTML=
+    `<b>${escH(c.nombre)}</b> — Vence: <b style="color:var(--red)">${c.vencimiento}</b> | Precio anterior: <b>${fmt(c.precio)}</b>`;
+  document.getElementById('ren-cli-id').value=id;
+  document.getElementById('ren-plan').value='1';
+  document.getElementById('ren-precio').value=c.precio||'';
+  abrirModal('modal-renovar');
+}
+
+function guardarRenovacion(){
+  const id=document.getElementById('ren-cli-id').value;
+  const plan=document.getElementById('ren-plan').value;
+  const precio=parseFloat(document.getElementById('ren-precio').value)||0;
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const fechaAnterior=c.vencimiento;
+  const baseDate=diasHasta(c.vencimiento)<0?today():c.vencimiento;
+  c.vencimiento=addMeses(baseDate,plan);
+  c.plan=plan;c.precio=precio;
+  if(!c.historial)c.historial=[];
+  c.historial.push({fecha:today(),fecha_anterior:fechaAnterior,meses:parseInt(plan),precio:precio,nueva_fecha:c.vencimiento});
+  save();cerrarModal('modal-renovar');renderAll();
+  alert('✅ Suscripción actualizada hasta: '+c.vencimiento);
+}
+
+// ===== WHATSAPP =====
+function msgCredenciales(c){
+  return`Hola ${c.nombre}! 👋\n\nAquí están tus datos de acceso *GOLD TV* 📺\n\n👤 *Usuario:* ${c.user}\n🔑 *Contraseña:* ${c.pass}\n📅 *Válido hasta:* ${c.vencimiento}\n\nCualquier consulta estoy a tu disposición 😊`;
+}
+
+function m3uLink(c){
+  return M3U_BASE.replace('USER',c.user).replace('PASS',c.pass);
+}
+
+function msgInstalacion(c,device,app){
+  const dev=device||c.device;
+  const user=c.user,pass=c.pass,nombre=c.nombre;
+  const cred=`\n👤 *Usuario:* ${user}\n🔑 *Contraseña:* ${pass}`;
+  const srv='http://mundo2.pro:80';
+  const credSmarters=`\n🌐 *URL:* ${srv}\n👤 *Usuario:* ${user}\n🔑 *Contraseña:* ${pass}`;
+  if(app==='smarters'){
+    const paso1={
+      'android-tv':'1️⃣ Descarga *IPTV Smarters Lite* desde *Play Store*',
+      'celular':'1️⃣ Descarga *IPTV Smarters Lite* desde *Play Store*',
+      'tv-box':'1️⃣ Descarga *IPTV Smarters Lite* desde *Play Store*',
+      'fire-tv':'1️⃣ Descarga *IPTV Smarters Lite* desde *Amazon App Store*',
+      'smart-tv':'1️⃣ Descarga *IPTV Smarters Lite* desde la tienda de tu Smart TV',
+      'iphone':'1️⃣ Descarga *IPTV Smarters Pro* desde *App Store*',
+      'pc':'1️⃣ Descarga *IPTV Smarters Player* desde Microsoft Store o smarters.live'
+    }[dev]||'1️⃣ Descarga *IPTV Smarters Lite*';
+    const emoji={'android-tv':'📺','celular':'📱','tv-box':'📦','fire-tv':'🔥','smart-tv':'🖥️','iphone':'🍎','pc':'💻'}[dev]||'📺';
+    return`Hola ${nombre}! ${emoji}\n\n*Instalación GOLD TV con IPTV Smarters Lite:*\n\n${paso1}\n2️⃣ Abre la app → toca *"Agregar usuario"*\n3️⃣ Selecciona *Xtream Codes API*\n4️⃣ Ingresa estos datos:${credSmarters}\n5️⃣ Toca *Agregar usuario*\n\n✅ ¡Listo! Disfruta todos los canales 🎉`;
+  }
+  if(dev==='android-tv')return`Hola ${nombre}! 📺\n\n*Instalación GOLD TV en Android TV:*\n\n1️⃣ Descarga *Downloader* desde Play Store\n2️⃣ Abre Downloader e ingresa el código:\n    📌 *${DOWNLOADER_CODE}*\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='celular')return`Hola ${nombre}! 📱\n\n*Instalación GOLD TV en Android:*\n\n1️⃣ Abre Chrome en tu celular\n2️⃣ Escribe este link:\n    🔗 ${DOWNLOADER_LINK}\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='smart-tv')return`Hola ${nombre}! 🖥️\n\n*Instalación GOLD TV en Smart TV (LG/Samsung):*\n\n1️⃣ Busca e instala *IPTV Master LITE* en la tienda de apps de tu TV (es gratis)\n2️⃣ Abre la app y selecciona *"Agregar lista M3U"*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ Espera que cargue\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='iphone')return`Hola ${nombre}! 🍎\n\n*Instalación GOLD TV en iPhone/iPad:*\n\n1️⃣ Busca e instala *IPTV Master LITE* en App Store (es gratis)\n2️⃣ Abre la app y selecciona *"Agregar lista M3U"*\n3️⃣ Pega este link:\n    🔗 ${m3uLink(c)}\n4️⃣ Espera que cargue\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='tv-box')return`Hola ${nombre}! 📦\n\n*Instalación GOLD TV en TV Box:*\n\n1️⃣ Abre *Chrome* en tu TV Box\n2️⃣ Escribe o pega este link:\n    🔗 ${DOWNLOADER_LINK}\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='fire-tv')return`Hola ${nombre}! 🔥\n\n*Instalación GOLD TV en Fire TV:*\n\n1️⃣ Descarga *Downloader* desde Amazon App Store\n2️⃣ Abre Downloader e ingresa el código:\n    📌 *${DOWNLOADER_CODE}*\n3️⃣ Descarga e instala la app\n4️⃣ Ingresa tus datos:${cred}\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  if(dev==='pc')return`Hola ${nombre}! 💻\n\n*Ver GOLD TV en PC con IPTV Smarters Player:*\n\n1️⃣ Busca *IPTV Smarters Player* en *Microsoft Store* e instálalo (gratis)\n2️⃣ Abre la app → *"Agregar usuario"*\n3️⃣ Selecciona *Xtream Codes API*\n4️⃣ Ingresa tus datos:\n    🌐 URL: http://mundo2.pro:80\n    👤 Usuario: ${user}\n    🔑 Contraseña: ${pass}\n5️⃣ Haz clic en *Agregar usuario*\n\n✅ ¡Listo! Ya puedes ver todos los canales 🎉`;
+  return'Dispositivo no reconocido';
+}
+
+function enviarWACredenciales(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const tel=c.tel.replace(/\D/g,'');
+  const msg=encodeURIComponent(msgCredenciales(c));
+  window.open('https://wa.me/593'+tel.replace(/^0/,'')+'?text='+msg,'_blank');
+}
+
+function enviarWAInstalacion(id){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const tel=c.tel.replace(/\D/g,'');
+  const msg=encodeURIComponent(msgInstalacion(c));
+  window.open('https://wa.me/593'+tel.replace(/^0/,'')+'?text='+msg,'_blank');
+}
+
+let _guiaMsgActual='';
+function generarGuia(){
+  const id=document.getElementById('guia-cliente').value;
+  const device=document.getElementById('guia-device').value;
+  const app=document.getElementById('guia-app').value;
+  if(!id)return alert('Selecciona un cliente');
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  const msg=msgInstalacion(c,device,app);
+  _guiaMsgActual=msg;
+  document.getElementById('guia-msg').textContent=msg;
+  document.getElementById('guia-resultado').style.display='block';
+}
+
+function enviarWA(tipo){
+  const c=tipo==='guia'?DB.clientes.find(x=>x.id===document.getElementById('guia-cliente').value):null;
+  const tel=c?.tel?.replace(/\D/g,'')||'';
+  const msg=encodeURIComponent(_guiaMsgActual);
+  if(tel)window.open('https://wa.me/593'+tel.replace(/^0/,'')+'?text='+msg,'_blank');
+  else window.open('https://wa.me/?text='+msg,'_blank');
+}
+
+function copiarMensaje(id){
+  const el=document.getElementById(id);if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(()=>alert('✅ Texto copiado'));
+}
+
+// ===== RENDERS =====
+function renderAll(){
+  renderDash();renderClientes();renderVencimientos();llenarSelectClientes();
+  const el=document.getElementById('pill-total');
+  if(el)el.textContent=DB.clientes.length+' clientes';
+}
+
+function renderDash(){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const activos=DB.clientes.filter(c=>estadoCliente(c)==='activo').length;
+  const pronto=DB.clientes.filter(c=>estadoCliente(c)==='vence').length;
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const trials=DB.clientes.filter(c=>(c.tipo||'mensual')==='trial').length;
+  const vendedores=DB.clientes.filter(c=>(c.tipo||'mensual')==='vendedor').length;
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('d-total',DB.clientes.length);s('d-activos',activos);s('d-trials',trials);s('d-vendedores',vendedores);s('d-pronto',pronto);s('d-vencidos',vencidos);
+  // Deudores
+  const conDeuda=DB.clientes.filter(c=>c.debe&&c.debe>0);
+  const totalDeuda=conDeuda.reduce((a,c)=>a+(c.debe||0),0);
+  s('d-deudores',conDeuda.length);
+  const subDeu=document.getElementById('d-deudores-total');if(subDeu)subDeu.textContent='pendiente: $'+totalDeuda.toFixed(2);
+  // Cobros del mes actual
+  const mesActual=new Date().toISOString().substr(0,7);
+  const cobrosClientes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
+  const totalCobros=cobrosClientes.reduce((a,c)=>a+(c.precio||0),0);
+  s('d-mes',fmt(totalCobros));
+  s('d-mes-sub',cobrosClientes.length+' clientes vencen este mes');
+  // Próximos
+  const proximos=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=7;}).sort((a,b)=>a.vencimiento.localeCompare(b.vencimiento));
+  document.getElementById('d-proximos').innerHTML=proximos.length?proximos.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px">
+    <div><b>${escH(c.nombre)}</b> <span style="color:var(--muted);font-size:11px">${DISP_LABEL[c.device]||c.device}</span></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span style="color:var(--orange);font-size:11px">Vence en ${diasHasta(c.vencimiento)} día(s)</span>
+      <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">📅 Actualizar fecha</button>
+      <button class="btn btn-wa btn-sm" onclick="enviarWACredenciales('${c.id}')">📲 WA</button>
+    </div>
+  </div>`).join(''):'<div class="empty">Sin vencimientos en los próximos 7 días</div>';
+  // Vencidos
+  const vencList=DB.clientes.filter(c=>estadoCliente(c)==='vencido').sort((a,b)=>b.vencimiento.localeCompare(a.vencimiento));
+  document.getElementById('d-vencidos-lista').innerHTML=vencList.length?vencList.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px">
+    <div><b>${escH(c.nombre)}</b> <span style="color:var(--red);font-size:11px">venció ${Math.abs(diasHasta(c.vencimiento))} día(s) atrás</span></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">📅 Actualizar fecha</button>
+    </div>
+  </div>`).join(''):'<div class="empty">Sin clientes vencidos</div>';
+}
+
+const TIPO_BADGE={'mensual':'<span class="bdg" style="background:#1565c0">💳 Mensual</span>','trial':'<span class="bdg" style="background:#6b3fa0">🆓 Trial</span>','anual':'<span class="bdg" style="background:#b8860b">⭐ Anual</span>','vendedor':'<span class="bdg" style="background:#065f46">🏪 Vendedor</span>'};
+
+function toggleCreditosField(){
+  const tipo=document.getElementById('cli-tipo').value;
+  document.getElementById('fg-creditos').style.display=tipo==='vendedor'?'':'none';
+}
+
+function renderClientes(){
+  const q=(document.getElementById('cli-q')?.value||'').toLowerCase();
+  const est=document.getElementById('cli-estado')?.value||'';
+  const disp=document.getElementById('cli-disp')?.value||'';
+  const tipoFil=document.getElementById('cli-tipo-fil')?.value||'';
+  let lista=DB.clientes.filter(c=>{
+    if(q&&!c.nombre?.toLowerCase().includes(q)&&!c.user?.toLowerCase().includes(q)&&!c.tel?.includes(q))return false;
+    if(est&&estadoCliente(c)!==est)return false;
+    if(disp&&c.device!==disp)return false;
+    if(tipoFil&&(c.tipo||'mensual')!==tipoFil)return false;
+    return true;
+  }).sort((a,b)=>a.vencimiento?.localeCompare(b.vencimiento));
+  const tb=document.getElementById('tb-clientes');
+  if(!lista.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Sin clientes con ese filtro</div></td></tr>';return;}
+  const BADGE={'activo':'<span class="bdg bdg-activo">Activo</span>','vence':'<span class="bdg bdg-vence">Vence pronto</span>','vencido':'<span class="bdg bdg-vencido">Vencido</span>'};
+  tb.innerHTML=lista.map(c=>{
+    const est=estadoCliente(c);
+    const dias=diasHasta(c.vencimiento);
+    const tipo=c.tipo||'mensual';
+    return`<tr>
+      <td><b>${escH(c.nombre)}</b>${c.debe&&c.debe>0?`<span style="background:#f97316;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:5px;font-weight:600">💸 $${parseFloat(c.debe).toFixed(2)}</span>`:''}${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
+      <td style="font-family:monospace">${escH(c.tel||'—')}</td>
+      <td style="font-family:monospace;font-size:11px">${escH(c.user)}</td>
+      <td>${DISP_LABEL[c.device]||c.device}</td>
+      <td>${TIPO_BADGE[tipo]||tipo}${tipo==='vendedor'&&c.creditos?`<div style="font-size:11px;color:#6ee7b7;margin-top:2px">💎 ${c.creditos} créditos</div>`:''}</td>
+      <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
+      <td>${BADGE[est]||''}</td>
+      <td style="font-family:monospace">${fmt(c.precio)}</td>
+      <td>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">
+          <button class="btn btn-wa btn-sm" onclick="enviarWACredenciales('${c.id}')" title="Enviar credenciales por WhatsApp">🔑</button>
+          <button class="btn btn-wa btn-sm" onclick="enviarWAInstalacion('${c.id}')" title="Enviar guía de instalación">📖</button>
+          <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')" title="Actualizar fecha">📅</button>
+          <button class="btn btn-s btn-sm" onclick="verHistorial('${c.id}')" title="Ver historial de renovaciones">📋</button>
+          <button class="btn btn-s btn-sm" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>
+          <button class="btn btn-d btn-sm" onclick="eliminarCliente('${c.id}')" title="Eliminar">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderVencimientos(){
+  const semana=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=7;}).length;
+  const mes=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=30;}).length;
+  const venc=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('v-semana',semana);s('v-mes',mes);s('v-vencidos',venc);
+  const proximos=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=30;}).sort((a,b)=>a.vencimiento.localeCompare(b.vencimiento));
+  document.getElementById('v-lista-proximos').innerHTML=proximos.length?proximos.map(c=>`<div style="display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+    <input type="checkbox" class="venc-chk" data-id="${c.id}" style="width:16px;height:16px;accent-color:var(--orange);flex-shrink:0">
+    <div style="flex:1">
+      <b>${escH(c.nombre)}</b> <span style="font-size:11px;color:var(--muted)">${DISP_LABEL[c.device]||''}</span>
+      <div style="font-size:11px;color:var(--muted);font-family:monospace">${c.user}</div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <span style="color:${diasHasta(c.vencimiento)<=7?'var(--orange)':'var(--gold)'};font-size:12px;font-weight:600">Vence: ${c.vencimiento} (${diasHasta(c.vencimiento)} días)</span>
+      <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">📅 Actualizar fecha</button>
+      <button class="btn btn-wa btn-sm" onclick="enviarWACredenciales('${c.id}')">📲 Credenciales</button>
+    </div>
+  </div>`).join(''):'<div class="empty">Sin vencimientos en los próximos 30 días</div>';
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').sort((a,b)=>b.vencimiento.localeCompare(a.vencimiento));
+  document.getElementById('v-lista-vencidos').innerHTML=vencidos.length?vencidos.map(c=>`<div style="display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+    <input type="checkbox" class="venc-chk" data-id="${c.id}" style="width:16px;height:16px;accent-color:var(--red);flex-shrink:0">
+    <div style="flex:1">
+      <b>${escH(c.nombre)}</b>
+      <div style="font-size:11px;color:var(--red)">Venció el ${c.vencimiento} (hace ${Math.abs(diasHasta(c.vencimiento))} días)</div>
+    </div>
+    <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')">📅 Actualizar fecha</button>
+  </div>`).join(''):'<div class="empty">Sin clientes vencidos</div>';
+}
+
+function llenarSelectClientes(){
+  const sel=document.getElementById('guia-cliente');if(!sel)return;
+  sel.innerHTML='<option value="">— Seleccionar cliente —</option>'+
+    DB.clientes.sort((a,b)=>a.nombre?.localeCompare(b.nombre)).map(c=>`<option value="${c.id}">${escH(c.nombre)} (${c.user})</option>`).join('');
+}
+
+function exportarCSV(){
+  if(!DB.clientes.length)return alert('No hay clientes registrados');
+  const filas=[['Nombre','Teléfono','Usuario','Contraseña','Dispositivo','Plan','Precio','Inicio','Vencimiento','Estado','Notas']];
+  DB.clientes.forEach(c=>filas.push([c.nombre,c.tel,c.user,c.pass,DISP_LABEL[c.device]||c.device,c.plan+' mes(es)',c.precio,c.inicio,c.vencimiento,estadoCliente(c),c.notas||'']));
+  const csv=filas.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,"'")}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='goldtv_clientes_'+today()+'.csv';a.click();
+}
+
+function restaurarBackup(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(parsed.clientes&&Array.isArray(parsed.clientes)){
+        DB=parsed;
+        save();
+        renderAll();
+        alert('✅ Backup restaurado: '+DB.clientes.length+' clientes cargados y guardados en la nube.');
+      }else{alert('❌ Archivo no válido. Usa un backup de GOLD TV.');}
+    }catch(err){alert('❌ Error al leer el archivo.');}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+function backupGold(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}));
+  a.download='goldtv_backup_'+today()+'.json';a.click();
+}
+
+// ===== SINCRONIZAR PANEL OTT =====
+const PANEL_URL='http://goldtv.lat:2086';
+const PANEL_USER='MONYAR90';
+const PANEL_PASS='Nenita25';
+let syncData=[];
+
+function abrirSincronizar(){
+  syncData=[];
+  var el=document.getElementById('sync-estado');
+  if(el) el.innerHTML='Haz clic en el boton dorado para seleccionar el archivo JSON que descargaste de tu panel (Backup Users > JSON).';
+  var sl=document.getElementById('sync-lista');
+  if(sl) sl.style.display='none';
+  var bi=document.getElementById('btn-importar');
+  if(bi) bi.style.display='none';
+  abrirModal('modal-sync');
+}
+function conectarPanel(){}
+
+function normalizarLinea(l){
+  // Soporta formato XM OTT Panel (Username/Password/Expires) y Xtream Codes (username/password/exp_date)
+  const user=l.Username||l.username||l.user||l.USER||'';
+  const pass=l.Password||l.password||l.pass||l.PASS||'';
+  const status=l.Status||l.status||l.enabled||'active';
+  const activo=typeof status==='string'?/active|activo|1/i.test(status):status===1||status==='1';
+  const notes=l.Notes||l.notes||l.Creator||l.creator||l.Owner||l.owner||'';
+  // Fecha de vencimiento
+  let vence='';
+  if(l.Expires||l.expires||l.Expiry||l.expiry){
+    vence=(l.Expires||l.expires||l.Expiry||l.expiry||'').split(' ')[0];
+  } else if(l.exp_date&&l.exp_date!=='0'){
+    vence=new Date(parseInt(l.exp_date)*1000).toISOString().split('T')[0];
+  } else if(l.expiration){
+    vence=l.expiration.split(' ')[0];
+  }
+  // Detectar tipo desde nombre del paquete
+  const pkg=(l.Package||l.package||l.Bouquet||l.bouquet||l.plan||'').toString().toLowerCase();
+  let tipo='mensual';
+  if(/trial|prueba|demo|test|free/i.test(pkg))tipo='trial';
+  else if(/anual|annual|year|12\s*mes/i.test(pkg))tipo='anual';
+  return{user,pass,activo,vence,notes,tipo,_raw:l};
+}
+
+function procesarLineas(raw){
+  let lineas=[];
+  if(Array.isArray(raw))lineas=raw;
+  else if(typeof raw==='object')lineas=Object.values(raw);
+  lineas=lineas.filter(l=>l&&typeof l==='object');
+
+  if(!lineas.length){
+    document.getElementById('sync-estado').innerHTML='<span style="color:#ef4444">No se encontraron clientes en el archivo.</span>';
+    return;
+  }
+
+  syncData=lineas.map(normalizarLinea);
+  const existentes=new Set(DB.clientes.map(c=>c.user));
+  const estado=document.getElementById('sync-estado');
+  const nuevos=syncData.filter(l=>!existentes.has(l.user)).length;
+  estado.innerHTML=`<span style="color:#22c55e">✅ Se encontraron <b>${lineas.length}</b> clientes — <b>${nuevos}</b> nuevos, <b>${lineas.length-nuevos}</b> ya existen.</span>`;
+
+  const tb=document.getElementById('tb-sync');
+  tb.innerHTML=syncData.map((l,i)=>{
+    const yaExiste=existentes.has(l.user);
+    return`<tr style="border-top:1px solid rgba(74,108,247,.15)">
+      <td style="padding:6px 10px"><input type="checkbox" class="sync-chk" data-idx="${i}" ${yaExiste?'':'checked'}></td>
+      <td style="padding:6px 10px;font-family:monospace;color:#f0eeff">${escH(l.user)}</td>
+      <td style="padding:6px 10px;font-family:monospace;color:var(--muted)">${escH(l.pass)}</td>
+      <td style="padding:6px 10px;color:${l.vence&&l.vence<today()?'var(--red)':'var(--gold)'}">${l.vence||'—'}</td>
+      <td style="padding:6px 10px"><span class="bdg ${l.activo?'bdg-activo':'bdg-vencido'}">${l.activo?'Activo':'Vencido'}</span></td>
+      <td style="padding:6px 10px">${yaExiste?'<span style="color:#f97316;font-size:11px">⚠️ Ya existe</span>':'<span style="color:#22c55e;font-size:11px">✓ Nuevo</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('sync-count').textContent=`${lineas.length} clientes — selecciona cuáles importar`;
+  document.getElementById('sync-lista').style.display='block';
+  document.getElementById('btn-importar').style.display='inline-flex';
+}
+
+function syncSelAll(v){
+  document.querySelectorAll('.sync-chk').forEach(c=>c.checked=v);
+  document.getElementById('chk-all').checked=v;
+}
+
+function importarSeleccionados(){
+  const selIdx=[];
+  document.querySelectorAll('.sync-chk:checked').forEach(c=>selIdx.push(parseInt(c.dataset.idx)));
+  if(!selIdx.length)return alert('Selecciona al menos un cliente');
+
+  let nuevos=0,actualizados=0;
+
+  selIdx.forEach(i=>{
+    const l=syncData[i];if(!l)return;
+    const vence=l.vence||addMeses(today(),1);
+    const obj={
+      id:uid(),
+      nombre:l.user,
+      tel:'',
+      user:l.user,
+      pass:l.pass,
+      device:'android-tv',
+      plan:'1',
+      precio:0,
+      inicio:today(),
+      vencimiento:vence,
+      notas:l.notes||'',
+      activo:l.activo
+    };
+    const idx=DB.clientes.findIndex(c=>c.user===obj.user);
+    if(idx!==-1){DB.clientes[idx]={...DB.clientes[idx],pass:obj.pass,vencimiento:obj.vencimiento,activo:obj.activo};actualizados++;}
+    else{DB.clientes.push(obj);nuevos++;}
+  });
+
+  save();renderAll();cerrarModal('modal-sync');
+  alert(`✅ Importación completa:\n• ${nuevos} clientes nuevos\n• ${actualizados} actualizados\n\nPuedes editar cada cliente (✏️) para agregar nombre, teléfono y dispositivo.`);
+}
+
+function importarPegado(){
+  const txt=(document.getElementById('sync-paste')?.value||'').trim();
+  if(!txt)return alert('Pega los datos primero');
+  const lineas=txt.split('\n').map(l=>l.trim()).filter(l=>l);
+  const fakeData=lineas.map(l=>{
+    const p=l.split(',');
+    return{username:(p[0]||'').trim(),password:(p[1]||'').trim(),exp_date:p[2]?Math.floor(new Date(p[2].trim())/1000).toString():'',enabled:'1',notes:''};
+  }).filter(l=>l.username);
+  if(!fakeData.length)return alert('Formato incorrecto. Usa: usuario,contraseña,fecha');
+  procesarLineas(fakeData);
+}
+
+function detectarPegado(ta){
+  const txt=(ta.value||'').trim();
+  const lineas=txt.split('\n').filter(l=>l.trim()&&l.includes(','));
+  const prev=document.getElementById('sync-preview');
+  if(lineas.length>0){
+    prev.innerHTML=`<span style="color:#22c55e">✅ ${lineas.length} clientes detectados — </span><button class="btn btn-sm" style="background:linear-gradient(135deg,#7c3aed,#c026d3);color:#fff;padding:3px 10px" onclick="importarDesdePaste()">⬇️ Importar todos ahora</button>`;
+  }else{
+    prev.innerHTML='';
+  }
+}
+
+function importarDesdePaste(){
+  const txt=(document.getElementById('sync-paste')?.value||'').trim();
+  if(!txt)return;
+  const lineas=txt.split('\n').map(l=>l.trim()).filter(l=>l&&l.includes(','));
+  const datos=lineas.map(l=>{
+    const p=l.split(',');
+    const expRaw=(p[2]||'').trim();
+    const expTs=expRaw?Math.floor(new Date(expRaw)/1000).toString():'';
+    return{username:(p[0]||'').trim(),password:(p[1]||'').trim(),exp_date:expTs,enabled:'1',notes:''};
+  }).filter(l=>l.username);
+  if(!datos.length)return alert('No se encontraron datos válidos');
+  procesarLineas(datos);
+}
+
+function triggerFileImport(){
+  document.getElementById('file-import-input').value='';
+  document.getElementById('file-import-input').click();
+}
+
+function importarArchivo(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const txt=e.target.result;
+    try{
+      // Intentar JSON primero
+      const json=JSON.parse(txt);
+      procesarLineas(Array.isArray(json)?json:Object.values(json));
+    }catch{
+      // Parsear CSV
+      const lineas=txt.split('\n').filter(l=>l.trim());
+      const header=lineas[0].toLowerCase();
+      let datos=[];
+      if(header.includes('username')||header.includes('usuario')){
+        // Tiene encabezado
+        const cols=lineas[0].split(',').map(c=>c.trim().toLowerCase().replace(/"/g,''));
+        const uIdx=cols.findIndex(c=>c.includes('user'));
+        const pIdx=cols.findIndex(c=>c.includes('pass')||c.includes('contra'));
+        const eIdx=cols.findIndex(c=>c.includes('exp')||c.includes('venc'));
+        datos=lineas.slice(1).map(l=>{
+          const p=l.split(',').map(c=>c.trim().replace(/"/g,''));
+          const expRaw=eIdx>=0?p[eIdx]:'';
+          const expTs=expRaw?Math.floor(new Date(expRaw)/1000).toString():'';
+          return{username:p[uIdx]||'',password:p[pIdx]||'',exp_date:expTs,enabled:'1',notes:''};
+        }).filter(l=>l.username);
+      }else{
+        datos=lineas.map(l=>{const p=l.split(',');return{username:(p[0]||'').trim().replace(/"/g,''),password:(p[1]||'').trim().replace(/"/g,''),exp_date:p[2]?Math.floor(new Date(p[2].trim().replace(/"/g,''))/1000).toString():'',enabled:'1',notes:''};}).filter(l=>l.username);
+      }
+      procesarLineas(datos);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ===== ENVÍO MASIVO =====
+let _selEnvioIds=[];
+
+function seleccionarTodosVenc(grupo){
+  const chks=document.querySelectorAll('.venc-chk');
+  const alguDesm=[...chks].some(c=>!c.checked);
+  chks.forEach(c=>c.checked=alguDesm);
+}
+
+function abrirEnvioMasivo(){
+  const chks=[...document.querySelectorAll('.venc-chk:checked')];
+  if(!chks.length)return alert('Selecciona al menos un cliente marcando las casillas ☑️');
+  _selEnvioIds=chks.map(c=>c.dataset.id);
+  const clientes=_selEnvioIds.map(id=>DB.clientes.find(c=>c.id===id)).filter(Boolean);
+  document.getElementById('envio-lista').innerHTML=`
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600">${clientes.length} cliente(s) seleccionados:</div>
+    ${clientes.map(c=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:18px">${c.device==='iphone'?'🍎':c.device==='pc'?'💻':c.device==='celular'?'📱':c.device==='smart-tv'?'🖥️':'📺'}</span>
+        <div style="flex:1">
+          <b style="font-size:13px">${escH(c.nombre)}</b>
+          <div style="font-size:11px;color:${diasHasta(c.vencimiento)<0?'var(--red)':'var(--orange)'}">${diasHasta(c.vencimiento)<0?'Vencido hace '+Math.abs(diasHasta(c.vencimiento))+' días':'Vence en '+diasHasta(c.vencimiento)+' días ('+c.vencimiento+')'}</div>
+        </div>
+        <span style="font-size:11px;color:var(--muted);font-family:monospace">${c.tel||'sin tel'}</span>
+      </div>`).join('')}`;
+  abrirModal('modal-envio');
+}
+
+function ejecutarEnvioMasivo(){
+  const clientes=_selEnvioIds.map(id=>DB.clientes.find(c=>c.id===id)).filter(Boolean);
+  if(!clientes.length)return;
+  cerrarModal('modal-envio');
+  let i=0;
+  function enviarSiguiente(){
+    if(i>=clientes.length)return;
+    const c=clientes[i];i++;
+    const dias=diasHasta(c.vencimiento);
+    let msg;
+    if(dias<0){
+      msg=`Hola ${c.nombre}! 👋\n\n⚠️ Tu servicio GOLD TV *venció hace ${Math.abs(dias)} días*.\n\nPara volver a activarlo, escríbeme y coordinamos tu renovación. 🙏\n\nGOLD TV 📺`;
+    }else{
+      msg=`Hola ${c.nombre}! 👋\n\n🔔 Te recuerdo que tu servicio GOLD TV *vence en ${dias} día(s)* (${c.vencimiento}).\n\nEscríbeme para renovar y no quedarte sin servicio. 😊\n\nGOLD TV 📺`;
+    }
+    const tel=c.tel?c.tel.replace(/\D/g,''):'';
+    const url=tel?`https://wa.me/593${tel.startsWith('0')?tel.slice(1):tel}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(url,'_blank');
+    setTimeout(enviarSiguiente,1200);
+  }
+  enviarSiguiente();
+}
+
+// ===== REPORTE MENSUAL =====
+function generarReporte(){
+  const hoy=new Date();
+  const mesActual=hoy.toISOString().substr(0,7);
+  const nombreMes=hoy.toLocaleString('es',{month:'long',year:'numeric'});
+  const activos=DB.clientes.filter(c=>estadoCliente(c)==='activo').length;
+  const pronto=DB.clientes.filter(c=>estadoCliente(c)==='vence').length;
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const trials=DB.clientes.filter(c=>(c.tipo||'mensual')==='trial').length;
+  const vendedores=DB.clientes.filter(c=>(c.tipo||'mensual')==='vendedor').length;
+  const conDeuda=DB.clientes.filter(c=>c.debe&&c.debe>0);
+  const totalDeuda=conDeuda.reduce((a,c)=>a+(c.debe||0),0);
+  const venEsteMes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
+  const cobrosEsteMes=venEsteMes.reduce((a,c)=>a+(c.precio||0),0);
+  // Renovaciones del mes
+  const renMes=DB.clientes.flatMap(c=>(c.historial||[]).filter(h=>h.fecha?.startsWith(mesActual)));
+  const totalRenMes=renMes.reduce((a,h)=>a+(h.precio||0),0);
+  // Top dispositivos
+  const dispCount={};
+  DB.clientes.forEach(c=>{const d=c.device||'otro';dispCount[d]=(dispCount[d]||0)+1;});
+  const topDisp=Object.entries(dispCount).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  // Vencimientos próximos 7 días
+  const proxSem=DB.clientes.filter(c=>{const d=diasHasta(c.vencimiento);return d>=0&&d<=7;});
+
+  const html=`
+    <div style="font-size:13px;line-height:1.7">
+      <div style="text-align:center;padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:14px">
+        <div style="font-size:22px">📊</div>
+        <div style="font-size:16px;font-weight:700;color:var(--gold)">Reporte ${nombreMes}</div>
+        <div style="font-size:11px;color:var(--muted)">GOLD TV · ${hoy.toLocaleDateString('es')}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        ${stat('👥 Total clientes',DB.clientes.length,'#fff')}
+        ${stat('✅ Activos',activos,'#4ade80')}
+        ${stat('⏰ Vencen pronto',pronto,'#fb923c')}
+        ${stat('🔴 Vencidos',vencidos,'#f87171')}
+        ${stat('🆓 Trials',trials,'#a78bfa')}
+        ${stat('🏪 Vendedores',vendedores,'#67e8f9')}
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;color:var(--gold);margin-bottom:6px">💰 Dinero este mes</div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Clientes que vencen este mes:</span><b>${venEsteMes.length} clientes · ${fmt(cobrosEsteMes)}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Renovaciones registradas:</span><b>${renMes.length} · ${fmt(totalRenMes)}</b></div>
+        ${conDeuda.length?`<div style="display:flex;justify-content:space-between;color:#f97316"><span>💸 Cobros pendientes (${conDeuda.length} clientes):</span><b>${fmt(totalDeuda)}</b></div>`:''}
+      </div>
+      ${proxSem.length?`<div style="background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;color:#fb923c;margin-bottom:6px">⏰ Vencen en los próximos 7 días (${proxSem.length})</div>
+        ${proxSem.map(c=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0"><span>${escH(c.nombre)}</span><span style="color:var(--muted)">${c.vencimiento} · ${diasHasta(c.vencimiento)}d</span></div>`).join('')}
+      </div>`:''}
+      <div style="background:var(--surface2);border-radius:8px;padding:12px">
+        <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📱 Dispositivos</div>
+        ${topDisp.map(([d,n])=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span>${DISP_LABEL[d]||d}</span><b>${n}</b></div>`).join('')}
+      </div>
+    </div>`;
+
+  function stat(lbl,val,color){
+    return`<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:11px;color:var(--muted)">${lbl}</div>
+      <div style="font-size:22px;font-weight:700;color:${color}">${val}</div>
+    </div>`;
+  }
+
+  document.getElementById('reporte-body').innerHTML=html;
+  abrirModal('modal-reporte');
+}
+
+function copiarReporte(){
+  const hoy=new Date();
+  const mesActual=hoy.toISOString().substr(0,7);
+  const activos=DB.clientes.filter(c=>estadoCliente(c)==='activo').length;
+  const vencidos=DB.clientes.filter(c=>estadoCliente(c)==='vencido').length;
+  const pronto=DB.clientes.filter(c=>estadoCliente(c)==='vence').length;
+  const venEsteMes=DB.clientes.filter(c=>c.vencimiento?.startsWith(mesActual));
+  const cobros=venEsteMes.reduce((a,c)=>a+(c.precio||0),0);
+  const conDeuda=DB.clientes.filter(c=>c.debe&&c.debe>0);
+  const totalDeuda=conDeuda.reduce((a,c)=>a+(c.debe||0),0);
+  const txt=`📊 REPORTE GOLD TV — ${hoy.toLocaleDateString('es',{month:'long',year:'numeric'}).toUpperCase()}
+
+👥 Total clientes: ${DB.clientes.length}
+✅ Activos: ${activos}
+⏰ Por vencer: ${pronto}
+🔴 Vencidos: ${vencidos}
+
+💰 Cobros este mes: ${fmt(cobros)} (${venEsteMes.length} clientes)
+${conDeuda.length?`💸 Cobros pendientes: ${fmt(totalDeuda)} (${conDeuda.length} clientes)\n`:''}
+Generado: ${hoy.toLocaleDateString('es')} · GOLD TV`;
+  navigator.clipboard.writeText(txt).then(()=>alert('✅ Reporte copiado al portapapeles'));
+}
+
+// ===== GESTIÓN DE VENDEDORES =====
+async function crearVendedor(){
+  const nombre=document.getElementById('nv-nombre').value.trim();
+  if(!nombre){alert('Ingresa el nombre del vendedor');return;}
+  const tipo=document.getElementById('nv-tipo').value;
+  const base=nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,'').replace(/[^a-z0-9]/g,'');
+  const vendorId=base+(Math.floor(Math.random()*90)+10);
+  const sufijo=nombre.toUpperCase().replace(/\s+/g,'').substring(0,8);
+  const licenseKey='GOLD-'+sufijo+'-2026';
+  const btn=document.getElementById('btn-crear-v');
+  btn.textContent='Creando...';btn.disabled=true;
+  const{error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true,demo:tipo==='demo'});
+  btn.textContent='Crear →';btn.disabled=false;
+  if(error){alert('Error al crear: '+error.message);return;}
+  const link=`https://sistemasmonica.github.io/goldtv-panel/?v=${vendorId}&k=${licenseKey}`;
+  document.getElementById('nv-resultado').style.display='block';
+  document.getElementById('nv-link').value=link;
+  document.getElementById('nv-info').textContent=nombre+' — '+(tipo==='demo'?'DEMO (hasta 3 clientes)':'Completo');
+  document.getElementById('nv-nombre').value='';
+  cargarVendedores();
+}
+
+function copiarNvLink(){
+  navigator.clipboard.writeText(document.getElementById('nv-link').value);
+  mostrarToastGV('✓ Link copiado');
+}
+
+async function cargarVendedores(){
+  const tbody=document.getElementById('tb-vendedores');
+  if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#475569;padding:16px">Cargando...</td></tr>';
+  const{data,error}=await sb.from('gtv_licencias').select('*').order('vendor_name');
+  if(error||!data){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#ef4444;padding:16px">Error al cargar vendedores</td></tr>';return;}
+  if(!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#475569;padding:16px">Sin vendedores aún</td></tr>';return;}
+  tbody.innerHTML=data.map(v=>{
+    const link=`https://sistemasmonica.github.io/goldtv-panel/?v=${encodeURIComponent(v.vendor_id)}&k=${encodeURIComponent(v.license_key)}`;
+    const tipoBadge=v.demo
+      ?`<span style="background:rgba(245,158,11,.2);color:#fbbf24;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">DEMO</span>`
+      :`<span style="background:rgba(74,108,247,.15);color:#7c8fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">COMPLETO</span>`;
+    const estadoBadge=v.active
+      ?`<span style="background:rgba(34,197,94,.15);color:#22c55e;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">ACTIVO</span>`
+      :`<span style="background:rgba(239,68,68,.15);color:#ef4444;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">INACTIVO</span>`;
+    const btnDemo=v.demo?`<button onclick="activarCompleto('${escH(v.vendor_id)}')" style="background:rgba(34,197,94,.2);border:1px solid rgba(34,197,94,.5);color:#22c55e;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit">✅ Activar completo</button> `:'';
+    const btnToggle=v.active
+      ?`<button onclick="toggleActivoV('${escH(v.vendor_id)}',true)" style="background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.5);color:#ef4444;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit">Desactivar</button> `
+      :`<button onclick="toggleActivoV('${escH(v.vendor_id)}',false)" style="background:rgba(34,197,94,.2);border:1px solid rgba(34,197,94,.5);color:#22c55e;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit">Activar</button> `;
+    const btnLink=`<button onclick="navigator.clipboard.writeText('${link}');mostrarToastGV('✓ Link copiado')" style="background:rgba(107,63,160,.2);border:1px solid rgba(107,63,160,.5);color:#a78bfa;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit">📋 Link</button>`;
+    return`<tr style="border-bottom:1px solid rgba(107,63,160,.12)">
+      <td style="padding:8px 10px;color:#e2e8f0;font-weight:600">${escH(v.vendor_name)}</td>
+      <td style="padding:8px 10px">${tipoBadge}</td>
+      <td style="padding:8px 10px">${estadoBadge}</td>
+      <td style="padding:8px 10px">${btnDemo}${btnToggle}${btnLink}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function activarCompleto(vendorId){
+  if(!confirm('¿Activar acceso COMPLETO para este vendedor? Ya no tendrá límite de clientes.'))return;
+  const{error}=await sb.from('gtv_licencias').update({demo:false}).eq('vendor_id',vendorId);
+  if(error){alert('Error: '+error.message);return;}
+  cargarVendedores();
+  mostrarToastGV('✓ Vendedor activado completo');
+}
+
+async function toggleActivoV(vendorId,currentActive){
+  const msg=currentActive?'¿Desactivar este vendedor? No podrá entrar al panel.':'¿Activar este vendedor nuevamente?';
+  if(!confirm(msg))return;
+  const{error}=await sb.from('gtv_licencias').update({active:!currentActive}).eq('vendor_id',vendorId);
+  if(error){alert('Error: '+error.message);return;}
+  cargarVendedores();
+  mostrarToastGV(currentActive?'Vendedor desactivado':'✓ Vendedor activado');
+}
+
+function mostrarToastGV(msg){
+  let t=document.getElementById('toast-gv');
+  if(!t){t=document.createElement('div');t.id='toast-gv';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;z-index:9999;transition:opacity .4s;pointer-events:none';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',2500);
+}
 </script>
 </body>
 </html>
