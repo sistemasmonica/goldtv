@@ -542,6 +542,15 @@ select option{background:#1a1735}
       </div>
     </div>
 
+    <!-- FORMULARIO CREAR MASIVO -->
+    <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="color:#c4b5fd;font-size:12px;font-weight:700;margin-bottom:6px">➕➕ Crear varios vendedores a la vez</div>
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:8px">Pega los nombres de tus Subresellers (uno por línea, copiados de la columna "Username" del Panel OTT). A todos se les crea acceso Completo.</div>
+      <textarea id="nv-masivo" placeholder="Mgloja26&#10;KleverGonz26&#10;Asdrubal26&#10;MackyAnimas" style="width:100%;min-height:90px;background:#0d0b1f;border:1px solid rgba(107,63,160,.5);border-radius:6px;padding:8px 10px;color:#fff;font-size:12px;font-family:monospace;resize:vertical"></textarea>
+      <button id="btn-crear-masivo" onclick="crearVendedoresMasivo()" style="margin-top:8px;background:linear-gradient(135deg,var(--np),#9333ea);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Crear todos →</button>
+      <div id="nv-masivo-resultado" style="display:none;margin-top:10px;background:#052e16;border:1px solid rgba(34,197,94,.4);border-radius:8px;padding:12px;font-size:12px;color:#86efac"></div>
+    </div>
+
     <!-- LISTA VENDEDORES -->
     <div style="background:#1a1a2e;border-radius:10px;padding:14px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -1591,7 +1600,10 @@ async function crearVendedor(){
   const licenseKey='GOLD-'+sufijo+'-2026';
   const btn=document.getElementById('btn-crear-v');
   btn.textContent='Creando...';btn.disabled=true;
-  const{error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true,demo:tipo==='demo'});
+  let{error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true,demo:tipo==='demo'});
+  if(error&&/column .*demo.* does not exist/i.test(error.message)){
+    ({error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true}));
+  }
   btn.textContent='Crear →';btn.disabled=false;
   if(error){alert('Error al crear: '+error.message);return;}
   const link=`https://sistemasmonica.github.io/goldtv-panel/?v=${vendorId}&k=${licenseKey}`;
@@ -1599,6 +1611,44 @@ async function crearVendedor(){
   document.getElementById('nv-link').value=link;
   document.getElementById('nv-info').textContent=nombre+' — '+(tipo==='demo'?'DEMO (hasta 3 clientes)':'Completo');
   document.getElementById('nv-nombre').value='';
+  cargarVendedores();
+}
+
+async function crearVendedoresMasivo(){
+  const txt=document.getElementById('nv-masivo').value.trim();
+  if(!txt){alert('Pega al menos un nombre');return;}
+  const nombres=[...new Set(txt.split('\n').map(l=>l.trim()).filter(Boolean))];
+  if(!nombres.length){alert('No se detectaron nombres válidos');return;}
+
+  const{data:existentes}=await sb.from('gtv_licencias').select('vendor_name');
+  const nombresExistentes=new Set((existentes||[]).map(v=>(v.vendor_name||'').toLowerCase()));
+
+  const btn=document.getElementById('btn-crear-masivo');
+  btn.textContent='Creando...';btn.disabled=true;
+
+  let creados=0,omitidos=0,errores=0;
+  const links=[];
+  for(const nombre of nombres){
+    if(nombresExistentes.has(nombre.toLowerCase())){omitidos++;continue;}
+    const base=nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,'').replace(/[^a-z0-9]/g,'');
+    const vendorId=base+(Math.floor(Math.random()*90)+10);
+    const sufijo=nombre.toUpperCase().replace(/\s+/g,'').substring(0,8);
+    const licenseKey='GOLD-'+sufijo+'-2026';
+    let{error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true,demo:false});
+    if(error&&/column .*demo.* does not exist/i.test(error.message)){
+      ({error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true}));
+    }
+    if(error){errores++;continue;}
+    creados++;
+    links.push(nombre+': https://sistemasmonica.github.io/goldtv-panel/?v='+vendorId+'&k='+licenseKey);
+  }
+
+  btn.textContent='Crear todos →';btn.disabled=false;
+  const resDiv=document.getElementById('nv-masivo-resultado');
+  resDiv.style.display='block';
+  resDiv.innerHTML=`✅ <b>${creados}</b> vendedores creados`+(omitidos?` · ⚠️ <b>${omitidos}</b> omitidos (ya existían)`:'')+(errores?` · ❌ <b>${errores}</b> con error`:'')+
+    (links.length?'<br><br><textarea readonly style="width:100%;min-height:120px;background:#0d0b1f;border:1px solid rgba(34,197,94,.4);border-radius:6px;padding:8px;color:#fde68a;font-size:11px;font-family:monospace">'+links.join('\n')+'</textarea>':'');
+  document.getElementById('nv-masivo').value='';
   cargarVendedores();
 }
 
