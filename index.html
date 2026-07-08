@@ -545,7 +545,10 @@ select option{background:#1a1735}
     <!-- FORMULARIO CREAR MASIVO -->
     <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:12px">
       <div style="color:#c4b5fd;font-size:12px;font-weight:700;margin-bottom:6px">➕➕ Crear varios vendedores a la vez</div>
-      <div style="font-size:11px;color:#94a3b8;margin-bottom:8px">Pega los nombres de tus Subresellers (uno por línea, copiados de la columna "Username" del Panel OTT). A todos se les crea acceso Completo.</div>
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:8px">Descarga el backup de tus Subresellers (Users → Administrar Usuarios → Backup Users → JSON) o pega los nombres a mano (uno por línea). A todos se les crea acceso Completo.</div>
+      <button onclick="document.getElementById('nv-file-input').click()" style="margin-bottom:8px;background:linear-gradient(135deg,var(--np),#9333ea);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📂 Seleccionar archivo (JSON/CSV del OTT)</button>
+      <input type="file" id="nv-file-input" accept=".json,.csv,.txt" style="display:none" onchange="importarVendedoresArchivo(this)">
+      <div style="text-align:center;color:#64748b;font-size:11px;margin:2px 0 8px;letter-spacing:1px">― o pega los nombres a mano ―</div>
       <textarea id="nv-masivo" placeholder="Mgloja26&#10;KleverGonz26&#10;Asdrubal26&#10;MackyAnimas" style="width:100%;min-height:90px;background:#0d0b1f;border:1px solid rgba(107,63,160,.5);border-radius:6px;padding:8px 10px;color:#fff;font-size:12px;font-family:monospace;resize:vertical"></textarea>
       <button id="btn-crear-masivo" onclick="crearVendedoresMasivo()" style="margin-top:8px;background:linear-gradient(135deg,var(--np),#9333ea);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Crear todos →</button>
       <div id="nv-masivo-resultado" style="display:none;margin-top:10px;background:#052e16;border:1px solid rgba(34,197,94,.4);border-radius:8px;padding:12px;font-size:12px;color:#86efac"></div>
@@ -1614,12 +1617,44 @@ async function crearVendedor(){
   cargarVendedores();
 }
 
-async function crearVendedoresMasivo(){
+function crearVendedoresMasivo(){
   const txt=document.getElementById('nv-masivo').value.trim();
   if(!txt){alert('Pega al menos un nombre');return;}
   const nombres=[...new Set(txt.split('\n').map(l=>l.trim()).filter(Boolean))];
   if(!nombres.length){alert('No se detectaron nombres válidos');return;}
+  procesarVendedoresMasivo(nombres);
+}
 
+function importarVendedoresArchivo(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const txt=e.target.result;
+    let nombres=[];
+    try{
+      const json=JSON.parse(txt);
+      const lineas=Array.isArray(json)?json:Object.values(json);
+      nombres=lineas.filter(l=>l&&typeof l==='object').map(l=>l.Username||l.username||l.user||l.USER||l.nombre||l.name||'').filter(Boolean);
+    }catch{
+      const lineas=txt.split('\n').map(l=>l.trim()).filter(Boolean);
+      const header=(lineas[0]||'').toLowerCase();
+      if(header.includes('username')||header.includes('usuario')){
+        const cols=lineas[0].split(',').map(c=>c.trim().toLowerCase().replace(/"/g,''));
+        const uIdx=cols.findIndex(c=>c.includes('user'));
+        nombres=lineas.slice(1).map(l=>(l.split(',')[uIdx]||'').trim().replace(/"/g,'')).filter(Boolean);
+      }else{
+        nombres=lineas.map(l=>l.split(',')[0].trim().replace(/"/g,'')).filter(Boolean);
+      }
+    }
+    nombres=[...new Set(nombres)];
+    if(!nombres.length)return alert('No se encontraron nombres de usuario en el archivo');
+    procesarVendedoresMasivo(nombres);
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+async function procesarVendedoresMasivo(nombres){
   const{data:existentes}=await sb.from('gtv_licencias').select('vendor_name');
   const nombresExistentes=new Set((existentes||[]).map(v=>(v.vendor_name||'').toLowerCase()));
 
