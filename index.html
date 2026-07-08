@@ -222,6 +222,7 @@ select option{background:#1a1735}
     <h2>Todos los clientes</h2>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button class="btn btn-gold btn-sm" onclick="tab('nuevo',document.querySelectorAll('.nav>.nt')[2])">➕ Nuevo cliente</button>
+      <button class="btn btn-sm" style="background:rgba(107,63,160,.2);border:1px solid rgba(107,63,160,.5);color:#a78bfa" onclick="abrirModal('modal-sync-vend')">🏪 Importar Subresellers</button>
       <button class="btn btn-s btn-sm" onclick="exportarCSV()">⬇️ Exportar</button>
     </div>
   </div>
@@ -637,6 +638,28 @@ select option{background:#1a1735}
       <button class="btn btn-s" onclick="cerrarModal('modal-sync')">✕ Cerrar</button>
     </div>
     <input type="file" id="file-import-input" accept=".json,.csv,.txt" style="display:none" onchange="importarArchivo(this)">
+  </div>
+</div>
+
+<!-- MODAL IMPORTAR SUBRESELLERS COMO CLIENTES TIPO VENDEDOR -->
+<div class="modal-overlay" id="modal-sync-vend">
+  <div class="modal" style="width:min(650px,95vw)">
+    <div class="modal-t">
+      <span>🏪 Importar Subresellers (como clientes tipo Vendedor)</span>
+      <button class="btn btn-s btn-sm" onclick="cerrarModal('modal-sync-vend')">✕</button>
+    </div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:8px">
+      En tu Panel OTT ve a <b>Manage Sub-Reseller → My Sub-Reseller's</b>, descarga el backup (JSON/CSV) o copia las columnas <b>Username</b> y <b>Credits</b>. Después edita cada uno (✏️) para poner precio y fecha de pago.
+    </div>
+    <button class="btn btn-gold" style="margin-bottom:8px" onclick="document.getElementById('sv-cli-file-input').click()">📂 Seleccionar archivo (JSON/CSV)</button>
+    <input type="file" id="sv-cli-file-input" accept=".json,.csv,.txt" style="display:none" onchange="importarSubresellersArchivo(this)">
+    <div style="text-align:center;color:#64748b;font-size:11px;margin:2px 0 8px;letter-spacing:1px">― o pega una lista (Username,Credits — uno por línea) ―</div>
+    <textarea id="sv-cli-pegado" placeholder="Mgloja26,7&#10;KleverGonz26,25&#10;Asdrubal26,7" style="width:100%;min-height:90px;background:#0d0b1f;border:1px solid rgba(107,63,160,.5);border-radius:6px;padding:8px 10px;color:#fff;font-size:12px;font-family:monospace;resize:vertical"></textarea>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn btn-gold" id="btn-imp-sv-cli" onclick="importarSubresellersPegado()">Importar todos →</button>
+      <button class="btn btn-s" onclick="cerrarModal('modal-sync-vend')">Cerrar</button>
+    </div>
+    <div id="sv-cli-resultado" style="display:none;margin-top:10px;background:#052e16;border:1px solid rgba(34,197,94,.4);border-radius:8px;padding:12px;font-size:12px;color:#86efac"></div>
   </div>
 </div>
 
@@ -1456,6 +1479,75 @@ function importarArchivo(input){
     }
   };
   reader.readAsText(file);
+}
+
+// ===== IMPORTAR SUBRESELLERS (como clientes tipo Vendedor) =====
+function procesarSubresellers(items){
+  // items: [{username, credits}]
+  const existentes=new Set(DB.clientes.map(c=>(c.nombre||'').toLowerCase()));
+  let creados=0,omitidos=0;
+  items.forEach(it=>{
+    if(!it.username)return;
+    if(existentes.has(it.username.toLowerCase())){omitidos++;return;}
+    DB.clientes.push({
+      id:uid(),nombre:it.username,tel:'',user:'',pass:'',device:'android-tv',plan:'1',
+      tipo:'vendedor',creditos:it.credits||0,precio:0,inicio:today(),
+      vencimiento:addMeses(today(),1),notas:'Importado de Subresellers OTT',debe:0,activo:true
+    });
+    existentes.add(it.username.toLowerCase());
+    creados++;
+  });
+  save();updateCount();renderDash();
+  if(document.getElementById('pn-clientes')?.classList.contains('on'))renderClientes();
+  cerrarModal('modal-sync-vend');
+  document.getElementById('sv-cli-pegado').value='';
+  alert(`✅ Importación completa:\n• ${creados} vendedores nuevos\n• ${omitidos} ya existían (omitidos)\n\nEdita cada uno (✏️) para poner precio y fecha de pago.`);
+}
+
+function importarSubresellersPegado(){
+  const txt=(document.getElementById('sv-cli-pegado').value||'').trim();
+  if(!txt)return alert('Pega al menos una línea, o usa "Seleccionar archivo"');
+  const items=txt.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+    const p=l.split(',');
+    return{username:(p[0]||'').trim(),credits:parseInt(p[1])||0};
+  }).filter(it=>it.username);
+  if(!items.length)return alert('No se detectaron datos válidos. Formato: Username,Credits');
+  procesarSubresellers(items);
+}
+
+function importarSubresellersArchivo(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const txt=e.target.result;
+    let items=[];
+    try{
+      const json=JSON.parse(txt);
+      const lineas=Array.isArray(json)?json:Object.values(json);
+      items=lineas.filter(l=>l&&typeof l==='object').map(l=>({
+        username:l.Username||l.username||l.user||l.USER||'',
+        credits:parseInt(l.Credits||l.credits||l.creditos||0)||0
+      })).filter(it=>it.username);
+    }catch{
+      const lineas=txt.split('\n').map(l=>l.trim()).filter(Boolean);
+      const header=(lineas[0]||'').toLowerCase();
+      if(header.includes('username')||header.includes('usuario')){
+        const cols=lineas[0].split(',').map(c=>c.trim().toLowerCase().replace(/"/g,''));
+        const uIdx=cols.findIndex(c=>c.includes('user'));
+        const cIdx=cols.findIndex(c=>c.includes('credit'));
+        items=lineas.slice(1).map(l=>{
+          const p=l.split(',').map(c=>c.trim().replace(/"/g,''));
+          return{username:p[uIdx]||'',credits:parseInt(p[cIdx])||0};
+        }).filter(it=>it.username);
+      }else{
+        items=lineas.map(l=>{const p=l.split(',');return{username:(p[0]||'').trim().replace(/"/g,''),credits:parseInt(p[1])||0};}).filter(it=>it.username);
+      }
+    }
+    if(!items.length)return alert('No se encontraron datos válidos en el archivo');
+    procesarSubresellers(items);
+  };
+  reader.readAsText(file);
+  input.value='';
 }
 
 // ===== ENVÍO MASIVO =====
