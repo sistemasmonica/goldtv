@@ -224,6 +224,7 @@ select option{background:#1a1735}
     <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button class="btn btn-gold btn-sm" onclick="tab('nuevo',document.querySelectorAll('.nav>.nt')[3])">➕ Nuevo cliente</button>
       <button class="btn btn-s btn-sm" onclick="exportarCSV()">⬇️ Exportar</button>
+      <button class="btn btn-sm" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#ef4444" onclick="eliminarVencidos()">🗑️ Eliminar vencidos</button>
     </div>
   </div>
   <div class="filters">
@@ -1084,6 +1085,16 @@ function eliminarCliente(id){
   save();renderAll();
 }
 
+function eliminarVencidos(){
+  const vencidos=DB.clientes.filter(c=>(c.tipo||'mensual')!=='vendedor'&&estadoCliente(c)==='vencido');
+  if(!vencidos.length)return alert('No hay clientes vencidos para eliminar.');
+  if(!confirm(`⚠️ Se van a ELIMINAR ${vencidos.length} clientes vencidos. Esta acción no se puede deshacer.\n\nRecomendado: haz clic en "⬇️ Exportar" antes de continuar, por si necesitas recuperarlos después.\n\n¿Confirmas que quieres eliminarlos?`))return;
+  const idsVencidos=new Set(vencidos.map(c=>c.id));
+  DB.clientes=DB.clientes.filter(c=>!idsVencidos.has(c.id));
+  save();renderAll();
+  alert(`✅ ${vencidos.length} clientes vencidos eliminados.`);
+}
+
 // ===== RENOVAR =====
 function abrirRenovar(id){
   const c=DB.clientes.find(x=>x.id===id);if(!c)return;
@@ -1247,8 +1258,14 @@ function cambiarTipoCliente(id,tipo){
   const meses=TIPO_A_PLAN[tipo];
   if(meses){
     c.plan=meses;
-    const sugerido=PRECIOS_PLAN[c.ndisp||'1-2']?.[meses];
-    if(sugerido!=null)c.precio=sugerido;
+    const ndisp=c.ndisp||'1-2';
+    const sugerido=PRECIOS_PLAN[ndisp]?.[meses];
+    if(sugerido!=null){
+      c.precio=sugerido;
+      mostrarToastGV(`Precio actualizado a $${sugerido} (${ndisp==='3'?'3 dispositivos':'1-2 dispositivos'})`);
+    }else{
+      mostrarToastGV(`⚠️ No hay precio fijo para ${TIPO_LABEL_SEL[tipo]||tipo} con ${ndisp==='3'?'3':'1-2'} dispositivos — ingrésalo a mano abajo`);
+    }
   }
   save();renderClientes();updateCount();renderDash();
 }
