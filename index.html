@@ -247,8 +247,10 @@ select option{background:#1a1735}
     <select id="cli-tipo-fil" onchange="renderClientes()">
       <option value="">Todos los tipos</option>
       <option value="mensual">💳 Mensual</option>
-      <option value="trial">🆓 Trial</option>
+      <option value="trimestral">📆 Trimestral</option>
+      <option value="semestral">📆 Semestral</option>
       <option value="anual">⭐ Anual</option>
+      <option value="trial">🆓 Trial</option>
     </select>
   </div>
   <div class="tbl-wrap">
@@ -315,8 +317,10 @@ select option{background:#1a1735}
       <div class="fg"><label>Tipo de cliente</label>
         <select id="cli-tipo" onchange="toggleCreditosField()">
           <option value="mensual">💳 Mensual</option>
-          <option value="trial">🆓 Trial / Prueba</option>
+          <option value="trimestral">📆 Trimestral</option>
+          <option value="semestral">📆 Semestral</option>
           <option value="anual">⭐ Anual</option>
+          <option value="trial">🆓 Trial / Prueba</option>
           <option value="vendedor">🏪 Vendedor</option>
         </select>
       </div>
@@ -994,6 +998,11 @@ function calcVence(){
   const prev=document.getElementById('cli-vence-preview');
   if(ini&&plan){prev.value=addMeses(ini,plan);}
   else{prev.value='';}
+  // El Tipo sigue al Plan automáticamente, salvo que sea Trial o Vendedor
+  const tipoEl=document.getElementById('cli-tipo');
+  if(tipoEl&&plan&&PLAN_A_TIPO[plan]&&tipoEl.value!=='trial'&&tipoEl.value!=='vendedor'){
+    tipoEl.value=PLAN_A_TIPO[plan];
+  }
 }
 
 function guardarCliente(){
@@ -1226,7 +1235,8 @@ function renderDash(){
   </div>`).join(''):'<div class="empty">Sin clientes vencidos</div>';
 }
 
-const TIPO_BADGE={'mensual':'<span class="bdg" style="background:#1565c0">💳 Mensual</span>','trial':'<span class="bdg" style="background:#6b3fa0">🆓 Trial</span>','anual':'<span class="bdg" style="background:#b8860b">⭐ Anual</span>','vendedor':'<span class="bdg" style="background:#065f46">🏪 Vendedor</span>'};
+const TIPO_BADGE={'mensual':'<span class="bdg" style="background:#1565c0">💳 Mensual</span>','trimestral':'<span class="bdg" style="background:#0e7490">📆 Trimestral</span>','semestral':'<span class="bdg" style="background:#7c3aed">📆 Semestral</span>','trial':'<span class="bdg" style="background:#6b3fa0">🆓 Trial</span>','anual':'<span class="bdg" style="background:#b8860b">⭐ Anual</span>','vendedor':'<span class="bdg" style="background:#065f46">🏪 Vendedor</span>'};
+const PLAN_A_TIPO={'1':'mensual','3':'trimestral','6':'semestral','12':'anual'};
 
 function toggleCreditosField(){
   const tipo=document.getElementById('cli-tipo').value;
