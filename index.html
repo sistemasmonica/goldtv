@@ -530,7 +530,7 @@ select option{background:#1a1735}
       </div>
       <div class="tbl-wrap">
         <table><thead><tr>
-          <th>Fecha</th><th>Cliente</th><th>Tipo</th><th>Meses</th><th>Precio</th><th>Vence hasta</th>
+          <th>Fecha</th><th>Cliente</th><th>Tipo</th><th>Meses</th><th>Precio</th><th>Método</th><th>Vence hasta</th>
         </tr></thead>
         <tbody id="tb-renovaciones"></tbody></table>
       </div>
@@ -635,7 +635,7 @@ select option{background:#1a1735}
     </div>
     <div class="tbl-wrap" style="max-height:300px;overflow-y:auto">
       <table><thead><tr>
-        <th>Fecha</th><th>Meses</th><th>Precio</th><th>Nuevo vence</th>
+        <th>Fecha</th><th>Meses</th><th>Precio</th><th>Método</th><th>Nuevo vence</th>
       </tr></thead>
       <tbody id="hist-body"></tbody></table>
     </div>
@@ -742,6 +742,14 @@ select option{background:#1a1735}
         </select>
       </div>
       <div class="fg"><label>Precio cobrado ($)</label><input type="number" id="ren-precio" step="0.01" min="0" placeholder="0.00"></div>
+    </div>
+    <div class="fg"><label>Método de pago</label>
+      <select id="ren-metodo">
+        <option value="Transferencia">🏦 Transferencia</option>
+        <option value="Efectivo">💵 Efectivo</option>
+        <option value="Depósito">🏧 Depósito</option>
+        <option value="Otro">🔁 Otro</option>
+      </select>
     </div>
     <input type="hidden" id="ren-cli-id">
     <div class="btn-row">
@@ -925,11 +933,12 @@ function verHistorial(id){
   const total=hist.reduce((s,h)=>s+(h.precio||0),0);
   document.getElementById('hist-titulo').textContent='📋 '+c.nombre+' — Historial';
   document.getElementById('hist-body').innerHTML=!hist.length
-    ?`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Sin renovaciones registradas aún</td></tr>`
+    ?`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Sin renovaciones registradas aún</td></tr>`
     :hist.slice().reverse().map(h=>`<tr>
       <td>${h.fecha}</td>
       <td>${h.meses} mes${h.meses>1?'es':''}</td>
       <td style="font-family:monospace;color:var(--green)">${fmt(h.precio)}</td>
+      <td><span class="bdg" style="background:var(--surface2)">${h.metodo||'—'}</span></td>
       <td style="font-family:monospace">${h.nueva_fecha||'—'}</td>
     </tr>`).join('');
   document.getElementById('hist-total').textContent=fmt(total);
@@ -940,7 +949,7 @@ function msgHistorialPagos(c){
   const hist=(c.historial||[]).slice().reverse();
   const total=hist.reduce((s,h)=>s+(h.precio||0),0);
   if(!hist.length)return`Hola ${c.nombre}! 👋\n\nAún no hay pagos registrados en tu historial. 📋`;
-  const lineas=hist.map(h=>`• ${h.fecha} — ${h.meses} mes${h.meses>1?'es':''} — ${fmt(h.precio)}`).join('\n');
+  const lineas=hist.map(h=>`• ${h.fecha} — ${h.meses} mes${h.meses>1?'es':''} — ${fmt(h.precio)}${h.metodo?' — '+h.metodo:''}`).join('\n');
   return`Hola ${c.nombre}! 👋\n\nAquí está tu *historial de pagos* 📋\n\n${lineas}\n\n💰 *Total pagado:* ${fmt(total)}\n📅 *Próximo vencimiento:* ${c.vencimiento}\n\nCualquier consulta estoy a tu disposición 😊`;
 }
 
@@ -980,13 +989,14 @@ function renderRenovaciones(){
   if(q)lista=lista.filter(h=>h.nombre.toLowerCase().includes(q));
   const tb=document.getElementById('tb-renovaciones');
   if(!tb)return;
-  if(!lista.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Sin renovaciones registradas</td></tr>';return;}
+  if(!lista.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">Sin renovaciones registradas</td></tr>';return;}
   tb.innerHTML=lista.map(h=>`<tr>
     <td>${h.fecha}</td>
     <td><b>${escH(h.nombre)}</b></td>
     <td>${TIPO_BADGE[h.tipo]||h.tipo}</td>
     <td style="text-align:center">${h.meses}</td>
     <td style="font-family:monospace;color:var(--green)">${fmt(h.precio)}</td>
+    <td><span class="bdg" style="background:var(--surface2)">${h.metodo||'—'}</span></td>
     <td style="font-family:monospace">${h.nueva_fecha||'—'}</td>
   </tr>`).join('');
 }
@@ -1136,13 +1146,14 @@ function guardarRenovacion(){
   const id=document.getElementById('ren-cli-id').value;
   const plan=document.getElementById('ren-plan').value;
   const precio=parseFloat(document.getElementById('ren-precio').value)||0;
+  const metodo=document.getElementById('ren-metodo').value;
   const c=DB.clientes.find(x=>x.id===id);if(!c)return;
   const fechaAnterior=c.vencimiento;
   const baseDate=diasHasta(c.vencimiento)<0?today():c.vencimiento;
   c.vencimiento=addMeses(baseDate,plan);
   c.plan=plan;c.precio=precio;
   if(!c.historial)c.historial=[];
-  c.historial.push({fecha:today(),fecha_anterior:fechaAnterior,meses:parseInt(plan),precio:precio,nueva_fecha:c.vencimiento});
+  c.historial.push({fecha:today(),fecha_anterior:fechaAnterior,meses:parseInt(plan),precio:precio,metodo:metodo,nueva_fecha:c.vencimiento});
   save();cerrarModal('modal-renovar');renderAll();
   alert('✅ Suscripción actualizada hasta: '+c.vencimiento);
 }
