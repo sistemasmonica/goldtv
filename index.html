@@ -639,7 +639,10 @@ select option{background:#1a1735}
       </tr></thead>
       <tbody id="hist-body"></tbody></table>
     </div>
-    <div style="margin-top:12px;text-align:right;font-size:13px;color:var(--gold)">Total cobrado: <b id="hist-total">$0.00</b></div>
+    <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <button class="btn btn-wa btn-sm" id="btn-hist-wa" onclick="enviarWAHistorial()">📲 Enviar por WhatsApp</button>
+      <div style="font-size:13px;color:var(--gold)">Total cobrado: <b id="hist-total">$0.00</b></div>
+    </div>
   </div>
 </div>
 
@@ -914,8 +917,10 @@ function tab(id,el){
   if(id==='misistema')cargarVendedores();
 }
 
+let _histClienteId=null;
 function verHistorial(id){
   const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  _histClienteId=id;
   const hist=c.historial||[];
   const total=hist.reduce((s,h)=>s+(h.precio||0),0);
   document.getElementById('hist-titulo').textContent='📋 '+c.nombre+' — Historial';
@@ -929,6 +934,22 @@ function verHistorial(id){
     </tr>`).join('');
   document.getElementById('hist-total').textContent=fmt(total);
   abrirModal('modal-hist');
+}
+
+function msgHistorialPagos(c){
+  const hist=(c.historial||[]).slice().reverse();
+  const total=hist.reduce((s,h)=>s+(h.precio||0),0);
+  if(!hist.length)return`Hola ${c.nombre}! 👋\n\nAún no hay pagos registrados en tu historial. 📋`;
+  const lineas=hist.map(h=>`• ${h.fecha} — ${h.meses} mes${h.meses>1?'es':''} — ${fmt(h.precio)}`).join('\n');
+  return`Hola ${c.nombre}! 👋\n\nAquí está tu *historial de pagos* 📋\n\n${lineas}\n\n💰 *Total pagado:* ${fmt(total)}\n📅 *Próximo vencimiento:* ${c.vencimiento}\n\nCualquier consulta estoy a tu disposición 😊`;
+}
+
+function enviarWAHistorial(){
+  const c=DB.clientes.find(x=>x.id===_histClienteId);if(!c)return;
+  const msg=encodeURIComponent(msgHistorialPagos(c));
+  const tel=(c.tel||'').replace(/\D/g,'');
+  if(tel)window.open('https://wa.me/593'+tel.replace(/^0/,'')+'?text='+msg,'_blank');
+  else window.open('https://wa.me/?text='+msg,'_blank');
 }
 
 function renderRenovaciones(){
