@@ -270,11 +270,6 @@ select option{background:#1a1735}
   </div>
   <div class="filters">
     <input type="search" id="vend-q" placeholder="Buscar nombre..." oninput="renderVendedoresCli()" style="min-width:200px">
-    <select id="vend-cat-fil" onchange="renderVendedoresCli()">
-      <option value="">Vendedores y Socios</option>
-      <option value="vendedor">🏪 Solo Vendedores</option>
-      <option value="socio">🤝 Solo Socios</option>
-    </select>
   </div>
   <div class="tbl-wrap">
     <table>
@@ -1258,12 +1253,15 @@ function renderClientes(){
   }).join('');
 }
 
-const CATEGORIA_BADGE={'socio':'<span class="bdg" style="background:#5b21b6;color:#e9d5ff">🤝 Socio</span>','vendedor':'<span class="bdg" style="background:#065f46;color:#6ee7b7">🏪 Vendedor</span>'};
+function cambiarCategoriaVendedor(id,categoria){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  c.categoria=categoria;
+  save();
+}
 
 function renderVendedoresCli(){
   const q=(document.getElementById('vend-q')?.value||'').toLowerCase();
-  const catFil=document.getElementById('vend-cat-fil')?.value||'';
-  let lista=DB.clientes.filter(c=>(c.tipo||'')==='vendedor'&&(!q||c.nombre?.toLowerCase().includes(q))&&(!catFil||(c.categoria||'vendedor')===catFil))
+  let lista=DB.clientes.filter(c=>(c.tipo||'')==='vendedor'&&(!q||c.nombre?.toLowerCase().includes(q)))
     .sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
   const tb=document.getElementById('tb-vendedores-cli');
   if(!lista.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Sin vendedores registrados. Usa "📥 Importar Subresellers" para traerlos del OTT.</div></td></tr>';return;}
@@ -1271,9 +1269,13 @@ function renderVendedoresCli(){
   tb.innerHTML=lista.map(c=>{
     const est=estadoCliente(c);
     const dias=diasHasta(c.vencimiento);
+    const cat=c.categoria||'vendedor';
     return`<tr>
       <td><b>${escH(c.nombre)}</b>${c.debe&&c.debe>0?`<span style="background:#f97316;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:5px;font-weight:600">💸 $${parseFloat(c.debe).toFixed(2)}</span>`:''}${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
-      <td>${CATEGORIA_BADGE[c.categoria||'vendedor']}</td>
+      <td><select onchange="cambiarCategoriaVendedor('${c.id}',this.value)" style="background:${cat==='socio'?'#5b21b6':'#065f46'};color:${cat==='socio'?'#e9d5ff':'#6ee7b7'};border:none;border-radius:5px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">
+        <option value="vendedor" ${cat==='vendedor'?'selected':''}>🏪 Vendedor</option>
+        <option value="socio" ${cat==='socio'?'selected':''}>🤝 Socio</option>
+      </select></td>
       <td style="font-family:monospace">${escH(c.tel||'—')}</td>
       <td>${c.creditos?`<span style="color:#6ee7b7">💎 ${c.creditos}</span>`:'—'}</td>
       <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
