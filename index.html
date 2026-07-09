@@ -271,12 +271,17 @@ select option{background:#1a1735}
       <button class="btn btn-s btn-sm" onclick="exportarCSV()">⬇️ Exportar</button>
     </div>
   </div>
+  <div class="sc-grid" id="socios-resumen" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px;display:none">
+    <div class="sc"><div class="sc-lbl">🤝 Total Socios</div><div class="sc-val" style="color:#e9d5ff" id="soc-total">0</div></div>
+    <div class="sc"><div class="sc-lbl">Mensual esperado</div><div class="sc-val" style="color:var(--gold)" id="soc-esperado">$0.00</div><div class="sc-sub">suma de planes activos</div></div>
+    <div class="sc"><div class="sc-lbl">Al día / Pendientes</div><div class="sc-val" style="color:var(--green)" id="soc-aldia">0</div><div class="sc-sub" id="soc-pendientes-sub">0 pendientes</div></div>
+  </div>
   <div class="filters">
     <input type="search" id="vend-q" placeholder="Buscar nombre..." oninput="renderVendedoresCli()" style="min-width:200px">
   </div>
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Vendedor</th><th>Categoría</th><th>Teléfono</th><th>Créditos</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Vendedor</th><th>Categoría</th><th>Teléfono</th><th>Créditos</th><th>Vence</th><th>Estado</th><th>Plan / Precio</th><th>Acciones</th></tr></thead>
       <tbody id="tb-vendedores-cli"></tbody>
     </table>
   </div>
@@ -1323,7 +1328,20 @@ function renderClientes(){
 function cambiarCategoriaVendedor(id,categoria){
   const c=DB.clientes.find(x=>x.id===id);if(!c)return;
   c.categoria=categoria;
-  save();
+  save();renderVendedoresCli();
+}
+
+const PLANES_SOCIO=[70,150,250];
+function cambiarPlanSocio(id,valor){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  if(valor==='otro'){
+    const monto=prompt('¿Cuál es el monto mensual del plan de este socio?',c.precio||'');
+    if(monto===null)return renderVendedoresCli(); // cancelado, volver a dibujar sin cambiar nada
+    c.precio=parseFloat(monto)||0;
+  }else{
+    c.precio=parseFloat(valor)||0;
+  }
+  save();renderVendedoresCli();
 }
 
 function renderVendedoresCli(){
@@ -1331,12 +1349,35 @@ function renderVendedoresCli(){
   let lista=DB.clientes.filter(c=>(c.tipo||'')==='vendedor'&&(!q||c.nombre?.toLowerCase().includes(q)))
     .sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
   const tb=document.getElementById('tb-vendedores-cli');
+
+  // Resumen de socios
+  const socios=DB.clientes.filter(c=>(c.tipo||'')==='vendedor'&&c.categoria==='socio');
+  const resDiv=document.getElementById('socios-resumen');
+  if(socios.length){
+    resDiv.style.display='grid';
+    const esperado=socios.reduce((a,c)=>a+(c.precio||0),0);
+    const aldia=socios.filter(c=>estadoCliente(c)!=='vencido').length;
+    document.getElementById('soc-total').textContent=socios.length;
+    document.getElementById('soc-esperado').textContent=fmt(esperado);
+    document.getElementById('soc-aldia').textContent=aldia;
+    document.getElementById('soc-pendientes-sub').textContent=(socios.length-aldia)+' pendientes';
+  }else{
+    resDiv.style.display='none';
+  }
+
   if(!lista.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Sin vendedores registrados. Usa "📥 Importar Subresellers" para traerlos del OTT.</div></td></tr>';return;}
   const BADGE={'activo':'<span class="bdg bdg-activo">Activo</span>','vence':'<span class="bdg bdg-vence">Vence pronto</span>','vencido':'<span class="bdg bdg-vencido">Vencido</span>'};
   tb.innerHTML=lista.map(c=>{
     const est=estadoCliente(c);
     const dias=diasHasta(c.vencimiento);
     const cat=c.categoria||'vendedor';
+    const esPlanFijo=PLANES_SOCIO.includes(c.precio);
+    const precioCol=cat==='socio'
+      ?`<select onchange="cambiarPlanSocio('${c.id}',this.value)" style="background:var(--surface2);border:1px solid rgba(107,63,160,.4);color:var(--gold);border-radius:5px;padding:4px 6px;font-size:11px;font-weight:700;cursor:pointer">
+          ${PLANES_SOCIO.map(p=>`<option value="${p}" ${c.precio===p?'selected':''}>$${p}/mes</option>`).join('')}
+          <option value="otro" ${!esPlanFijo?'selected':''}>${!esPlanFijo&&c.precio?'$'+fmt(c.precio).slice(1)+'/mes (otro)':'Otro monto...'}</option>
+        </select>`
+      :`<span style="font-family:monospace">${fmt(c.precio)}</span>`;
     return`<tr>
       <td><b>${escH(c.nombre)}</b>${c.debe&&c.debe>0?`<span style="background:#f97316;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:5px;font-weight:600">💸 $${parseFloat(c.debe).toFixed(2)}</span>`:''}${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
       <td><select onchange="cambiarCategoriaVendedor('${c.id}',this.value)" style="background:${cat==='socio'?'#5b21b6':'#065f46'};color:${cat==='socio'?'#e9d5ff':'#6ee7b7'};border:none;border-radius:5px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">
@@ -1347,11 +1388,11 @@ function renderVendedoresCli(){
       <td>${c.creditos?`<span style="color:#6ee7b7">💎 ${c.creditos}</span>`:'—'}</td>
       <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
       <td>${BADGE[est]||''}</td>
-      <td style="font-family:monospace">${fmt(c.precio)}</td>
+      <td>${precioCol}</td>
       <td>
         <div style="display:flex;gap:3px;flex-wrap:wrap">
-          <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')" title="Actualizar fecha">📅</button>
-          <button class="btn btn-s btn-sm" onclick="verHistorial('${c.id}')" title="Ver historial de renovaciones">📋</button>
+          <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')" title="Registrar pago / actualizar fecha">📅</button>
+          <button class="btn btn-s btn-sm" onclick="verHistorial('${c.id}')" title="Ver historial de pagos">📋</button>
           <button class="btn btn-s btn-sm" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>
           <button class="btn btn-d btn-sm" onclick="eliminarCliente('${c.id}')" title="Eliminar">🗑️</button>
         </div>
