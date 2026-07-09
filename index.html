@@ -660,6 +660,9 @@ select option{background:#1a1735}
       <button class="btn btn-s" onclick="cerrarModal('modal-sync-vend')">Cerrar</button>
     </div>
     <div id="sv-cli-resultado" style="display:none;margin-top:10px;background:#052e16;border:1px solid rgba(34,197,94,.4);border-radius:8px;padding:12px;font-size:12px;color:#86efac"></div>
+    <div style="margin-top:14px;border-top:1px solid rgba(107,63,160,.3);padding-top:10px">
+      <button class="btn btn-sm" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#ef4444" onclick="limpiarVendedoresInvalidos()">🧹 Limpiar vendedores con nombre inválido (números/IPs)</button>
+    </div>
   </div>
 </div>
 
@@ -1518,17 +1521,24 @@ function importarSubresellersPegado(){
   const txt=(document.getElementById('sv-cli-pegado').value||'').trim();
   if(!txt)return alert('Pega al menos una línea, o usa "Seleccionar archivo"');
   const lineas=txt.split('\n').map(l=>l.trim()).filter(Boolean);
-  const pareceManual=lineas.length>0&&lineas.every(l=>!l.includes('\t')&&l.split(',').length<=2);
+  // Formato manual EXPLÍCITO: cada línea debe ser exactamente "Nombre,Numero"
+  // (nombre que no es puramente numérico, seguido de una cantidad de créditos).
+  // Si una sola línea no cumple esto (ej: es solo un ID como "10117"), se descarta
+  // este modo y se usa el detector general de abajo.
+  const esManualExplicito=lineas.length>0&&lineas.every(l=>{
+    const p=l.split(',');
+    return p.length===2&&!_pareceNumero(p[0].trim())&&_pareceNumero(p[1].trim());
+  });
   let items=[];
-  if(pareceManual){
-    // Formato escrito a mano: Usuario,Creditos (o solo Usuario)
+  if(esManualExplicito){
     items=lineas.map(l=>{
       const p=l.split(',');
-      return{username:(p[0]||'').trim(),credits:p[1]?parseFloat(p[1].replace(',','.'))||0:0};
+      return{username:p[0].trim(),credits:parseFloat(p[1].trim().replace(',','.'))||0};
     }).filter(it=>it.username);
   }else{
-    // Pegado directo desde la tabla del OTT: extraer nombres de cualquier parte del texto
-    const tokens=txt.split(/[\s\t\n]+/).map(t=>t.trim().replace(/[,:]+$/,'')).filter(Boolean);
+    // Pegado directo desde la tabla del OTT (o cualquier otro formato):
+    // extraer nombres de cualquier parte del texto, sin importar cómo esté separado.
+    const tokens=txt.split(/[\s,\t\n]+/).map(t=>t.trim().replace(/[,:]+$/,'')).filter(Boolean);
     const vistos=new Set();
     tokens.forEach(tok=>{
       if(_pareceNumero(tok)||_pareceIP(tok)||_pareceFecha(tok)||_pareceHora(tok))return;
@@ -1540,6 +1550,16 @@ function importarSubresellersPegado(){
   }
   if(!items.length)return alert('No se detectaron nombres de usuario. Copia de nuevo las filas de la tabla Subresellers e inténtalo otra vez.');
   procesarSubresellers(items);
+}
+
+function limpiarVendedoresInvalidos(){
+  const invalidos=DB.clientes.filter(c=>c.tipo==='vendedor'&&(_pareceNumero(c.nombre)||_pareceIP(c.nombre)||_pareceFecha(c.nombre)||_pareceHora(c.nombre)||(c.nombre||'').toUpperCase()===PANEL_USER.toUpperCase()));
+  if(!invalidos.length)return alert('No se encontraron vendedores con nombre inválido (números, IPs, fechas).');
+  if(!confirm(`Se encontraron ${invalidos.length} vendedores con nombre inválido (ej: "${invalidos[0].nombre}"). ¿Eliminarlos?`))return;
+  const idsInvalidos=new Set(invalidos.map(c=>c.id));
+  DB.clientes=DB.clientes.filter(c=>!idsInvalidos.has(c.id));
+  save();updateCount();renderDash();renderClientes();
+  alert(`✅ ${invalidos.length} vendedores inválidos eliminados.`);
 }
 
 function importarSubresellersArchivo(input){
