@@ -305,11 +305,11 @@ select option{background:#1a1735}
         </select>
       </div>
       <div class="fg"><label>Plan (meses)</label>
-        <select id="cli-plan">
-          <option value="1">1 mes</option>
-          <option value="3">3 meses</option>
-          <option value="6">6 meses</option>
-          <option value="12">12 meses</option>
+        <select id="cli-plan" onchange="calcVence();calcularPrecioSugerido()">
+          <option value="1">1 mes (Mensual)</option>
+          <option value="3">3 meses (Trimestral)</option>
+          <option value="6">6 meses (Semestral)</option>
+          <option value="12">12 meses (Anual)</option>
         </select>
       </div>
       <div class="fg"><label>Tipo de cliente</label>
@@ -318,6 +318,12 @@ select option{background:#1a1735}
           <option value="trial">🆓 Trial / Prueba</option>
           <option value="anual">⭐ Anual</option>
           <option value="vendedor">🏪 Vendedor</option>
+        </select>
+      </div>
+      <div class="fg"><label>Cantidad de dispositivos</label>
+        <select id="cli-ndisp" onchange="calcularPrecioSugerido()">
+          <option value="1-2">1 o 2 dispositivos</option>
+          <option value="3">3 dispositivos</option>
         </select>
       </div>
       <div class="fg"><label>Precio cobrado ($)</label><input type="number" id="cli-precio" step="0.01" min="0" placeholder="0.00"></div>
@@ -968,6 +974,20 @@ function iniciarApp(){
 
 document.addEventListener('DOMContentLoaded',()=>checkOwnerAuth());
 
+// Precios sugeridos según plan (meses) y cantidad de dispositivos
+const PRECIOS_PLAN={
+  '3':{'1':9,'3':25,'6':50,'12':90},
+  '1-2':{'1':5}
+};
+function calcularPrecioSugerido(){
+  const plan=document.getElementById('cli-plan').value;
+  const ndisp=document.getElementById('cli-ndisp')?.value;
+  const precioEl=document.getElementById('cli-precio');
+  if(!precioEl||!ndisp)return;
+  const sugerido=PRECIOS_PLAN[ndisp]?.[plan];
+  if(sugerido!=null)precioEl.value=sugerido;
+}
+
 function calcVence(){
   const ini=document.getElementById('cli-inicio').value;
   const plan=document.getElementById('cli-plan').value;
@@ -983,6 +1003,7 @@ function guardarCliente(){
   const pass=(document.getElementById('cli-pass').value||'').trim();
   const device=document.getElementById('cli-device').value;
   const plan=document.getElementById('cli-plan').value;
+  const ndisp=document.getElementById('cli-ndisp')?.value||'1-2';
   const precio=parseFloat(document.getElementById('cli-precio').value)||0;
   const inicio=document.getElementById('cli-inicio').value||today();
   const notas=(document.getElementById('cli-notas').value||'').trim();
@@ -996,12 +1017,12 @@ function guardarCliente(){
   const vencimiento=addMeses(inicio,plan);
   if(editId){
     const idx=DB.clientes.findIndex(c=>c.id===editId);
-    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe};
+    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,ndisp,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe};
     document.getElementById('cli-edit-id').value='';
     document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
     document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
   }else{
-    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe,activo:true});
+    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,ndisp,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe,activo:true});
   }
   save();limpiarFormCliente();renderAll();
   tab(tipo==='vendedor'?'vendedores':'clientes',document.querySelectorAll('.nav>.nt')[tipo==='vendedor'?2:1]);
@@ -1012,6 +1033,7 @@ function limpiarFormCliente(){
   ['cli-nombre','cli-tel','cli-user','cli-pass','cli-precio','cli-notas','cli-debe'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('cli-device').value='android-tv';
   document.getElementById('cli-plan').value='1';
+  document.getElementById('cli-ndisp').value='1-2';
   document.getElementById('cli-tipo').value='mensual';
   document.getElementById('cli-creditos').value='';
   document.getElementById('fg-creditos').style.display='none';
@@ -1030,6 +1052,7 @@ function editarCliente(id){
   document.getElementById('cli-pass').value=c.pass||'';
   document.getElementById('cli-device').value=c.device||'android-tv';
   document.getElementById('cli-plan').value=c.plan||'1';
+  document.getElementById('cli-ndisp').value=c.ndisp||'1-2';
   document.getElementById('cli-tipo').value=c.tipo||'mensual';
   document.getElementById('cli-creditos').value=c.creditos||'';
   const catEl=document.getElementById('cli-categoria');if(catEl)catEl.value=c.categoria||'vendedor';
