@@ -649,7 +649,7 @@ select option{background:#1a1735}
       <button class="btn btn-s btn-sm" onclick="cerrarModal('modal-sync-vend')">✕</button>
     </div>
     <div style="font-size:11px;color:#94a3b8;margin-bottom:8px">
-      Subresellers no tiene botón de descarga como Users. En su lugar: en tu Panel OTT ve a <b>Manage Sub-Reseller → My Sub-Reseller's</b>, <b>selecciona con el mouse las filas de la tabla</b> (como si seleccionaras texto, desde la primera columna hasta el final), cópialas (Ctrl+C) y pégalas abajo tal cual — el sistema detecta solo el nombre y los créditos. Después edita cada uno (✏️) para poner precio y fecha de pago.
+      Subresellers no tiene botón de descarga como Users. En su lugar: en tu Panel OTT ve a <b>Manage Sub-Reseller → My Sub-Reseller's</b>, <b>selecciona con el mouse las filas de la tabla</b> (como si seleccionaras texto, desde la primera columna hasta el final), cópialas (Ctrl+C) y pégalas abajo tal cual — el sistema detecta los nombres automáticamente. Los créditos no se pueden copiar (son insignias gráficas), así que quedan en 0 — edita cada uno (✏️) después para poner créditos, precio y fecha de pago.
     </div>
     <button class="btn btn-gold" style="margin-bottom:8px" onclick="document.getElementById('sv-cli-file-input').click()">📂 O seleccionar archivo (JSON/CSV)</button>
     <input type="file" id="sv-cli-file-input" accept=".json,.csv,.txt" style="display:none" onchange="importarSubresellersArchivo(this)">
@@ -1504,35 +1504,41 @@ function procesarSubresellers(items){
   alert(`✅ Importación completa:\n• ${creados} vendedores nuevos\n• ${omitidos} ya existían (omitidos)\n\nEdita cada uno (✏️) para poner precio y fecha de pago.`);
 }
 
-// Interpreta una línea pegada. Soporta:
-// 1) "Username,Credits" escrito a mano
-// 2) Una fila completa copiada directo de la tabla Subresellers del OTT
-//    (columnas separadas por tabulación: ID, Username, Owner, IP, Status, Credits, Users, DNS, Last Login)
-function _parseLineaSubreseller(linea){
-  let cols=linea.includes('\t')?linea.split('\t'):(linea.includes(',')?linea.split(','):linea.split(/\s{2,}/));
-  cols=cols.map(c=>c.trim()).filter(c=>c!=='');
-  if(!cols.length)return null;
-  const esIP=s=>/^\d{1,3}(\.\d{1,3}){3}$/.test(s);
-  const esNumero=s=>/^\d+([.,]\d+)?$/.test(s);
-  if(cols.length>=6){
-    // Formato de tabla OTT: ID, Username, Owner, IP, Status(icono, puede venir vacío), Credits, Users...
-    const username=cols.find((c,i)=>i>0&&!esNumero(c)&&!esIP(c))||cols[1];
-    // Credits: el primer número (no ID) que aparece después del username
-    const idxUser=cols.indexOf(username);
-    const numsDespues=cols.slice(idxUser+1).filter(esNumero);
-    const credits=numsDespues.length?parseFloat(numsDespues[0].replace(',','.')):0;
-    return{username,credits:credits||0};
-  }
-  // Formato simple: Username,Credits (o solo Username)
-  return{username:cols[0]||'',credits:cols[1]?parseFloat(cols[1].replace(',','.'))||0:0};
-}
+// La tabla Subresellers del OTT no copia los créditos como texto (son insignias gráficas)
+// y el copiado no siempre respeta tabulaciones por fila — a veces cada dato queda en su
+// propia línea. Por eso se procesa TODO el texto pegado como una bolsa de palabras sueltas,
+// descartando lo que claramente no es un nombre de usuario (números, IPs, fechas, horas,
+// y tu propio usuario del OTT que aparece repetido en la columna "Owner").
+function _pareceIP(s){return/^\d{1,3}(\.\d{1,3}){3}$/.test(s);}
+function _pareceFecha(s){return/^\d{4}-\d{2}-\d{2}/.test(s)||/^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(s);}
+function _pareceHora(s){return/^\d{1,2}:\d{2}(:\d{2})?$/.test(s);}
+function _pareceNumero(s){return/^\d+([.,]\d+)?$/.test(s);}
 
 function importarSubresellersPegado(){
   const txt=(document.getElementById('sv-cli-pegado').value||'').trim();
   if(!txt)return alert('Pega al menos una línea, o usa "Seleccionar archivo"');
-  const items=txt.split('\n').map(l=>l.trim()).filter(Boolean)
-    .map(_parseLineaSubreseller).filter(it=>it&&it.username);
-  if(!items.length)return alert('No se detectaron datos válidos. Pega "Username,Credits" o las filas copiadas directo de la tabla Subresellers del OTT.');
+  const lineas=txt.split('\n').map(l=>l.trim()).filter(Boolean);
+  const pareceManual=lineas.length>0&&lineas.every(l=>!l.includes('\t')&&l.split(',').length<=2);
+  let items=[];
+  if(pareceManual){
+    // Formato escrito a mano: Usuario,Creditos (o solo Usuario)
+    items=lineas.map(l=>{
+      const p=l.split(',');
+      return{username:(p[0]||'').trim(),credits:p[1]?parseFloat(p[1].replace(',','.'))||0:0};
+    }).filter(it=>it.username);
+  }else{
+    // Pegado directo desde la tabla del OTT: extraer nombres de cualquier parte del texto
+    const tokens=txt.split(/[\s\t\n]+/).map(t=>t.trim().replace(/[,:]+$/,'')).filter(Boolean);
+    const vistos=new Set();
+    tokens.forEach(tok=>{
+      if(_pareceNumero(tok)||_pareceIP(tok)||_pareceFecha(tok)||_pareceHora(tok))return;
+      if(tok.toUpperCase()===PANEL_USER.toUpperCase())return;
+      if(vistos.has(tok.toLowerCase()))return;
+      vistos.add(tok.toLowerCase());
+      items.push({username:tok,credits:0});
+    });
+  }
+  if(!items.length)return alert('No se detectaron nombres de usuario. Copia de nuevo las filas de la tabla Subresellers e inténtalo otra vez.');
   procesarSubresellers(items);
 }
 
