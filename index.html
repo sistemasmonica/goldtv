@@ -186,7 +186,7 @@ select option{background:#1a1735}
     <div class="sc" style="cursor:pointer" onclick="tab('vendedores',document.querySelectorAll('.nav>.nt')[2])"><div class="sc-lbl">Vendedores</div><div class="sc-val" style="color:#6ee7b7" id="d-vendedores">0</div><div class="sc-sub">revendedores activos</div></div>
     <div class="sc"><div class="sc-lbl">Vencen pronto</div><div class="sc-val" style="color:var(--orange)" id="d-pronto">0</div><div class="sc-sub">en los próximos 7 días</div></div>
     <div class="sc"><div class="sc-lbl">Vencidos</div><div class="sc-val" style="color:var(--red)" id="d-vencidos">0</div><div class="sc-sub">requieren renovación</div></div>
-    <div class="sc" style="cursor:pointer" onclick="tab('clientes',document.querySelectorAll('.nav>.nt')[1]);document.getElementById('cli-tipo-fil').value='';document.getElementById('cli-estado').value='';renderClientes()"><div class="sc-lbl">💸 Con deuda</div><div class="sc-val" style="color:#f97316" id="d-deudores">0</div><div class="sc-sub" id="d-deudores-total">pendiente: $0.00</div></div>
+    <div class="sc" style="cursor:pointer" onclick="irADeudores()"><div class="sc-lbl">💸 Con deuda</div><div class="sc-val" style="color:#f97316" id="d-deudores">0</div><div class="sc-sub" id="d-deudores-total">pendiente: $0.00</div></div>
   </div>
   <div class="card" style="margin-top:2px">
     <div class="card-inner" style="display:flex;justify-content:space-between;align-items:center">
@@ -1383,6 +1383,22 @@ function renderAll(){
   renderDash();renderClientes();renderVendedoresCli();renderVencimientos();llenarSelectClientes();
   const el=document.getElementById('pill-total');
   if(el)el.textContent=DB.clientes.length+' clientes';
+}
+
+function irADeudores(){
+  const deudoresClientes=DB.clientes.filter(c=>c.debe>0&&(c.tipo||'mensual')!=='vendedor');
+  const deudoresVendedores=DB.clientes.filter(c=>c.debe>0&&(c.tipo||'')==='vendedor');
+  if(!deudoresClientes.length&&!deudoresVendedores.length)return alert('No hay nadie con deuda pendiente.');
+  if(deudoresClientes.length){
+    tab('clientes',document.querySelectorAll('.nav>.nt')[1]);
+    document.getElementById('cli-tipo-fil').value='';
+    document.getElementById('cli-estado').value='';
+    renderClientes();
+    if(deudoresVendedores.length)alert(`También hay ${deudoresVendedores.length} vendedor(es)/socio(s) con deuda — revísalos en la pestaña 🏪 Vendedores.`);
+  }else{
+    tab('vendedores',document.querySelectorAll('.nav>.nt')[2]);
+    renderVendedoresCli();
+  }
 }
 
 function renderDash(){
