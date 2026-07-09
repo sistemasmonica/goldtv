@@ -270,10 +270,15 @@ select option{background:#1a1735}
   </div>
   <div class="filters">
     <input type="search" id="vend-q" placeholder="Buscar nombre..." oninput="renderVendedoresCli()" style="min-width:200px">
+    <select id="vend-cat-fil" onchange="renderVendedoresCli()">
+      <option value="">Vendedores y Socios</option>
+      <option value="vendedor">🏪 Solo Vendedores</option>
+      <option value="socio">🤝 Solo Socios</option>
+    </select>
   </div>
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Vendedor</th><th>Teléfono</th><th>Créditos</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Vendedor</th><th>Categoría</th><th>Teléfono</th><th>Créditos</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
       <tbody id="tb-vendedores-cli"></tbody>
     </table>
   </div>
@@ -326,7 +331,15 @@ select option{background:#1a1735}
       <div class="fg"><label>Fecha de inicio</label><input type="date" id="cli-inicio"></div>
       <div class="fg"><label>Fecha vencimiento (calculada)</label><input type="text" id="cli-vence-preview" readonly style="background:var(--surface2);color:var(--gold);font-weight:700"></div>
     </div>
-    <div class="fg" id="fg-creditos" style="display:none"><label>Créditos OTT actuales</label><input type="number" id="cli-creditos" min="0" placeholder="Ej: 50"></div>
+    <div class="f2" id="fg-creditos" style="display:none">
+      <div class="fg"><label>Créditos OTT actuales</label><input type="number" id="cli-creditos" min="0" placeholder="Ej: 50"></div>
+      <div class="fg"><label>Categoría</label>
+        <select id="cli-categoria">
+          <option value="vendedor">🏪 Vendedor</option>
+          <option value="socio">🤝 Socio</option>
+        </select>
+      </div>
+    </div>
     <div class="f2">
       <div class="fg"><label>Notas</label><input type="text" id="cli-notas" placeholder="Observaciones opcionales..."></div>
       <div class="fg"><label>💸 Cobro pendiente ($)</label><input type="number" id="cli-debe" step="0.01" min="0" placeholder="0.00 — si debe algo"></div>
@@ -984,18 +997,19 @@ function guardarCliente(){
   if(!user||!pass)return alert('Ingresa el usuario y contraseña del panel OTT');
   const tipo=document.getElementById('cli-tipo').value||'mensual';
   const creditos=tipo==='vendedor'?parseInt(document.getElementById('cli-creditos').value)||0:0;
+  const categoria=tipo==='vendedor'?(document.getElementById('cli-categoria')?.value||'vendedor'):'';
   const vencimiento=addMeses(inicio,plan);
   if(editId){
     const idx=DB.clientes.findIndex(c=>c.id===editId);
-    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas,debe};
+    if(idx!==-1)DB.clientes[idx]={...DB.clientes[idx],nombre,tel,user,pass,device,plan,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe};
     document.getElementById('cli-edit-id').value='';
     document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
     document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
   }else{
-    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,tipo,creditos,precio,inicio,vencimiento,notas,debe,activo:true});
+    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe,activo:true});
   }
   save();limpiarFormCliente();renderAll();
-  tab('clientes',document.querySelectorAll('.nav>.nt')[1]);
+  tab(tipo==='vendedor'?'vendedores':'clientes',document.querySelectorAll('.nav>.nt')[tipo==='vendedor'?2:1]);
   setTimeout(()=>alert('✅ Cliente guardado correctamente'),100);
 }
 
@@ -1023,6 +1037,7 @@ function editarCliente(id){
   document.getElementById('cli-plan').value=c.plan||'1';
   document.getElementById('cli-tipo').value=c.tipo||'mensual';
   document.getElementById('cli-creditos').value=c.creditos||'';
+  const catEl=document.getElementById('cli-categoria');if(catEl)catEl.value=c.categoria||'vendedor';
   toggleCreditosField();
   document.getElementById('cli-precio').value=c.precio||'';
   document.getElementById('cli-inicio').value=c.inicio||today();
@@ -1243,18 +1258,22 @@ function renderClientes(){
   }).join('');
 }
 
+const CATEGORIA_BADGE={'socio':'<span class="bdg" style="background:#5b21b6;color:#e9d5ff">🤝 Socio</span>','vendedor':'<span class="bdg" style="background:#065f46;color:#6ee7b7">🏪 Vendedor</span>'};
+
 function renderVendedoresCli(){
   const q=(document.getElementById('vend-q')?.value||'').toLowerCase();
-  let lista=DB.clientes.filter(c=>(c.tipo||'')==='vendedor'&&(!q||c.nombre?.toLowerCase().includes(q)))
+  const catFil=document.getElementById('vend-cat-fil')?.value||'';
+  let lista=DB.clientes.filter(c=>(c.tipo||'')==='vendedor'&&(!q||c.nombre?.toLowerCase().includes(q))&&(!catFil||(c.categoria||'vendedor')===catFil))
     .sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
   const tb=document.getElementById('tb-vendedores-cli');
-  if(!lista.length){tb.innerHTML='<tr><td colspan="7"><div class="empty">Sin vendedores registrados. Usa "📥 Importar Subresellers" para traerlos del OTT.</div></td></tr>';return;}
+  if(!lista.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Sin vendedores registrados. Usa "📥 Importar Subresellers" para traerlos del OTT.</div></td></tr>';return;}
   const BADGE={'activo':'<span class="bdg bdg-activo">Activo</span>','vence':'<span class="bdg bdg-vence">Vence pronto</span>','vencido':'<span class="bdg bdg-vencido">Vencido</span>'};
   tb.innerHTML=lista.map(c=>{
     const est=estadoCliente(c);
     const dias=diasHasta(c.vencimiento);
     return`<tr>
       <td><b>${escH(c.nombre)}</b>${c.debe&&c.debe>0?`<span style="background:#f97316;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:5px;font-weight:600">💸 $${parseFloat(c.debe).toFixed(2)}</span>`:''}${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
+      <td>${CATEGORIA_BADGE[c.categoria||'vendedor']}</td>
       <td style="font-family:monospace">${escH(c.tel||'—')}</td>
       <td>${c.creditos?`<span style="color:#6ee7b7">💎 ${c.creditos}</span>`:'—'}</td>
       <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
@@ -1544,7 +1563,7 @@ function procesarSubresellers(items){
     if(existentes.has(it.username.toLowerCase())){omitidos++;return;}
     DB.clientes.push({
       id:uid(),nombre:it.username,tel:'',user:'',pass:'',device:'android-tv',plan:'1',
-      tipo:'vendedor',creditos:it.credits||0,precio:0,inicio:today(),
+      tipo:'vendedor',creditos:it.credits||0,categoria:'vendedor',precio:0,inicio:today(),
       vencimiento:addMeses(today(),1),notas:'Importado de Subresellers OTT',debe:0,activo:true
     });
     existentes.add(it.username.toLowerCase());
