@@ -168,6 +168,7 @@ select option{background:#1a1735}
 <div class="nav">
   <button class="nt on" onclick="tab('dash',this)">📊 Inicio</button>
   <button class="nt" onclick="tab('clientes',this)">👥 Clientes</button>
+  <button class="nt" onclick="tab('vendedores',this)">🏪 Vendedores</button>
   <button class="nt" onclick="tab('nuevo',this)">➕ Nuevo cliente</button>
   <button class="nt" onclick="tab('vencimientos',this)">⏰ Vencimientos</button>
   <button class="nt" onclick="tab('guias',this)">📖 Guías instalación</button>
@@ -181,7 +182,7 @@ select option{background:#1a1735}
     <div class="sc"><div class="sc-lbl">Total clientes</div><div class="sc-val" style="color:var(--gold)" id="d-total">0</div><div class="sc-sub">registrados</div></div>
     <div class="sc"><div class="sc-lbl">Activos</div><div class="sc-val" style="color:var(--green)" id="d-activos">0</div><div class="sc-sub">en servicio</div></div>
     <div class="sc"><div class="sc-lbl">Trial / Prueba</div><div class="sc-val" style="color:#a78bfa" id="d-trials">0</div><div class="sc-sub">clientes de prueba</div></div>
-    <div class="sc"><div class="sc-lbl">Vendedores</div><div class="sc-val" style="color:#6ee7b7" id="d-vendedores">0</div><div class="sc-sub">revendedores activos</div></div>
+    <div class="sc" style="cursor:pointer" onclick="tab('vendedores',document.querySelectorAll('.nav>.nt')[2])"><div class="sc-lbl">Vendedores</div><div class="sc-val" style="color:#6ee7b7" id="d-vendedores">0</div><div class="sc-sub">revendedores activos</div></div>
     <div class="sc"><div class="sc-lbl">Vencen pronto</div><div class="sc-val" style="color:var(--orange)" id="d-pronto">0</div><div class="sc-sub">en los próximos 7 días</div></div>
     <div class="sc"><div class="sc-lbl">Vencidos</div><div class="sc-val" style="color:var(--red)" id="d-vencidos">0</div><div class="sc-sub">requieren renovación</div></div>
     <div class="sc" style="cursor:pointer" onclick="tab('clientes',document.querySelectorAll('.nav>.nt')[1]);document.getElementById('cli-tipo-fil').value='';document.getElementById('cli-estado').value='';renderClientes()"><div class="sc-lbl">💸 Con deuda</div><div class="sc-val" style="color:#f97316" id="d-deudores">0</div><div class="sc-sub" id="d-deudores-total">pendiente: $0.00</div></div>
@@ -221,8 +222,7 @@ select option{background:#1a1735}
   <div class="sh">
     <h2>Todos los clientes</h2>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn btn-gold btn-sm" onclick="tab('nuevo',document.querySelectorAll('.nav>.nt')[2])">➕ Nuevo cliente</button>
-      <button class="btn btn-sm" style="background:rgba(107,63,160,.2);border:1px solid rgba(107,63,160,.5);color:#a78bfa" onclick="abrirModal('modal-sync-vend')">🏪 Importar Subresellers</button>
+      <button class="btn btn-gold btn-sm" onclick="tab('nuevo',document.querySelectorAll('.nav>.nt')[3])">➕ Nuevo cliente</button>
       <button class="btn btn-s btn-sm" onclick="exportarCSV()">⬇️ Exportar</button>
     </div>
   </div>
@@ -249,13 +249,32 @@ select option{background:#1a1735}
       <option value="mensual">💳 Mensual</option>
       <option value="trial">🆓 Trial</option>
       <option value="anual">⭐ Anual</option>
-      <option value="vendedor">🏪 Vendedor</option>
     </select>
   </div>
   <div class="tbl-wrap">
     <table>
       <thead><tr><th>Cliente</th><th>Teléfono</th><th>Usuario</th><th>Dispositivo</th><th>Tipo</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
       <tbody id="tb-clientes"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== VENDEDORES (clientes tipo Vendedor) ===== -->
+<div id="pn-vendedores" class="pn">
+  <div class="sh">
+    <h2>🏪 Vendedores (Subresellers)</h2>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-sm" style="background:rgba(107,63,160,.2);border:1px solid rgba(107,63,160,.5);color:#a78bfa" onclick="abrirModal('modal-sync-vend')">📥 Importar Subresellers</button>
+      <button class="btn btn-s btn-sm" onclick="exportarCSV()">⬇️ Exportar</button>
+    </div>
+  </div>
+  <div class="filters">
+    <input type="search" id="vend-q" placeholder="Buscar nombre..." oninput="renderVendedoresCli()" style="min-width:200px">
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Vendedor</th><th>Teléfono</th><th>Créditos</th><th>Vence</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
+      <tbody id="tb-vendedores-cli"></tbody>
     </table>
   </div>
 </div>
@@ -863,6 +882,7 @@ function tab(id,el){
   el.classList.add('on');
   if(id==='dash')renderDash();
   if(id==='clientes')renderClientes();
+  if(id==='vendedores')renderVendedoresCli();
   if(id==='nuevo'){limpiarFormCliente();const fi=document.getElementById('cli-inicio');if(fi&&!fi.value)fi.value=today();calcVence();}
   if(id==='vencimientos')renderVencimientos();
   if(id==='guias')llenarSelectClientes();
@@ -1012,7 +1032,7 @@ function editarCliente(id){
   document.getElementById('form-titulo').textContent='Editar: '+c.nombre;
   document.getElementById('btn-guardar-cli').textContent='💾 Guardar cambios';
   calcVence();
-  tab('nuevo',document.querySelectorAll('.nav>.nt')[2]);
+  tab('nuevo',document.querySelectorAll('.nav>.nt')[3]);
 }
 
 function eliminarCliente(id){
@@ -1128,7 +1148,7 @@ function copiarMensaje(id){
 
 // ===== RENDERS =====
 function renderAll(){
-  renderDash();renderClientes();renderVencimientos();llenarSelectClientes();
+  renderDash();renderClientes();renderVendedoresCli();renderVencimientos();llenarSelectClientes();
   const el=document.getElementById('pill-total');
   if(el)el.textContent=DB.clientes.length+' clientes';
 }
@@ -1186,6 +1206,7 @@ function renderClientes(){
   const disp=document.getElementById('cli-disp')?.value||'';
   const tipoFil=document.getElementById('cli-tipo-fil')?.value||'';
   let lista=DB.clientes.filter(c=>{
+    if((c.tipo||'mensual')==='vendedor')return false; // los vendedores viven en su propia pestaña
     if(q&&!c.nombre?.toLowerCase().includes(q)&&!c.user?.toLowerCase().includes(q)&&!c.tel?.includes(q))return false;
     if(est&&estadoCliente(c)!==est)return false;
     if(disp&&c.device!==disp)return false;
@@ -1212,6 +1233,35 @@ function renderClientes(){
         <div style="display:flex;gap:3px;flex-wrap:wrap">
           <button class="btn btn-wa btn-sm" onclick="enviarWACredenciales('${c.id}')" title="Enviar credenciales por WhatsApp">🔑</button>
           <button class="btn btn-wa btn-sm" onclick="enviarWAInstalacion('${c.id}')" title="Enviar guía de instalación">📖</button>
+          <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')" title="Actualizar fecha">📅</button>
+          <button class="btn btn-s btn-sm" onclick="verHistorial('${c.id}')" title="Ver historial de renovaciones">📋</button>
+          <button class="btn btn-s btn-sm" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>
+          <button class="btn btn-d btn-sm" onclick="eliminarCliente('${c.id}')" title="Eliminar">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderVendedoresCli(){
+  const q=(document.getElementById('vend-q')?.value||'').toLowerCase();
+  let lista=DB.clientes.filter(c=>(c.tipo||'')==='vendedor'&&(!q||c.nombre?.toLowerCase().includes(q)))
+    .sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
+  const tb=document.getElementById('tb-vendedores-cli');
+  if(!lista.length){tb.innerHTML='<tr><td colspan="7"><div class="empty">Sin vendedores registrados. Usa "📥 Importar Subresellers" para traerlos del OTT.</div></td></tr>';return;}
+  const BADGE={'activo':'<span class="bdg bdg-activo">Activo</span>','vence':'<span class="bdg bdg-vence">Vence pronto</span>','vencido':'<span class="bdg bdg-vencido">Vencido</span>'};
+  tb.innerHTML=lista.map(c=>{
+    const est=estadoCliente(c);
+    const dias=diasHasta(c.vencimiento);
+    return`<tr>
+      <td><b>${escH(c.nombre)}</b>${c.debe&&c.debe>0?`<span style="background:#f97316;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:5px;font-weight:600">💸 $${parseFloat(c.debe).toFixed(2)}</span>`:''}${c.notas?`<div style="font-size:10px;color:var(--muted)">${escH(c.notas)}</div>`:''}</td>
+      <td style="font-family:monospace">${escH(c.tel||'—')}</td>
+      <td>${c.creditos?`<span style="color:#6ee7b7">💎 ${c.creditos}</span>`:'—'}</td>
+      <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
+      <td>${BADGE[est]||''}</td>
+      <td style="font-family:monospace">${fmt(c.precio)}</td>
+      <td>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">
           <button class="btn btn-g btn-sm" onclick="abrirRenovar('${c.id}')" title="Actualizar fecha">📅</button>
           <button class="btn btn-s btn-sm" onclick="verHistorial('${c.id}')" title="Ver historial de renovaciones">📋</button>
           <button class="btn btn-s btn-sm" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>
@@ -1502,6 +1552,7 @@ function procesarSubresellers(items){
   });
   save();updateCount();renderDash();
   if(document.getElementById('pn-clientes')?.classList.contains('on'))renderClientes();
+  if(document.getElementById('pn-vendedores')?.classList.contains('on'))renderVendedoresCli();
   cerrarModal('modal-sync-vend');
   document.getElementById('sv-cli-pegado').value='';
   alert(`✅ Importación completa:\n• ${creados} vendedores nuevos\n• ${omitidos} ya existían (omitidos)\n\nEdita cada uno (✏️) para poner precio y fecha de pago.`);
