@@ -1237,6 +1237,21 @@ function renderDash(){
 
 const TIPO_BADGE={'mensual':'<span class="bdg" style="background:#1565c0">💳 Mensual</span>','trimestral':'<span class="bdg" style="background:#0e7490">📆 Trimestral</span>','semestral':'<span class="bdg" style="background:#7c3aed">📆 Semestral</span>','trial':'<span class="bdg" style="background:#6b3fa0">🆓 Trial</span>','anual':'<span class="bdg" style="background:#b8860b">⭐ Anual</span>','vendedor':'<span class="bdg" style="background:#065f46">🏪 Vendedor</span>'};
 const PLAN_A_TIPO={'1':'mensual','3':'trimestral','6':'semestral','12':'anual'};
+const TIPO_A_PLAN={'mensual':'1','trimestral':'3','semestral':'6','anual':'12'};
+const TIPO_COLOR={'mensual':'#1565c0','trimestral':'#0e7490','semestral':'#7c3aed','anual':'#b8860b','trial':'#6b3fa0'};
+const TIPO_LABEL_SEL={'mensual':'💳 Mensual','trimestral':'📆 Trimestral','semestral':'📆 Semestral','anual':'⭐ Anual','trial':'🆓 Trial'};
+
+function cambiarTipoCliente(id,tipo){
+  const c=DB.clientes.find(x=>x.id===id);if(!c)return;
+  c.tipo=tipo;
+  const meses=TIPO_A_PLAN[tipo];
+  if(meses){
+    c.plan=meses;
+    const sugerido=PRECIOS_PLAN[c.ndisp||'1-2']?.[meses];
+    if(sugerido!=null)c.precio=sugerido;
+  }
+  save();renderClientes();updateCount();renderDash();
+}
 
 function toggleCreditosField(){
   const tipo=document.getElementById('cli-tipo').value;
@@ -1268,7 +1283,9 @@ function renderClientes(){
       <td style="font-family:monospace">${escH(c.tel||'—')}</td>
       <td style="font-family:monospace;font-size:11px">${escH(c.user)}</td>
       <td>${DISP_LABEL[c.device]||c.device}</td>
-      <td>${TIPO_BADGE[tipo]||tipo}${tipo==='vendedor'&&c.creditos?`<div style="font-size:11px;color:#6ee7b7;margin-top:2px">💎 ${c.creditos} créditos</div>`:''}</td>
+      <td><select onchange="cambiarTipoCliente('${c.id}',this.value)" style="background:${TIPO_COLOR[tipo]||'#1565c0'};color:#fff;border:none;border-radius:5px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">
+        ${Object.entries(TIPO_LABEL_SEL).map(([k,v])=>`<option value="${k}" ${tipo===k?'selected':''}>${v}</option>`).join('')}
+      </select></td>
       <td><span style="font-family:monospace">${c.vencimiento}</span><div style="font-size:10px;color:${dias<0?'var(--red)':dias<=7?'var(--orange)':'var(--muted)'}">${dias<0?Math.abs(dias)+' días vencido':dias+' días'}</div></td>
       <td>${BADGE[est]||''}</td>
       <td style="font-family:monospace">${fmt(c.precio)}</td>
