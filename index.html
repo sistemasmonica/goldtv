@@ -174,6 +174,7 @@ select option{background:#1a1735}
   <button class="nt" onclick="tab('guias',this)">📖 Guías instalación</button>
   <button class="nt" onclick="tab('renovaciones',this)">📋 Renovaciones</button>
   <button class="nt" onclick="tab('misistema',this)">⚙️ Mi Sistema</button>
+  <button class="nt" onclick="tab('ayuda',this)">❓ Ayuda</button>
 </div>
 
 <!-- ===== INICIO ===== -->
@@ -619,6 +620,60 @@ select option{background:#1a1735}
             <tr><td colspan="5" style="text-align:center;color:#475569;padding:20px">Cargando...</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AYUDA ===== -->
+<div id="pn-ayuda" class="pn">
+  <div class="card">
+    <div class="card-inner">
+      <div class="card-t">❓ Ayuda — Cómo manejar Vendedores y Socios</div>
+
+      <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="color:#c4b5fd;font-size:13px;font-weight:700;margin-bottom:8px">1️⃣ Traer tus Subresellers del Panel OTT</div>
+        <ol style="font-size:12px;color:#cbd5e1;line-height:2;padding-left:18px">
+          <li>Ve a la pestaña <b>🏪 Vendedores</b> → botón <b>"📥 Importar Subresellers"</b></li>
+          <li>En tu Panel OTT abre <b>Manage Sub-Reseller → My Sub-Reseller's</b></li>
+          <li>Selecciona con el mouse las filas de esa tabla (como si seleccionaras texto) y cópialas (Ctrl+C)</li>
+          <li>Pega en el cuadro y haz clic en <b>"Importar todos"</b> — se crean automáticamente</li>
+        </ol>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="color:#c4b5fd;font-size:13px;font-weight:700;margin-bottom:8px">2️⃣ Vendedor vs Socio</div>
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.8">En la pestaña <b>Vendedores</b>, cada fila tiene un desplegable en <b>"Categoría"</b> — elige <b>🏪 Vendedor</b> (el normal, con créditos OTT) o <b>🤝 Socio</b> (paga un plan mensual fijo). El cambio se guarda solo, sin necesidad de editar.</p>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="color:#c4b5fd;font-size:13px;font-weight:700;margin-bottom:8px">3️⃣ Plan mensual de un Socio</div>
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.8">Cuando la categoría es <b>Socio</b>, la columna "Plan / Precio" se vuelve un desplegable: <b>$70 / $150 / $250</b> o <b>"Otro monto"</b> (te pide el número). Arriba de la tabla aparece un resumen: cuántos socios tienes, cuánto esperas cobrar al mes en total, y cuántos están al día.</p>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="color:#c4b5fd;font-size:13px;font-weight:700;margin-bottom:8px">4️⃣ Registrar un pago (de un cliente, vendedor o socio)</div>
+        <ol style="font-size:12px;color:#cbd5e1;line-height:2;padding-left:18px">
+          <li>Haz clic en <b>📅</b> ("Actualizar fecha") junto al nombre</li>
+          <li>Elige los meses, el precio cobrado y el <b>Método de pago</b> (Transferencia/Efectivo/Depósito/Otro)</li>
+          <li>Si es transferencia, puedes poner el <b>N° de referencia</b> y/o <b>subir una foto o PDF del comprobante</b></li>
+          <li>Clic en <b>"✅ Confirmar renovación"</b> — la fecha de vencimiento avanza y queda guardado en el historial</li>
+        </ol>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="color:#c4b5fd;font-size:13px;font-weight:700;margin-bottom:8px">5️⃣ Ver historial y enviarlo por WhatsApp</div>
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.8">Clic en <b>📋</b> junto al nombre para ver todos sus pagos (fecha, monto, método, comprobante). Ahí mismo hay un botón verde <b>"📲 Enviar por WhatsApp"</b> que arma el mensaje con todo el historial y lo abre listo para mandárselo.</p>
+      </div>
+
+      <div style="background:#1a1a2e;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="color:#c4b5fd;font-size:13px;font-weight:700;margin-bottom:8px">6️⃣ Resumen general de cobros</div>
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.8">La pestaña <b>📋 Renovaciones</b> muestra TODOS los pagos registrados (clientes, vendedores y socios juntos), con filtro por mes y buscador por nombre — ahí ves el total cobrado del mes y el histórico completo.</p>
+      </div>
+
+      <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px">
+        <div style="color:#fca5a5;font-size:13px;font-weight:700;margin-bottom:6px">⚠️ Importante: esto NO es lo mismo que el Panel de Vendedores</div>
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.8">Esta pestaña "Vendedores" es <b>tuya</b>, para llevar control de TUS revendedores/socios. El <b>Panel de Vendedores</b> (el que compartes con cada persona vía link, en "⚙️ Mi Sistema") es un sistema aparte donde cada uno administra sus propios clientes IPTV — son cosas distintas, aunque los nombres se parezcan.</p>
       </div>
     </div>
   </div>
