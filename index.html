@@ -983,7 +983,7 @@ function setSyncStatus(s){
 async function saveToCloud(){
   try{
     setSyncStatus('sync');
-    await sb.from('goldtv_clientes').upsert({version:'v1',data:DB.clientes,updated_at:new Date().toISOString()});
+    await sb.rpc('admin_guardar_clientes',{p_password:getOwnerPass(),p_data:DB.clientes});
     setSyncStatus('ok');
   }catch(e){setSyncStatus('err');console.warn('Cloud error:',e);}
 }
@@ -991,8 +991,8 @@ async function saveToCloud(){
 async function syncFromCloud(){
   try{
     setSyncStatus('load');
-    const{data,error}=await sb.from('goldtv_clientes').select('data').eq('version','v1').maybeSingle();
-    if(!error&&data?.data?.length>0)DB.clientes=data.data;
+    const{data,error}=await sb.rpc('admin_obtener_clientes',{p_password:getOwnerPass()});
+    if(!error&&data?.length>0)DB.clientes=data;
     syncOk=true;
     setSyncStatus('ok');
   }catch(e){setSyncStatus('err');}
