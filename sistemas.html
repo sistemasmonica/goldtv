@@ -204,7 +204,14 @@ function addDias(fecha,dias){
   return d.toISOString().split('T')[0];
 }
 
+let ownerPass='';
+
 async function abrirVendedores(){
+  if(!ownerPass){
+    const intento=prompt('Ingresa la clave de propietaria para gestionar vendedores:');
+    if(!intento)return;
+    ownerPass=intento;
+  }
   document.getElementById('overlayV').classList.add('show');
   await cargarVendedores();
 }
@@ -213,9 +220,9 @@ async function cargarVendedores(){
   const lista=document.getElementById('lista-vendedores');
   lista.innerHTML='<div class="cargando">Cargando...</div>';
   try{
-    const{data,error}=await sb.from('gtv_licencias').select('*').order('vendor_name');
+    const{data,error}=await sb.rpc('admin_listar_vendedores',{p_password:ownerPass});
     if(error||!data){lista.innerHTML='<div class="cargando">Error al cargar. Verifica conexión.</div>';return;}
-    if(!data.length){lista.innerHTML='<div class="cargando">No hay vendedores aún.</div>';return;}
+    if(!data.length){lista.innerHTML='<div class="cargando">Clave incorrecta o no hay vendedores aún.</div>';ownerPass='';return;}
     lista.innerHTML=data.map(v=>{
       const link=`${PANEL_BASE}?v=${v.vendor_id}&k=${v.license_key}`;
       const wa=`https://wa.me/?text=${encodeURIComponent('Hola '+v.vendor_name+'! 👋\n\nTe comparto el acceso a tu *Guía de Administración de Clientes GOLDTV* personalizada:\n\n🔗 '+link+'\n\n✅ Guarda este link, funciona en cualquier celular o computadora.\n⚠️ No lo compartas, es solo tuyo.\n\nCualquier consulta escríbeme. 📲')}`;
@@ -244,7 +251,7 @@ async function cargarVendedores(){
 
 async function toggleVendedor(vendor_id, activo){
   if(!confirm(activo?'¿Desactivar acceso a este vendedor?':'¿Activar acceso a este vendedor?'))return;
-  await sb.from('gtv_licencias').update({active:!activo}).eq('vendor_id',vendor_id);
+  await sb.rpc('admin_actualizar_licencia',{p_password:ownerPass,p_vendor_id:vendor_id,p_active:!activo});
   await cargarVendedores();
   mostrarToast(activo?'Vendedor desactivado':'Vendedor activado');
 }
@@ -252,8 +259,8 @@ async function toggleVendedor(vendor_id, activo){
 async function activarCompletoV(vendor_id){
   if(!confirm('¿Activar acceso COMPLETO para este vendedor por 1 año? Ya no tendrá límite de 3 clientes.'))return;
   const vence=addDias(today(),365);
-  const{error}=await sb.from('gtv_licencias').update({demo:false,vence}).eq('vendor_id',vendor_id);
-  if(error){alert('Error: '+error.message);return;}
+  const{data:ok,error}=await sb.rpc('admin_actualizar_licencia',{p_password:ownerPass,p_vendor_id:vendor_id,p_demo:false,p_vence:vence});
+  if(error||!ok){alert('Error: '+(error?.message||'clave inválida'));return;}
   await cargarVendedores();
   mostrarToast('✓ Vendedor activado completo por 1 año');
 }
@@ -261,8 +268,8 @@ async function activarCompletoV(vendor_id){
 async function renovarVendedorV(vendor_id){
   if(!confirm('¿Renovar el acceso de este vendedor por 1 año más?'))return;
   const vence=addDias(today(),365);
-  const{error}=await sb.from('gtv_licencias').update({vence,active:true}).eq('vendor_id',vendor_id);
-  if(error){alert('Error: '+error.message);return;}
+  const{data:ok,error}=await sb.rpc('admin_actualizar_licencia',{p_password:ownerPass,p_vendor_id:vendor_id,p_active:true,p_vence:vence});
+  if(error||!ok){alert('Error: '+(error?.message||'clave inválida'));return;}
   await cargarVendedores();
   mostrarToast('✓ Renovado por 1 año más');
 }
@@ -300,8 +307,8 @@ async function guardarNuevoVendedor(){
   const key=document.getElementById('nv-key').value.trim().toUpperCase();
   if(!nombre||!vid||!key){alert('Completa todos los campos');return;}
   const vence=addDias(today(),365);
-  const{error}=await sb.from('gtv_licencias').insert({vendor_id:vid,license_key:key,vendor_name:nombre,active:true,demo:false,vence});
-  if(error){alert('Error: '+error.message);return;}
+  const{data:ok,error}=await sb.rpc('admin_crear_vendedor',{p_password:ownerPass,p_vendor_id:vid,p_license_key:key,p_vendor_name:nombre,p_active:true,p_demo:false,p_vence:vence,p_parent_vendor_id:null});
+  if(error||!ok){alert('Error: '+(error?.message||'clave inválida'));return;}
   const link=`${PANEL_BASE}?v=${vid}&k=${key}`;
   const res=document.getElementById('nv-resultado');
   res.style.display='block';

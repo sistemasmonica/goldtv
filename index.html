@@ -930,7 +930,6 @@ select option{background:#1a1735}
 // ===== SUPABASE =====
 // ===== CLAVE PROPIETARIA =====
 // Para cambiar la clave: reemplaza OWNER_HASH por el SHA-256 de tu nueva clave
-// Clave actual: GoldTV2026!
 const OWNER_HASH='2f665154a24f13c1b17e17a27d6240d9ae415bd13b7e038216c7f8202cb9bc2d';
 const SESSION_KEY='goldtv_owner_auth';
 
@@ -939,11 +938,14 @@ async function sha256(text){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
+function getOwnerPass(){return sessionStorage.getItem('goldtv_owner_pass')||'';}
+
 async function verificarClave(){
   const input=document.getElementById('owner-input').value;
   const hash=await sha256(input);
   if(hash===OWNER_HASH){
     sessionStorage.setItem(SESSION_KEY,'1');
+    sessionStorage.setItem('goldtv_owner_pass',input);
     document.getElementById('login-screen').style.display='none';
     iniciarApp();
   }else{
@@ -2308,12 +2310,9 @@ async function crearVendedor(){
   const btn=document.getElementById('btn-crear-v');
   btn.textContent='Creando...';btn.disabled=true;
   const vence=tipo==='demo'?addDias(today(),1):addDias(today(),365);
-  let{error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true,demo:tipo==='demo',vence});
-  if(error&&/column .*(demo|vence).* does not exist/i.test(error.message)){
-    ({error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true}));
-  }
+  const{data:ok,error}=await sb.rpc('admin_crear_vendedor',{p_password:getOwnerPass(),p_vendor_id:vendorId,p_license_key:licenseKey,p_vendor_name:nombre,p_active:true,p_demo:tipo==='demo',p_vence:vence,p_parent_vendor_id:null});
   btn.textContent='Crear →';btn.disabled=false;
-  if(error){alert('Error al crear: '+error.message);return;}
+  if(error||!ok){alert('Error al crear: '+(error?.message||'clave de propietaria inválida'));return;}
   const link=`https://sistemasmonica.github.io/goldtv-panel/?v=${vendorId}&k=${licenseKey}`;
   document.getElementById('nv-resultado').style.display='block';
   document.getElementById('nv-link').value=link;
@@ -2360,7 +2359,7 @@ function importarVendedoresArchivo(input){
 }
 
 async function procesarVendedoresMasivo(nombres){
-  const{data:existentes}=await sb.from('gtv_licencias').select('vendor_name');
+  const{data:existentes}=await sb.rpc('nombres_vendedores_existentes');
   const nombresExistentes=new Set((existentes||[]).map(v=>(v.vendor_name||'').toLowerCase()));
 
   const btn=document.getElementById('btn-crear-masivo');
@@ -2368,6 +2367,7 @@ async function procesarVendedoresMasivo(nombres){
 
   let creados=0,omitidos=0,errores=0;
   const links=[];
+  const ownerPass=getOwnerPass();
   for(const nombre of nombres){
     if(nombresExistentes.has(nombre.toLowerCase())){omitidos++;continue;}
     const base=nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,'').replace(/[^a-z0-9]/g,'');
@@ -2375,11 +2375,8 @@ async function procesarVendedoresMasivo(nombres){
     const sufijo=nombre.toUpperCase().replace(/\s+/g,'').substring(0,8);
     const licenseKey='GOLD-'+sufijo+'-2026';
     const vence=addDias(today(),365);
-    let{error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true,demo:false,vence});
-    if(error&&/column .*(demo|vence).* does not exist/i.test(error.message)){
-      ({error}=await sb.from('gtv_licencias').insert({vendor_id:vendorId,license_key:licenseKey,vendor_name:nombre,active:true}));
-    }
-    if(error){errores++;continue;}
+    const{data:ok,error}=await sb.rpc('admin_crear_vendedor',{p_password:ownerPass,p_vendor_id:vendorId,p_license_key:licenseKey,p_vendor_name:nombre,p_active:true,p_demo:false,p_vence:vence,p_parent_vendor_id:null});
+    if(error||!ok){errores++;continue;}
     creados++;
     links.push(nombre+': https://sistemasmonica.github.io/goldtv-panel/?v='+vendorId+'&k='+licenseKey);
   }
@@ -2402,7 +2399,7 @@ async function cargarVendedores(){
   const tbody=document.getElementById('tb-vendedores');
   if(!tbody)return;
   tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#475569;padding:16px">Cargando...</td></tr>';
-  const{data,error}=await sb.from('gtv_licencias').select('*').order('vendor_name');
+  const{data,error}=await sb.rpc('admin_listar_vendedores',{p_password:getOwnerPass()});
   if(error||!data){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:16px">Error al cargar vendedores</td></tr>';return;}
   if(!data.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#475569;padding:16px">Sin vendedores aún</td></tr>';return;}
   const hoy=today();
@@ -2435,8 +2432,8 @@ async function cargarVendedores(){
 async function activarCompleto(vendorId){
   if(!confirm('¿Activar acceso COMPLETO para este vendedor por 1 año? Ya no tendrá límite de clientes.'))return;
   const vence=addDias(today(),365);
-  const{error}=await sb.from('gtv_licencias').update({demo:false,vence}).eq('vendor_id',vendorId);
-  if(error){alert('Error: '+error.message);return;}
+  const{data:ok,error}=await sb.rpc('admin_actualizar_licencia',{p_password:getOwnerPass(),p_vendor_id:vendorId,p_demo:false,p_vence:vence});
+  if(error||!ok){alert('Error: '+(error?.message||'clave inválida'));return;}
   cargarVendedores();
   mostrarToastGV('✓ Vendedor activado completo por 1 año');
 }
@@ -2444,8 +2441,8 @@ async function activarCompleto(vendorId){
 async function renovarVendedor(vendorId){
   if(!confirm('¿Renovar el acceso de este vendedor por 1 año más?'))return;
   const vence=addDias(today(),365);
-  const{error}=await sb.from('gtv_licencias').update({vence,active:true}).eq('vendor_id',vendorId);
-  if(error){alert('Error: '+error.message);return;}
+  const{data:ok,error}=await sb.rpc('admin_actualizar_licencia',{p_password:getOwnerPass(),p_vendor_id:vendorId,p_active:true,p_vence:vence});
+  if(error||!ok){alert('Error: '+(error?.message||'clave inválida'));return;}
   cargarVendedores();
   mostrarToastGV('✓ Renovado por 1 año más');
 }
@@ -2453,8 +2450,8 @@ async function renovarVendedor(vendorId){
 async function toggleActivoV(vendorId,currentActive){
   const msg=currentActive?'¿Desactivar este vendedor? No podrá entrar al panel.':'¿Activar este vendedor nuevamente?';
   if(!confirm(msg))return;
-  const{error}=await sb.from('gtv_licencias').update({active:!currentActive}).eq('vendor_id',vendorId);
-  if(error){alert('Error: '+error.message);return;}
+  const{data:ok,error}=await sb.rpc('admin_actualizar_licencia',{p_password:getOwnerPass(),p_vendor_id:vendorId,p_active:!currentActive});
+  if(error||!ok){alert('Error: '+(error?.message||'clave inválida'));return;}
   cargarVendedores();
   mostrarToastGV(currentActive?'Vendedor desactivado':'✓ Vendedor activado');
 }
