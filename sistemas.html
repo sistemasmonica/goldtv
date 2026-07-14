@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Sistemas — Monica</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,sans-serif;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:30px;
+}
+.titulo{color:rgba(255,255,255,0.5);font-size:12px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;text-align:center}
+.nombre{color:#fff;font-size:26px;font-weight:700;text-align:center;margin-bottom:40px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:720px;width:100%}
+.card{
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:18px;
+  padding:32px 28px;
+  text-decoration:none;
+  color:#fff;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  cursor:pointer;
+  transition:all .2s;
+  text-align:center;
+}
+.card:hover{
+  background:rgba(255,255,255,0.14);
+  transform:translateY(-4px);
+  box-shadow:0 16px 40px rgba(0,0,0,0.4);
+}
+.icon{font-size:52px;line-height:1}
+.card-titulo{font-size:18px;font-weight:700;letter-spacing:.3px}
+.card-sub{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.5}
+.card-btn{
+  margin-top:8px;
+  padding:10px 22px;
+  border-radius:30px;
+  font-size:13px;font-weight:600;
+  border:none;cursor:pointer;
+  transition:all .15s;
+  font-family:inherit;
+  color:#fff;
+}
+.btn-verde{background:#1a6b3c}
+.btn-verde:hover{background:#134d2c}
+.btn-azul{background:#1565c0}
+.btn-azul:hover{background:#0d47a1}
+.pie{color:rgba(255,255,255,0.25);font-size:11px;margin-top:36px;text-align:center}
+.btn-gold{background:#b8860b}
+.btn-gold:hover{background:#8b6508}
+.btn-morado{background:#5b21b6}
+.btn-morado:hover{background:#4c1d95}
+/* Modal vendedores */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;align-items:center;justify-content:center;padding:20px}
+.overlay.show{display:flex}
+.modal{background:#1a1a2e;border:1px solid rgba(255,255,255,0.15);border-radius:18px;padding:28px;max-width:650px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.modal h2{color:#fff;font-size:18px;margin-bottom:6px}
+.modal .sub{color:rgba(255,255,255,0.45);font-size:12px;margin-bottom:20px}
+.cerrar{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;line-height:1}
+.cerrar:hover{color:#fff}
+.v-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+.v-row:last-child{border-bottom:none}
+.v-name{color:#fff;font-size:13px;font-weight:600;min-width:160px}
+.v-link{color:rgba(255,255,255,0.45);font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-btns{display:flex;gap:6px;flex-shrink:0}
+.v-btn{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;border:none;cursor:pointer;color:#fff}
+.v-btn.copiar{background:#1565c0}
+.v-btn.copiar:hover{background:#0d47a1}
+.v-btn.wa{background:#1a6b3c}
+.v-btn.wa:hover{background:#134d2c}
+.v-btn.apagar{background:#7f1d1d}
+.v-btn.apagar:hover{background:#6b1414}
+.cargando{color:rgba(255,255,255,0.4);text-align:center;padding:30px;font-size:13px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a6b3c;color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.nuevo-v{background:#5b21b6;color:#fff;border:none;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:20px;width:100%}
+.nuevo-v:hover{background:#4c1d95}
+@media(max-width:700px){
+  .grid{grid-template-columns:1fr}
+  .nombre{font-size:20px}
+  .v-row{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<div class="titulo">Acceso rápido</div>
+<div class="nombre">Mis Sistemas 📂</div>
+
+<div class="grid">
+
+  <!-- Sistema Textos -->
+  <div class="card" onclick="abrirTextos()">
+    <div class="icon">📚</div>
+    <div class="card-titulo">Textos Escolares</div>
+    <div class="card-sub">
+      Ventas · Inventario · Colegios<br>
+      Comisiones · Declaraciones SRI<br>
+      ⚠️ Solo funciona en la computadora
+    </div>
+    <button class="card-btn btn-verde">Abrir sistema</button>
+  </div>
+
+  <!-- Fast Line -->
+  <div class="card" onclick="abrirFastLine()">
+    <div class="icon">🚗</div>
+    <div class="card-titulo">Fast Line</div>
+    <div class="card-sub">
+      Control de vehículos<br>
+      Gestión y seguimiento<br>
+      &nbsp;
+    </div>
+    <button class="card-btn btn-azul">Abrir sistema</button>
+  </div>
+
+  <!-- GOLD TV -->
+  <div class="card" onclick="abrirGoldTV()">
+    <div class="icon">📺</div>
+    <div class="card-titulo">GOLD TV</div>
+    <div class="card-sub">
+      Clientes IPTV<br>
+      Vencimientos · WhatsApp<br>
+      &nbsp;
+    </div>
+    <button class="card-btn btn-gold">Abrir sistema</button>
+  </div>
+
+  <!-- Panel Vendedores -->
+  <div class="card" onclick="abrirVendedores()">
+    <div class="icon">🏪</div>
+    <div class="card-titulo">Guía Admin Clientes</div>
+    <div class="card-sub">
+      Gestión de revendedores<br>
+      Links · Activar · Desactivar<br>
+      &nbsp;
+    </div>
+    <button class="card-btn btn-morado">Gestionar</button>
+  </div>
+
+</div>
+
+<!-- Modal Vendedores -->
+<div class="overlay" id="overlayV" onclick="cerrarModal(event)">
+  <div class="modal">
+    <button class="cerrar" onclick="document.getElementById('overlayV').classList.remove('show')">✕</button>
+    <h2>📋 Guía de Administración de Clientes GOLDTV</h2>
+    <div class="sub">Gestiona los links y accesos de tus revendedores</div>
+    <button class="nuevo-v" onclick="mostrarFormNuevo()">+ Agregar nuevo vendedor</button>
+    <div id="lista-vendedores"><div class="cargando">Cargando vendedores...</div></div>
+  </div>
+</div>
+
+<!-- Form nuevo vendedor -->
+<div class="overlay" id="overlayNuevo" onclick="cerrarNuevo(event)">
+  <div class="modal" style="max-width:420px">
+    <button class="cerrar" onclick="document.getElementById('overlayNuevo').classList.remove('show')">✕</button>
+    <h2>+ Nuevo Vendedor</h2>
+    <div class="sub" style="margin-bottom:16px">Completa los datos del nuevo revendedor</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input id="nv-nombre" placeholder="Nombre / usuario OTT" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;font-size:14px">
+      <input id="nv-id" placeholder="ID único (sin espacios, ej: pedro2026)" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;font-size:14px">
+      <input id="nv-key" placeholder="Clave (ej: GOLD-PEDRO-2026)" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;font-size:14px">
+      <button onclick="guardarNuevoVendedor()" style="background:#5b21b6;color:#fff;border:none;padding:12px;border-radius:30px;font-size:14px;font-weight:600;cursor:pointer">Guardar y generar link</button>
+    </div>
+    <div id="nv-resultado" style="margin-top:16px;display:none"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="pie">
+  Monica © 2026<br><br>
+  <span onclick="window.open('guias/Guia-Panel-Vendedores.html','_blank')" style="cursor:pointer;color:rgba(139,92,246,0.7);font-size:12px;text-decoration:underline">📖 Ver guía: Panel de Vendedores GOLDTV</span><br><br>
+  <span onclick="window.open('guias/Guia-Renovar-VPS-Cada-Mes.html','_blank')" style="cursor:pointer;color:rgba(139,92,246,0.7);font-size:12px;text-decoration:underline">🖥️ Ver guía: Renovar el VPS cada mes</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPA_URL='https://pqluiqsvfeddmxpuxyhm.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxbHVpcXN2ZmVkZG14cHV4eWhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTI4MDYsImV4cCI6MjA5NjA4ODgwNn0.cdWKlECRLxms1y8a3sSHr1i5rsif9B94mDrvigHNm2A';
+const PANEL_BASE='https://sistemasmonica.github.io/goldtv-panel/';
+let sb;
+try{ sb=supabase.createClient(SUPA_URL,SUPA_KEY); }catch(e){}
+
+function abrirTextos(){
+  window.open('C:/claude/proyectos/sistema_textos/index.html','_blank');
+}
+function abrirFastLine(){
+  window.open('https://sistemasmonica.github.io/fastline/','_blank');
+}
+function abrirGoldTV(){
+  window.open('https://sistemasmonica.github.io/goldtv/','_blank');
+}
+
+function today(){return new Date().toISOString().split('T')[0]}
+function addDias(fecha,dias){
+  const d=new Date(fecha+'T12:00:00');
+  d.setDate(d.getDate()+parseInt(dias));
+  return d.toISOString().split('T')[0];
+}
+
+async function abrirVendedores(){
+  document.getElementById('overlayV').classList.add('show');
+  await cargarVendedores();
+}
+
+async function cargarVendedores(){
+  const lista=document.getElementById('lista-vendedores');
+  lista.innerHTML='<div class="cargando">Cargando...</div>';
+  try{
+    const{data,error}=await sb.from('gtv_licencias').select('*').order('vendor_name');
+    if(error||!data){lista.innerHTML='<div class="cargando">Error al cargar. Verifica conexión.</div>';return;}
+    if(!data.length){lista.innerHTML='<div class="cargando">No hay vendedores aún.</div>';return;}
+    lista.innerHTML=data.map(v=>{
+      const link=`${PANEL_BASE}?v=${v.vendor_id}&k=${v.license_key}`;
+      const wa=`https://wa.me/?text=${encodeURIComponent('Hola '+v.vendor_name+'! 👋\n\nTe comparto el acceso a tu *Guía de Administración de Clientes GOLDTV* personalizada:\n\n🔗 '+link+'\n\n✅ Guarda este link, funciona en cualquier celular o computadora.\n⚠️ No lo compartas, es solo tuyo.\n\nCualquier consulta escríbeme. 📲')}`;
+      const demoBadge=v.demo?' <span style="background:#6b3fa0;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700">🎁 DEMO</span>':'';
+      const btnCompleto=v.demo?`<button class="v-btn" style="background:#16a34a;color:#fff" onclick="activarCompletoV('${v.vendor_id}')">✅ Activar completo</button>`:'';
+      const btnRenovar=(!v.demo)?`<button class="v-btn" style="background:#2563eb;color:#fff" onclick="renovarVendedorV('${v.vendor_id}')">🔄 Renovar 1 año</button>`:'';
+      const vencido=v.vence&&v.vence<today();
+      const venceLinea=v.vence?`<div class="v-link" style="color:${vencido?'#ef4444':'inherit'};font-weight:${vencido?'700':'400'}">Vence: ${v.vence}${vencido?' (vencido)':''}</div>`:'';
+      return `<div class="v-row">
+        <div>
+          <div class="v-name">${v.active?'🟢':'🔴'} ${v.vendor_name}${demoBadge}</div>
+          <div class="v-link">${link}</div>
+          ${venceLinea}
+        </div>
+        <div class="v-btns">
+          <button class="v-btn copiar" onclick="copiar('${link}')">📋 Copiar</button>
+          <button class="v-btn wa" onclick="window.open('${wa}','_blank')">WhatsApp</button>
+          ${btnCompleto}
+          ${btnRenovar}
+          <button class="v-btn apagar" onclick="toggleVendedor('${v.vendor_id}',${v.active})">${v.active?'Apagar':'Activar'}</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){lista.innerHTML='<div class="cargando">Error: '+e.message+'</div>';}
+}
+
+async function toggleVendedor(vendor_id, activo){
+  if(!confirm(activo?'¿Desactivar acceso a este vendedor?':'¿Activar acceso a este vendedor?'))return;
+  await sb.from('gtv_licencias').update({active:!activo}).eq('vendor_id',vendor_id);
+  await cargarVendedores();
+  mostrarToast(activo?'Vendedor desactivado':'Vendedor activado');
+}
+
+async function activarCompletoV(vendor_id){
+  if(!confirm('¿Activar acceso COMPLETO para este vendedor por 1 año? Ya no tendrá límite de 3 clientes.'))return;
+  const vence=addDias(today(),365);
+  const{error}=await sb.from('gtv_licencias').update({demo:false,vence}).eq('vendor_id',vendor_id);
+  if(error){alert('Error: '+error.message);return;}
+  await cargarVendedores();
+  mostrarToast('✓ Vendedor activado completo por 1 año');
+}
+
+async function renovarVendedorV(vendor_id){
+  if(!confirm('¿Renovar el acceso de este vendedor por 1 año más?'))return;
+  const vence=addDias(today(),365);
+  const{error}=await sb.from('gtv_licencias').update({vence,active:true}).eq('vendor_id',vendor_id);
+  if(error){alert('Error: '+error.message);return;}
+  await cargarVendedores();
+  mostrarToast('✓ Renovado por 1 año más');
+}
+
+function copiar(texto){
+  navigator.clipboard.writeText(texto).then(()=>mostrarToast('Link copiado'));
+}
+
+function mostrarToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function cerrarModal(e){
+  if(e.target===document.getElementById('overlayV'))
+    document.getElementById('overlayV').classList.remove('show');
+}
+function cerrarNuevo(e){
+  if(e.target===document.getElementById('overlayNuevo'))
+    document.getElementById('overlayNuevo').classList.remove('show');
+}
+
+function mostrarFormNuevo(){
+  document.getElementById('overlayNuevo').classList.add('show');
+  document.getElementById('nv-resultado').style.display='none';
+  document.getElementById('nv-nombre').value='';
+  document.getElementById('nv-id').value='';
+  document.getElementById('nv-key').value='';
+}
+
+async function guardarNuevoVendedor(){
+  const nombre=document.getElementById('nv-nombre').value.trim();
+  const vid=document.getElementById('nv-id').value.trim().toLowerCase().replace(/\s+/g,'');
+  const key=document.getElementById('nv-key').value.trim().toUpperCase();
+  if(!nombre||!vid||!key){alert('Completa todos los campos');return;}
+  const vence=addDias(today(),365);
+  const{error}=await sb.from('gtv_licencias').insert({vendor_id:vid,license_key:key,vendor_name:nombre,active:true,demo:false,vence});
+  if(error){alert('Error: '+error.message);return;}
+  const link=`${PANEL_BASE}?v=${vid}&k=${key}`;
+  const res=document.getElementById('nv-resultado');
+  res.style.display='block';
+  res.innerHTML=`<div style="background:rgba(26,107,60,0.3);border:1px solid #1a6b3c;border-radius:10px;padding:14px;font-size:12px;color:#fff">
+    <b>✅ Vendedor agregado</b><br><br>
+    <b>Link de acceso:</b><br>
+    <span style="color:#86efac;word-break:break-all">${link}</span><br><br>
+    <button class="v-btn copiar" onclick="copiar('${link}')" style="font-size:12px;padding:6px 14px">📋 Copiar link</button>
+  </div>`;
+  await cargarVendedores();
+}
+</script>
+</body>
+</html>

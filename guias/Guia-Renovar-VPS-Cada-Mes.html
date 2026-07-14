@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía: Renovar el VPS cada mes — GOLD TV</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,sans-serif;
+  background:#0f0f1a;
+  color:#e2e8f0;
+  padding:30px 20px;
+  min-height:100vh;
+}
+.wrap{max-width:820px;margin:0 auto}
+.header{text-align:center;margin-bottom:40px;padding:30px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:18px;border:1px solid rgba(139,92,246,0.3)}
+.logo{font-size:48px;margin-bottom:10px}
+.header h1{font-size:24px;color:#fff;margin-bottom:6px}
+.header p{color:rgba(255,255,255,0.55);font-size:13px}
+.seccion{margin-bottom:32px}
+.seccion-titulo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:#a78bfa;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(139,92,246,0.2)}
+.num{background:#5b21b6;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.paso{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px}
+.paso-num{background:#5b21b6;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+.paso-txt{flex:1;font-size:14px;line-height:1.6;color:#cbd5e1}
+.paso-txt b{color:#fff}
+.tip{background:rgba(26,107,60,0.2);border:1px solid rgba(26,107,60,0.4);border-radius:10px;padding:12px 16px;font-size:13px;color:#86efac;margin:10px 0;line-height:1.6}
+.alerta{background:rgba(127,29,29,0.2);border:1px solid rgba(127,29,29,0.4);border-radius:10px;padding:12px 16px;font-size:13px;color:#fca5a5;margin:10px 0;line-height:1.6}
+.datos{background:rgba(21,101,192,0.12);border:1px solid rgba(21,101,192,0.4);border-radius:12px;padding:18px;margin:10px 0}
+.datos h3{color:#93c5fd;font-size:14px;margin-bottom:12px}
+.datos .fila{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px}
+.datos .fila:last-child{border-bottom:none}
+.datos .etq{color:rgba(255,255,255,0.55)}
+.datos .val{color:#fff;font-weight:600;text-align:right}
+.datos .llenar{color:#fbbf24;font-style:italic;font-weight:400}
+.codigo{background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px 16px;font-family:monospace;font-size:13px;color:#7dd3fc;margin:10px 0;line-height:1.8;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-verde{background:rgba(26,107,60,0.3);color:#86efac}
+.b-rojo{background:rgba(127,29,29,0.3);color:#fca5a5}
+.divider{height:1px;background:rgba(255,255,255,0.08);margin:30px 0}
+.pie{text-align:center;color:rgba(255,255,255,0.2);font-size:11px;margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06)}
+a{color:#93c5fd}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="logo">🖥️</div>
+  <h1>Guía: Renovar el VPS cada mes</h1>
+  <p>El servidor que hace funcionar el Player de GOLD TV · Monica © 2026</p>
+</div>
+
+<!-- SECCION 1: QUE ES -->
+<div class="seccion">
+  <div class="seccion-titulo">
+    <div class="num">1</div>
+    ¿Qué es el VPS y por qué hay que pagarlo cada mes?
+  </div>
+  <div class="paso">
+    <div class="paso-num">🖥️</div>
+    <div class="paso-txt">
+      El <b>VPS</b> es un pequeño servidor en internet que tienes rentado. Es el que hace que funcione el <b>Player de GOLD TV</b> (donde tus clientes ven la TV en el navegador, en <b>player.controltotal.lat</b>). El VPS recibe la señal del servidor IPTV y se la entrega limpia a cada cliente.
+    </div>
+  </div>
+  <div class="paso">
+    <div class="paso-num">💳</div>
+    <div class="paso-txt">
+      El VPS <b>se renta mes a mes</b>. Si no pagas la factura a tiempo, la empresa de hosting lo <b>suspende</b> y el Player deja de funcionar para TODOS tus clientes al mismo tiempo. Por eso hay que renovarlo puntual cada mes.
+    </div>
+  </div>
+  <div class="tip">
+    ✅ En resumen: <b>pagar el VPS = el Player sigue prendido.</b> Es como pagar la luz del negocio.
+  </div>
+</div>
+
+<!-- SECCION 2: TUS DATOS -->
+<div class="seccion">
+  <div class="seccion-titulo">
+    <div class="num">2</div>
+    Tus datos (llena los que faltan)
+  </div>
+  <p class="paso-txt" style="margin-bottom:12px">Guarda aquí tus datos para tenerlos siempre a mano. Los que dicen <span class="llenar">(llenar)</span> los completas tú una sola vez.</p>
+  <div class="datos">
+    <h3>🌐 Del Player y el dominio</h3>
+    <div class="fila"><span class="etq">Página del Player</span><span class="val">player.controltotal.lat</span></div>
+    <div class="fila"><span class="etq">Dominio (Namecheap)</span><span class="val">controltotal.lat</span></div>
+    <div class="fila"><span class="etq">Dirección del VPS (proxy)</span><span class="val">api.controltotal.lat</span></div>
+  </div>
+  <div class="datos">
+    <h3>💳 De tu cuenta de hosting</h3>
+    <div class="fila"><span class="etq">Empresa de hosting</span><span class="val">GTHost (gthost.com)</span></div>
+    <div class="fila"><span class="etq">Correo de acceso</span><span class="val llenar">(llenar)</span></div>
+    <div class="fila"><span class="etq">Plan / ubicación</span><span class="val llenar">(llenar — ej: Miami, 2GB RAM)</span></div>
+    <div class="fila"><span class="etq">Precio mensual</span><span class="val llenar">$___ /mes (llenar)</span></div>
+    <div class="fila"><span class="etq">Día de pago cada mes</span><span class="val llenar">día ___ (llenar)</span></div>
+    <div class="fila"><span class="etq">IP del VPS</span><span class="val llenar">(llenar cuando lo compres)</span></div>
+  </div>
+  <div class="alerta">
+    ⚠️ <b>Nunca compartas</b> el correo y la clave de tu hosting con nadie. Quien tenga eso puede apagar tu servidor.
+  </div>
+</div>
+
+<!-- SECCION 3: PASO A PASO RENOVAR -->
+<div class="seccion">
+  <div class="seccion-titulo">
+    <div class="num">3</div>
+    Paso a paso: pagar / renovar cada mes
+  </div>
+  <div class="paso">
+    <div class="paso-num">1</div>
+    <div class="paso-txt">
+      Entra a <b>gthost.com</b> y da clic en <b>"Iniciar sesión" / "Login"</b> (arriba a la derecha). Ingresa con tu <b>correo y clave</b> de GTHost.
+    </div>
+  </div>
+  <div class="paso">
+    <div class="paso-num">2</div>
+    <div class="paso-txt">
+      Una vez dentro, busca el menú <b>"Facturación"</b> o <b>"Billing"</b> (suele estar arriba o en tu foto/inicial). Ahí ves tus facturas y pagos.
+    </div>
+  </div>
+  <div class="paso">
+    <div class="paso-num">3</div>
+    <div class="paso-txt">
+      Busca la sección <b>"Pagos pendientes"</b> o <b>"Facturas por pagar" / "Invoices"</b>. Si tu VPS está por vencer, aparecerá una factura del <b>plan VPS</b>.
+    </div>
+  </div>
+  <div class="paso">
+    <div class="paso-num">4</div>
+    <div class="paso-txt">
+      Da clic en <b>"Pagar ahora"</b>, elige tu <b>tarjeta</b> (o el método que uses) y confirma el pago.
+    </div>
+  </div>
+  <div class="paso">
+    <div class="paso-num">5</div>
+    <div class="paso-txt">
+      Verifica que el estado del VPS quede como <span class="badge b-verde">Activo</span> y que la <b>próxima fecha de renovación</b> avanzó un mes. ¡Listo!
+    </div>
+  </div>
+  <div class="tip">
+    💡 Guarda el <b>correo de confirmación</b> del pago que te llega. Es tu comprobante.
+  </div>
+</div>
+
+<!-- SECCION 4: AUTOMATICO -->
+<div class="seccion">
+  <div class="seccion-titulo">
+    <div class="num">4</div>
+    Recomendado: activar renovación automática
+  </div>
+  <div class="paso">
+    <div class="paso-num">🔁</div>
+    <div class="paso-txt">
+      Para no olvidarte y que <b>nunca se apague el Player</b>, puedes dejar la <b>renovación automática activada</b>. En <b>Facturación → tu plan VPS</b>, busca la opción <b>"Renovación automática" / "Auto-renew"</b> y actívala. Así se cobra solito cada mes a tu tarjeta.
+    </div>
+  </div>
+  <div class="alerta">
+    ⚠️ Si activas el cobro automático, <b>ten siempre saldo en la tarjeta</b> el día del pago. Si el cobro falla, igual lo suspenden.
+  </div>
+</div>
+
+<!-- SECCION 5: VERIFICAR -->
+<div class="seccion">
+  <div class="seccion-titulo">
+    <div class="num">5</div>
+    Después de pagar: comprueba que todo funciona
+  </div>
+  <div class="paso">
+    <div class="paso-num">▶️</div>
+    <div class="paso-txt">
+      Abre <b>player.controltotal.lat</b> en tu celular o computadora y prueba <b>abrir un canal</b>. Si se ve la TV, todo está bien.
+    </div>
+  </div>
+  <div class="paso">
+    <div class="paso-num">📲</div>
+    <div class="paso-txt">
+      Si algún cliente avisa que no funciona justo después de un pago, primero revisa tú el Player. Si a ti tampoco te abre, el problema no es el pago sino algo del servidor.
+    </div>
+  </div>
+</div>
+
+<!-- SECCION 6: SI SE SUSPENDIO -->
+<div class="seccion">
+  <div class="seccion-titulo">
+    <div class="num">6</div>
+    Si el VPS ya se suspendió por no pagar
+  </div>
+  <div class="paso">
+    <div class="paso-num">🔴</div>
+    <div class="paso-txt">
+      Si se te pasó la fecha, el Player mostrará error y los clientes no verán TV. <b>No entres en pánico:</b> los datos NO se borran de inmediato.
+    </div>
+  </div>
+  <div class="paso">
+    <div class="paso-num">✅</div>
+    <div class="paso-txt">
+      Entra a <b>Facturación</b>, <b>paga la factura pendiente</b>, y en pocos minutos el hosting <b>reactiva</b> el VPS. El Player vuelve a funcionar solo, sin tener que reconfigurar nada.
+    </div>
+  </div>
+  <div class="alerta">
+    ⚠️ Si pasan <b>muchos días</b> suspendido, el hosting puede borrar el servidor. En ese caso habría que <b>volver a instalar</b> el proxy (necesitas ayuda técnica). Por eso: mejor pagar a tiempo.
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECCION 7: DATOS TECNICOS -->
+<div class="seccion">
+  <div class="seccion-titulo">
+    <div class="num">7</div>
+    Datos técnicos (solo si un técnico te ayuda)
+  </div>
+  <p class="paso-txt" style="margin-bottom:12px">Esta parte <b>no necesitas entenderla</b>. Es para mostrársela a quien te ayude con el servidor si algún día toca reinstalarlo o migrarlo.</p>
+  <div class="codigo">Programa: proxy en Node.js
+Archivo: /root/proxy.js
+Puerto: 3000
+Gestor: PM2, proceso "goldtv-proxy"
+SSL: Let's Encrypt (api.controltotal.lat)
+DNS: registro A de api.controltotal.lat apunta a la IP del VPS (se edita en Namecheap)
+Servidor IPTV origen: http://mundo2.pro:80</div>
+  <div class="alerta">
+    ⚠️ <b>Importante al cambiar de VPS:</b> cuando compres el VPS nuevo en GTHost, la <b>IP cambia</b>. Hay que entrar a <b>Namecheap</b> y actualizar el registro <b>A de api.controltotal.lat</b> con la nueva IP, o el Player no encontrará el servidor.
+  </div>
+  <div class="tip">
+    📝 Nota: el servidor anterior estaba en <b>DigitalOcean</b>. Cuando confirmes que el de GTHost ya funciona, <b>cancela el de DigitalOcean</b> para no pagar dos veces.
+  </div>
+</div>
+
+<div class="pie">
+  Guía creada para ayudarte a mantener el Player siempre prendido · Monica © 2026<br>
+  Consejo: ponte un recordatorio en el celular el día ___ de cada mes para pagar el VPS.
+</div>
+
+</div>
+</body>
+</html>
