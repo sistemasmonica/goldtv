@@ -952,8 +952,21 @@ async function syncFromCloud(){
     syncOk=true;
     setSyncStatus('ok');
   }catch(e){setSyncStatus('err');}
+  repararHistorialInicial();
   localStorage.setItem('goldtv',JSON.stringify(DB));
   renderAll();
+}
+
+function repararHistorialInicial(){
+  let cambios=0;
+  DB.clientes.forEach(c=>{
+    if((!c.historial||!c.historial.length)&&c.precio>0&&c.inicio){
+      c.historial=[{fecha:c.inicio,fecha_anterior:'',meses:parseInt(c.plan)||1,precio:c.precio,metodo:'',referencia:'Contratación inicial',nueva_fecha:c.vencimiento||''}];
+      cambios++;
+    }
+  });
+  if(cambios>0)save();
+  return cambios;
 }
 
 function save(){
@@ -1228,7 +1241,8 @@ function guardarCliente(){
     document.getElementById('form-titulo').textContent='Registrar nuevo cliente';
     document.getElementById('btn-guardar-cli').textContent='✅ Guardar cliente';
   }else{
-    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,ndisp,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe,activo:true});
+    const historial=precio>0?[{fecha:inicio,fecha_anterior:'',meses:parseInt(plan)||1,precio:precio,metodo:'',referencia:'Contratación inicial',nueva_fecha:vencimiento}]:[];
+    DB.clientes.push({id:uid(),nombre,tel,user,pass,device,plan,ndisp,tipo,creditos,categoria,precio,inicio,vencimiento,notas,debe,activo:true,historial});
   }
   save();limpiarFormCliente();renderAll();
   tab(tipo==='vendedor'?'vendedores':'clientes',document.querySelectorAll('.nav>.nt')[tipo==='vendedor'?2:1]);
