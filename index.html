@@ -599,9 +599,8 @@ select option{background:#1a1735}
   <div class="card" style="border:2px solid rgba(245,158,11,.4)">
     <div class="card-t" style="color:var(--gold)">🔐 Clave de propietaria (acceso al panel admin)</div>
     <div style="background:#1a1a2e;border-radius:10px;padding:16px;margin-bottom:12px">
-      <div style="color:#fde68a;font-size:13px;font-weight:700;margin-bottom:8px">Tu clave actual:</div>
-      <div style="font-family:monospace;font-size:20px;color:#fff;letter-spacing:3px;background:#0d0b1f;padding:10px 16px;border-radius:8px;display:inline-block">um#KKwJKzvnRx4B8s7SS</div>
-      <div style="font-size:11px;color:#64748b;margin-top:8px">Úsala cada vez que abras el panel de administración. La sesión dura hasta que cierres el navegador.</div>
+      <div style="color:#fde68a;font-size:13px;font-weight:700;margin-bottom:8px">Por seguridad, tu clave ya no se muestra aquí</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.7">La tienes guardada en el gestor de contraseñas de tu navegador (Google). Si la perdiste, pídeme que te genere una nueva.</div>
     </div>
     <div style="background:#1a1a2e;border-radius:10px;padding:14px">
       <div style="color:#fde68a;font-size:12px;font-weight:700;margin-bottom:8px">¿Cómo cambiar la clave?</div>
@@ -930,7 +929,7 @@ select option{background:#1a1735}
 // ===== SUPABASE =====
 // ===== CLAVE PROPIETARIA =====
 // Para cambiar la clave: reemplaza OWNER_HASH por el SHA-256 de tu nueva clave
-const OWNER_HASH='5088386c7fc3455c69770a24b861ab12b87c9b04fbc4a592bdfe4f15fe5fcbab';
+const OWNER_HASH='e3f53e51fb6021e5325a9d5c08dc0c0e5830bbb1c0de2f690c7cda3fd1a83624';
 const SESSION_KEY='goldtv_owner_auth';
 
 async function sha256(text){
