@@ -2356,7 +2356,7 @@ function importarVendedoresArchivo(input){
 }
 
 async function procesarVendedoresMasivo(nombres){
-  const{data:existentes}=await sb.rpc('nombres_vendedores_existentes');
+  const{data:existentes}=await sb.rpc('nombres_vendedores_existentes',{p_password:getOwnerPass()});
   const nombresExistentes=new Set((existentes||[]).map(v=>(v.vendor_name||'').toLowerCase()));
 
   const btn=document.getElementById('btn-crear-masivo');
