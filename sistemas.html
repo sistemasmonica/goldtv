@@ -101,7 +101,7 @@ body{
     <div class="card-sub">
       Ventas · Inventario · Colegios<br>
       Comisiones · Declaraciones SRI<br>
-      ⚠️ Solo funciona en la computadora
+      🔒 Pide su clave la primera vez
     </div>
     <button class="card-btn btn-verde">Abrir sistema</button>
   </div>
@@ -188,7 +188,7 @@ let sb;
 try{ sb=supabase.createClient(SUPA_URL,SUPA_KEY); }catch(e){}
 
 function abrirTextos(){
-  window.open('C:/claude/proyectos/sistema_textos/index.html','_blank');
+  window.open('https://sistemasmonica.github.io/sistema-textos/','_blank');
 }
 function abrirFastLine(){
   window.open('https://sistemasmonica.github.io/fastline/','_blank');
