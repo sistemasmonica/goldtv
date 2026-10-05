@@ -55,6 +55,9 @@ body{
 .btn-gold:hover{background:#8b6508}
 .btn-morado{background:#5b21b6}
 .btn-morado:hover{background:#4c1d95}
+.btn-teal{background:#0f766e}
+.btn-teal:hover{background:#115e59}
+.card-ancha{grid-column:1/-1}
 /* Modal vendedores */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;align-items:center;justify-content:center;padding:20px}
 .overlay.show{display:flex}
@@ -142,6 +145,18 @@ body{
     <button class="card-btn btn-morado">Gestionar</button>
   </div>
 
+  <!-- Intervención de Cuentas -->
+  <div class="card card-ancha" onclick="abrirIntervencion()">
+    <div class="icon">🧾</div>
+    <div class="card-titulo">Intervención de Cuentas</div>
+    <div class="card-sub">
+      Auditoría S-25b de la congregación<br>
+      Hoja de cuentas · Respaldos · Conciliación<br>
+      🔒 Se abre con su cuenta de claude.ai
+    </div>
+    <button class="card-btn btn-teal">Abrir sistema</button>
+  </div>
+
 </div>
 
 <!-- Modal Vendedores -->
@@ -195,6 +210,9 @@ function abrirFastLine(){
 }
 function abrirGoldTV(){
   window.open('https://sistemasmonica.github.io/goldtv/','_blank');
+}
+function abrirIntervencion(){
+  window.open('https://claude.ai/artifact/MdaMwRfrw5ymVLzrNmZ1hD','_blank');
 }
 
 function today(){return new Date().toISOString().split('T')[0]}
